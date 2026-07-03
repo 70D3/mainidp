@@ -1,0 +1,208 @@
+<?php
+
+namespace App\Http\Controllers\Auth;
+
+use App\Events\NewUserRegistered;
+use App\Http\Controllers\Controller;
+use App\Models\AppNotification;
+use App\Models\User;
+use Illuminate\Auth\Events\Registered;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\Rules;
+use Illuminate\View\View;
+
+class RegisteredUserController extends Controller
+{
+    private function buildRegistrationNotificationMeta(string $roleName): array
+    {
+        $normalizedRole = strtolower(trim($roleName));
+
+        $roleLabels = [
+            'talent' => 'Talent',
+            'mentor' => 'Mentor',
+            'atasan' => 'Atasan',
+            'finance' => 'Finance',
+            'panelis' => 'Panelis',
+        ];
+
+        $label = $roleLabels[$normalizedRole] ?? ucfirst($normalizedRole ?: 'User');
+
+        return [
+            'title' => $label . ' Baru Registrasi',
+            'role_label' => $label,
+            'type' => 'registration-' . $normalizedRole,
+        ];
+    }
+
+    /**
+     * Display the registration view.
+     */
+    public function create(): View
+    {
+        $mentors = User::whereHas('role', fn($q) => $q->where('role_name', 'mentor'))->get();
+        $atasans = User::whereHas('role', fn($q) => $q->where('role_name', 'atasan'))->get();
+        $companies = DB::table('company')->get();
+        // NOTE: departments are loaded dynamically via AJAX based on selected company
+        $departments = collect();
+        $roles = DB::table('role')->whereNotIn('role_name', ['admin'])->get();
+        $positions = DB::table('position')
+            ->whereNotIn('position_name', ['Super Admin'])
+            ->get();
+        $targetPositions = DB::table('position')
+            ->whereNotIn('position_name', ['Super Admin', 'panelis'])
+            ->get();
+
+        return view('auth.register', compact('mentors', 'atasans', 'companies', 'departments', 'roles', 'positions', 'targetPositions'));
+    }
+
+    /**
+     * Return departments filtered by company for AJAX request.
+     */
+    public function getDepartmentsByCompany(Request $request)
+    {
+        $companyId = $request->query('company_id');
+        if (!$companyId) {
+            return response()->json([]);
+        }
+        $departments = DB::table('department')
+            ->where('company_id', $companyId)
+            ->orderBy('nama_department')
+            ->get(['id', 'nama_department']);
+        return response()->json($departments);
+    }
+
+    /**
+     * Handle an incoming registration request.
+     *
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    public function store(Request $request): RedirectResponse
+    {
+        $request->validate([
+            'username' => ['required', 'string', 'max:255', 'unique:users'],
+            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:users'],
+            'password' => [
+                'required',
+                'confirmed',
+                'min:8',
+                'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/'
+            ],
+            'nama' => ['required', 'string', 'max:255'],
+            'company_id' => ['required', 'exists:company,id'],
+            'department_id' => ['nullable', 'exists:department,id'],
+            'position_id' => ['nullable', 'exists:position,id'],
+            'role_id' => ['required', 'exists:role,id'],
+            'jabatan_target' => ['nullable', 'exists:position,id'],
+            'mentor_id' => ['nullable', 'exists:users,id'],
+            'atasan_id' => ['nullable', 'exists:users,id'],
+        ], [
+            'username.required' => 'Username wajib diisi.',
+            'username.unique' => 'Username tersebut telah digunakan.',
+            'email.required' => 'Email wajib diisi.',
+            'email.email' => 'Format email tidak valid.',
+            'email.unique' => 'Email tersebut telah digunakan.',
+            'password.required' => 'Password wajib diisi.',
+            'password.min' => 'Password minimal harus 8 karakter.',
+            'password.regex' => 'Password harus mengandung minimal satu huruf kapital, huruf kecil, dan angka.',
+            'password.confirmed' => 'Konfirmasi password tidak cocok.',
+            'nama.required' => 'Nama lengkap wajib diisi.',
+            'company_id.required' => 'Perusahaan wajib dipilih.',
+            'role_id.required' => 'Role wajib dipilih.',
+        ]);
+
+        DB::beginTransaction();
+
+        try {
+            // 1. Buat User Baru
+            $user = User::create([
+                'nama' => $request->nama,
+                'username' => $request->username,
+                'email' => $request->email,
+                'password' => Hash::make($request->password),
+                'company_id' => $request->company_id,
+                'department_id' => $request->department_id,
+                'position_id' => $request->position_id,
+                'role_id' => $request->role_id,
+                'mentor_id' => $request->mentor_id,
+                'atasan_id' => $request->atasan_id,
+            ]);
+
+            // 2. Hubungkan User dengan tabel user_role
+            DB::table('user_role')->insert([
+                'id_user' => $user->id,
+                'id_role' => $request->role_id,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+
+            // Cek apakah rolenya adalah talent
+            $isTalent = DB::table('role')
+                ->where('id', $request->role_id)
+                ->whereIn('role_name', ['talent', 'Talent'])
+                ->exists();
+
+            // 3. Tambahkan ke promotion_plan (IDP) jika dia Talent & punya target jabatan
+            if ($isTalent && $request->jabatan_target) {
+                DB::table('promotion_plan')->insert([
+                    'user_id_talent' => $user->id,
+                    'target_position_id' => $request->jabatan_target,
+                    'status_promotion' => 'Draft',
+                    'start_date' => now(),
+                    'target_date' => now()->addYear(), // Target otomatis 1 tahun ke depan
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            }
+
+            DB::commit();
+
+            event(new Registered($user));
+
+            // ── Notify all PDC Admins about new registration ──────────────────
+            $roleName = DB::table('role')->where('id', $request->role_id)->value('role_name') ?? 'User';
+            $notificationMeta = $this->buildRegistrationNotificationMeta($roleName);
+            $pdcAdminIds = User::whereHas('roles', fn($q) => $q->where('role_name', 'admin'))->pluck('id');
+            foreach ($pdcAdminIds as $adminId) {
+                $notif = \App\Models\AppNotification::create([
+                    'user_id' => $adminId,
+                    'title' => $notificationMeta['title'],
+                    'desc' => '<span class="font-semibold">' . e($request->nama) . '</span> telah mendaftar sebagai <span class="font-semibold">' . e($notificationMeta['role_label']) . '</span>.',
+                    'type' => $notificationMeta['type'],
+                    'is_read' => false,
+                ]);
+
+                // 🔴 Broadcast real-time ke channel private PDC Admin ini
+                try {
+                    broadcast(new NewUserRegistered(
+                        $adminId,
+                        $notificationMeta['title'],
+                        e($request->nama) . ' telah mendaftar sebagai ' . $notificationMeta['role_label'] . '.',
+                        $notif->id
+                    ));
+                } catch (\Throwable $broadcastException) {
+                    Log::warning('Broadcast notifikasi registrasi gagal dikirim.', [
+                        'admin_id' => $adminId,
+                        'notification_id' => $notif->id,
+                        'error' => $broadcastException->getMessage(),
+                    ]);
+                }
+            }
+            // ─────────────────────────────────────────────────────────────────
+
+            // Redirect ke halaman login dengan pesan sukses
+            return redirect()->route('login')->with('status', 'Pendaftaran akun berhasil! Silakan masuk.');
+
+        }
+        catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Registration failed: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            return back()->withInput()->withErrors(['email' => 'Proses pendaftaran gagal: ' . $e->getMessage()]);
+        }
+    }
+}
+ 

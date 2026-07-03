@@ -1,0 +1,119 @@
+<?php
+
+namespace App\Http\Requests\Auth;
+
+use Illuminate\Auth\Events\Lockout;
+use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
+use App\Services\AuditLogger;
+use App\Services\SecurityAlerter;
+use App\Models\User;
+
+class LoginRequest extends FormRequest
+{
+    /**
+     * Determine if the user is authorized to make this request.
+     */
+    public function authorize(): bool
+    {
+        return true;
+    }
+
+    /**
+     * Get the validation rules that apply to the request.
+     *
+     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     */
+    public function rules(): array
+    {
+        return [
+            'username' => ['required', 'string'],
+            'password' => ['required', 'string'],
+        ];
+    }
+
+    /**
+     * Attempt to authenticate the request's credentials.
+     *
+     * @throws \Illuminate\Validation\ValidationException
+     */
+
+
+    public function authenticate(): void
+    {
+        $this->ensureIsNotRateLimited();
+
+        $login = $this->input('username');
+        $password = $this->input('password');
+
+        // Deteksi apakah input adalah email atau username
+        $field = filter_var($login, FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
+
+
+        if (!Auth::attempt([$field => $login, 'password' => $password], $this->boolean('remember'))) {
+            RateLimiter::hit($this->throttleKey());
+
+            // Ambil jumlah attempts saat ini
+            $attempts = RateLimiter::attempts($this->throttleKey());
+            $ip = $this->ip();
+
+            // ✅ LOG: Login gagal ke audit log
+            AuditLogger::log(
+                event: 'login_failed',
+                description: "Login gagal untuk login [{$login}] (attempt ke-{$attempts}).",
+                properties: [
+                    'login_input' => $login,
+                    'attempts' => $attempts,
+                ],
+                userId: null // belum diketahui siapa usernya
+            );
+
+            // ✅ ALERT: Jika sudah >= 5 kali gagal, kirim alert brute force
+            if ($attempts >= 5) {
+                SecurityAlerter::loginBruteForce($login, $ip, $attempts);
+            }
+
+            throw ValidationException::withMessages([
+                'username' => trans('auth.failed'),
+            ]);
+        }
+
+        RateLimiter::clear($this->throttleKey());
+    }
+
+
+
+    /**
+     * Ensure the login request is not rate limited.
+     *
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    public function ensureIsNotRateLimited(): void
+    {
+        if (!RateLimiter::tooManyAttempts($this->throttleKey(), 5)) {
+            return;
+        }
+
+        event(new Lockout($this));
+
+        $seconds = RateLimiter::availableIn($this->throttleKey());
+
+        throw ValidationException::withMessages([
+            'username' => trans('auth.throttle', [
+                'seconds' => $seconds,
+                'minutes' => ceil($seconds / 60),
+            ]),
+        ]);
+    }
+
+    /**
+     * Get the rate limiting throttle key for the request.
+     */
+    public function throttleKey(): string
+    {
+        return Str::transliterate(Str::lower($this->string('username')) . '|' . $this->ip());
+    }
+}

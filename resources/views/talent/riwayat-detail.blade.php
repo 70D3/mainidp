@@ -1,0 +1,685 @@
+<x-talent.layout title="Detail Riwayat Program – Individual Development Plan" :user="$user" :notifications="$notifications"
+    :mobileCollapsible="true" :showProfileCard="true">
+    <x-slot name="styles">
+        <style>
+            /* ── Donut Chart ── */
+            .donut-ring {
+                transform: rotate(-90deg);
+                transform-origin: 50% 50%;
+            }
+
+            /* ── Competency bar ── */
+            @keyframes barReveal {
+                from {
+                    clip-path: inset(0 100% 0 0);
+                }
+
+                to {
+                    clip-path: inset(0 0% 0 0);
+                }
+            }
+
+            .bar-fill {
+                animation: barReveal 0.9s cubic-bezier(0.4, 0, 0.2, 1) both;
+                animation-delay: 0.35s;
+            }
+
+            /* ── Common Premium Styles ── */
+            .btn-back-prem {
+                background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+                border: 1px solid #e2e8f0;
+                color: #475569;
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+
+            .btn-back-prem:active {
+                transform: scale(0.98);
+            }
+
+            /* ── Disable card and table row hover animations ── */
+            .prem-card:hover {
+                transform: none !important;
+            }
+
+            table tbody tr,
+            table tbody tr td {
+                transition: none !important;
+            }
+
+            table tbody tr:hover,
+            table tbody tr:hover td {
+                background: inherit !important;
+                box-shadow: none !important;
+                transform: none !important;
+            }
+
+            /* ── Hasil Penilaian Panelis Styles ── */
+
+            /* Aspek table — identik dengan penilaian panelis */
+            .aspek-table-riwayat {
+                width: 100%;
+                border-collapse: collapse;
+                border: none;
+                border-radius: 0;
+            }
+
+            .aspek-table-riwayat th {
+                background: #f8fafc;
+                font-size: 0.85rem;
+                font-weight: 700;
+                color: #1e293b;
+                padding: 14px 18px;
+                text-align: center;
+                border-bottom: 1px solid #e2e8f0;
+                border-right: 1px solid #e2e8f0;
+            }
+
+            .aspek-table-riwayat th:first-child {
+                text-align: left;
+            }
+
+            .aspek-table-riwayat th:last-child {
+                border-right: none;
+            }
+
+            .aspek-table-riwayat td {
+                padding: 14px 18px;
+                font-size: 0.85rem;
+                color: #334155;
+                border-bottom: 1px solid #f1f5f9;
+                border-right: 1px solid #f1f5f9;
+                vertical-align: middle;
+            }
+
+            .aspek-table-riwayat td:last-child {
+                border-right: none;
+            }
+
+            .aspek-table-riwayat tbody tr:last-child td {
+                border-bottom: none;
+            }
+
+            .aspek-table-riwayat .col-aspek {
+                text-align: left;
+                width: 30%;
+                font-weight: 600;
+            }
+
+            .aspek-table-riwayat .col-indikator {
+                width: 50%;
+            }
+
+            .aspek-table-riwayat .col-skor {
+                width: 20%;
+                text-align: center;
+            }
+
+            .skor-badge {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                width: 32px;
+                height: 32px;
+                border-radius: 6px;
+                border: 1.5px solid #14b8a6;
+                background: #14b8a6;
+                color: white;
+                font-size: 0.82rem;
+                font-weight: 700;
+                box-shadow: 0 2px 8px rgba(20, 184, 166, 0.28);
+            }
+
+            .komentar-bullet {
+                display: flex;
+                align-items: flex-start;
+                gap: 10px;
+                padding: 10px 0;
+                border-bottom: 1px solid #f1f5f9;
+            }
+
+            .komentar-bullet:last-child {
+                border-bottom: none;
+                padding-bottom: 0;
+            }
+
+            .komentar-dot {
+                width: 8px;
+                height: 8px;
+                border-radius: 50%;
+                background: #0d9488;
+                flex-shrink: 0;
+                margin-top: 5px;
+            }
+
+            .panelis-total-card {
+                width: 100%;
+                min-height: 120px;
+                border: 1px solid #cbd5e1;
+                border-radius: 10px;
+                padding: 16px 18px 26px;
+                background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+                display: flex;
+                flex-direction: column;
+                box-sizing: border-box;
+            }
+
+            .panelis-total-score {
+                font-size: 2rem;
+                font-weight: 800;
+                color: #0f766e;
+                line-height: 1;
+                text-align: center;
+                margin: auto 0;
+            }
+
+            .panelis-bottom-layout {
+                display: grid;
+                grid-template-columns: minmax(0, 1.22fr) minmax(210px, 0.40fr);
+                gap: 16px;
+                align-items: start;
+                padding: 20px 16px 28px;
+                width: 100%;
+                box-sizing: border-box;
+            }
+
+            .panelis-comment-card {
+                min-width: 0;
+                display: flex;
+                flex-direction: column;
+            }
+
+            .panelis-score-side {
+                min-width: 0;
+                display: flex;
+                flex-direction: column;
+                box-sizing: border-box;
+                position: sticky;
+                top: 16px;
+            }
+
+            .panelis-section-label {
+                min-height: 30px;
+                display: flex;
+                align-items: center;
+                font-size: 0.85rem;
+                font-weight: 700;
+                color: #1e293b;
+                margin-bottom: 10px;
+            }
+
+            .panelis-score-spacer {
+                min-height: 30px;
+                margin-bottom: 10px;
+                visibility: hidden;
+            }
+
+            .panelis-comment-box {
+                width: 100%;
+                border: 1px solid #e2e8f0;
+                border-radius: 10px;
+                padding: 16px 18px 20px;
+                font-size: 0.82rem;
+                color: #334155;
+                background: white;
+                font-family: 'Poppins', sans-serif;
+                box-sizing: border-box;
+            }
+
+            /* Komentar per item */
+            .komentar-text {
+                line-height: 1.6;
+                margin: 0;
+                word-break: break-word;
+                overflow-wrap: break-word;
+                color: #334155;
+                font-size: 0.82rem;
+            }
+
+            .komentar-text.line-clamp-3 {
+                display: -webkit-box;
+                -webkit-line-clamp: 3;
+                -webkit-box-orient: vertical;
+                overflow: hidden;
+            }
+
+            .btn-expand-komentar {
+                display: inline-block;
+                color: #14b8a6;
+                font-size: 0.78rem;
+                font-weight: 700;
+                cursor: pointer;
+                border: none;
+                background: none;
+                padding: 4px 0 0;
+                margin: 0;
+                transition: color 0.2s;
+                text-align: left;
+                line-height: 1.4;
+            }
+
+            .btn-expand-komentar:hover {
+                color: #0d9488;
+                text-decoration: underline;
+            }
+
+            .btn-expand-komentar.hidden {
+                display: none;
+            }
+
+            @media (max-width: 1024px) {
+                .panelis-bottom-layout {
+                    grid-template-columns: 1fr;
+                }
+
+                .panelis-comment-card,
+                .panelis-score-side {
+                    width: 100%;
+                }
+
+                .panelis-score-side {
+                    margin-top: 0;
+                }
+            }
+        </style>
+    </x-slot>
+
+    <div class="w-full px-4 lg:px-6 pt-5 pb-6 space-y-8 flex-grow">
+
+        {{-- ══════════════════════════════ KOMPETENSI ══════════════════════════════ --}}
+        <div class="space-y-4" id="Kompetensi">
+            <div class="page-header animate-title mb-2 mt-2">
+                <div class="page-header-icon" style="background: linear-gradient(135deg, #0f172a 0%, #38475a 100%);">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6">
+                        <path fill-rule="evenodd"
+                            d="M8.603 3.799A4.49 4.49 0 0112 2.25c1.357 0 2.573.6 3.397 1.549a4.49 4.49 0 013.498 1.307 4.491 4.491 0 011.307 3.497A4.49 4.49 0 0121.75 12a4.49 4.49 0 01-1.549 3.397 4.491 4.491 0 01-1.307 3.497 4.491 4.491 0 01-3.497 1.307A4.49 4.49 0 0112 21.75a4.49 4.49 0 01-3.397-1.549 4.49 4.49 0 01-3.498-1.306 4.491 4.491 0 01-1.307-3.498A4.49 4.49 0 012.25 12c0-1.357.6-2.573 1.549-3.397a4.49 4.49 0 011.307-3.497 4.49 4.49 0 013.497-1.307zm7.007 6.387a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z"
+                            clip-rule="evenodd" />
+                    </svg>
+                </div>
+                <div>
+                    <div class="page-header-title">Kompetensi</div>
+                    <div class="page-header-sub">Hasil penilaian kompetensi pada sesi ini (GAP Score)</div>
+                </div>
+            </div>
+
+            <div class="prem-card p-6 md:p-8 fade-up fade-up-2">
+                @php $maxScore = 5; @endphp
+                <div class="space-y-5">
+                    <div class="flex justify-end hidden md:flex" style="margin-bottom: -15px;">
+                        <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mr-[8px]">GAP</span>
+                    </div>
+                    @foreach ($kompetensiData as $label => $data)
+                        @php
+                            $scoreVal = is_array($data) ? $data['score'] : $data;
+                            $gapVal = is_array($data) ? $data['gap'] : 0;
+                            $targetScore = $scoreVal - $gapVal;
+                            $pct = ($scoreVal / $maxScore) * 100;
+                            $targetPct = ($targetScore / $maxScore) * 100;
+
+                            $textColor = '#64748b';
+                            if ($gapVal < -1.5) {
+                                $textColor = '#ef4444';
+                            } elseif ($gapVal < 0) {
+                                $textColor = '#f97316';
+                            }
+                        @endphp
+                        <div class="flex flex-col md:flex-row md:items-center gap-1 md:gap-3 mb-2 md:mb-0">
+                            <span
+                                class="text-sm text-gray-700 md:w-56 flex-shrink-0 whitespace-nowrap overflow-hidden truncate"
+                                title="{{ $label }}">{{ $label }}</span>
+                            <div class="flex items-center gap-3 flex-1 w-full">
+                                <div class="flex-1 bg-gray-100 rounded-full h-5 relative overflow-hidden">
+                                    <div class="absolute top-0 left-0 h-full rounded-full bg-gray-300"
+                                        style="width:{{ $targetPct }}%; z-index: 0;"></div>
+                                    <div class="absolute top-0 left-0 bar-fill h-full rounded-full"
+                                        style="width:{{ $pct }}%; background:#0d9488; z-index: 10;"></div>
+                                </div>
+                                <span class="text-sm font-black w-10 text-right flex-shrink-0"
+                                    style="color:{{ $textColor }};">
+                                    {{ number_format($gapVal, 1) }}
+                                </span>
+                            </div>
+                        </div>
+                    @endforeach
+                    <div class="items-center gap-3 pt-1 hidden md:flex">
+                        <span class="w-56 flex-shrink-0"></span>
+                        <div class="flex-1 flex justify-between text-xs text-gray-400">
+                            <span>0</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span>
+                        </div>
+                        <span class="w-10 flex-shrink-0"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {{-- ══════════════════════════════ IDP MONITORING ══════════════════════════════ --}}
+        <div class="space-y-4" id="IDP Monitoring">
+            <div class="page-header animate-title mb-2 mt-6">
+                <div class="page-header-icon" style="background: linear-gradient(135deg, #0f172a 0%, #38475a 100%);">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                        <path fill-rule="evenodd"
+                            d="M9 1.5H5.625c-1.036 0-1.875.84-1.875 1.875v17.25c0 1.035.84 1.875 1.875 1.875h12.75c1.035 0 1.875-.84 1.875-1.875V12.75A3.75 3.75 0 0 0 16.5 9h-1.875a1.875 1.875 0 0 1-1.875-1.875V5.25A3.75 3.75 0 0 0 9 1.5Zm6.61 10.936a.75.75 0 1 0-1.22-.872l-3.236 4.53L9.53 14.47a.75.75 0 0 0-1.06 1.06l2.25 2.25a.75.75 0 0 0 1.14-.094l3.75-5.25Z"
+                            clip-rule="evenodd" />
+                        <path
+                            d="M12.971 1.816A5.23 5.23 0 0 1 14.25 5.25v1.875c0 .207.168.375.375.375H16.5a5.23 5.23 0 0 1 3.434 1.279 9.768 9.768 0 0 0-6.963-6.963Z" />
+                    </svg>
+                </div>
+                <div>
+                    <div class="page-header-title">IDP Monitoring</div>
+                    <div class="page-header-sub">Ringkasan perkembangan program IDP pada sesi ini</div>
+                </div>
+            </div>
+
+            <div class="prem-card p-6 md:p-8 fade-up fade-up-4">
+                @php
+                    $idpChartData = [
+                        'Exposure' => [
+                            'done' => min($exposureCount ?? 0, 6),
+                            'total' => 6,
+                            'from' => '#334155',
+                            'to' => '#334155',
+                            'id' => 'grad-exposure',
+                            'btn_color' => 'bg-slate-700 shadow-[0_4px_12px_-2px_rgba(51,65,85,0.4)] hover:shadow-lg',
+                        ],
+                        'Mentoring' => [
+                            'done' => min($mentoringCount ?? 0, 6),
+                            'total' => 6,
+                            'from' => '#f59e0b',
+                            'to' => '#f59e0b',
+                            'id' => 'grad-mentoring',
+                            'btn_color' => 'bg-amber-500 shadow-[0_4px_12px_-2px_rgba(245,158,11,0.4)] hover:shadow-lg',
+                        ],
+                        'Learning' => [
+                            'done' => min($learningCount ?? 0, 6),
+                            'total' => 6,
+                            'from' => '#0d9488',
+                            'to' => '#0d9488',
+                            'id' => 'grad-learning',
+                            'btn_color' => 'bg-teal-600 shadow-[0_4px_12px_-2px_rgba(13,148,136,0.4)] hover:shadow-lg',
+                        ],
+                    ];
+                    $r = 38;
+                    $circ = 2 * M_PI * $r;
+                @endphp
+                <div class="flex justify-evenly gap-6 flex-wrap">
+                    @foreach ($idpChartData as $label => $d)
+                        @php
+                            $pct = $d['done'] / $d['total'];
+                            $filled = $pct * $circ;
+                            $empty = $circ - $filled;
+                        @endphp
+                        <div class="flex flex-col items-center gap-3">
+                            <div class="relative w-48 h-48 drop-shadow-sm">
+                                <svg viewBox="0 0 100 100" class="w-full h-full -rotate-90">
+                                    <defs>
+                                        <linearGradient id="{{ $d['id'] }}" x1="0%" y1="0%"
+                                            x2="100%" y2="100%">
+                                            <stop offset="0%" stop-color="{{ $d['from'] }}" />
+                                            <stop offset="100%" stop-color="{{ $d['to'] }}" />
+                                        </linearGradient>
+                                    </defs>
+                                    <circle cx="50" cy="50" r="{{ $r }}" fill="none"
+                                        stroke="#f1f5f9" stroke-width="10" />
+                                    <circle cx="50" cy="50" r="{{ $r }}" fill="none"
+                                        stroke="url(#{{ $d['id'] }})" stroke-width="10" stroke-linecap="round"
+                                        stroke-dasharray="{{ number_format($filled, 2) }} {{ number_format($empty, 2) }}"
+                                        style="transition: stroke-dasharray 0.8s ease;" />
+                                </svg>
+                                <div class="absolute inset-0 flex items-center justify-center">
+                                    <span class="text-4xl font-bold"
+                                        style="color:{{ $d['from'] }};">{{ round($pct * 100) }}%</span>
+                                </div>
+                            </div>
+                            <a href="{{ route('talent.logbook', ['session_id' => request()->route('id'), 'tab' => strtolower($label)]) }}#{{ strtolower($label) }}"
+                                class="{{ $d['btn_color'] }} text-white px-8 py-2 rounded-[10px] transition-all flex items-center justify-center gap-2 group active:scale-95 hover:-translate-y-0.5 cursor-pointer">
+                                <span class="text-sm font-bold tracking-wide">{{ $label }}</span>
+                                <svg xmlns="http://www.w3.org/2000/svg"
+                                    class="h-4 w-4 relative transition-transform group-hover:translate-x-1"
+                                    fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                                        d="M9 5l7 7-7 7" />
+                                </svg>
+                            </a>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+        </div>
+
+        {{-- ══════════════════════════════ PROJECT IMPROVEMENT ══════════════════════════════ --}}
+        <div class="space-y-4" id="Project Improvement">
+            <div class="page-header animate-title mb-2 mt-6">
+                <div class="page-header-icon" style="background: linear-gradient(135deg, #0f172a 0%, #38475a 100%);">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M2 6a2 2 0 012-2h5l2 2h5a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" />
+                    </svg>
+                </div>
+                <div>
+                    <div class="page-header-title">Project Improvement</div>
+                    <div class="page-header-sub">Daftar project improvement pada sesi ini</div>
+                </div>
+            </div>
+
+            <div class="prem-card p-6 md:p-8 fade-up fade-up-4">
+                <div class="rounded-xl overflow-hidden border border-gray-200">
+                    <table class="w-full text-left bg-white">
+                        <thead class="bg-slate-50 border-b border-gray-200">
+                            <tr>
+                                <th class="py-4 px-6 text-sm font-bold text-slate-700 text-left">Judul Project
+                                    Improvement</th>
+                                <th class="py-4 px-6 text-sm font-bold text-slate-700 text-center w-48">File</th>
+                                <th class="py-4 px-6 text-sm font-bold text-slate-700 text-center w-48">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse($projects as $project)
+                                <tr class="border-b border-gray-100 hover:bg-teal-50/50 transition duration-150">
+                                    <td class="py-4 px-6 font-bold text-sm text-slate-800 text-left">
+                                        {{ $project->title }}
+                                        <div class="text-xs text-gray-400 font-normal mt-0.5">
+                                            {{ \Carbon\Carbon::parse($project->created_at)->locale('id')->translatedFormat('d F Y') }}
+                                        </div>
+                                    </td>
+                                    <td class="py-4 px-6 text-center w-48">
+                                        @if ($project->document_path)
+                                            <a href="{{ route('files.preview', ['path' => $project->document_path]) }}"
+                                                target="_blank"
+                                                class="inline-flex items-center gap-2 px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-[12px] font-semibold text-teal-600 hover:text-teal-700 hover:border-teal-300 hover:bg-teal-50/50 shadow-sm transition-all"
+                                                title="Lihat/Download File Project">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5"
+                                                    fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        stroke-width="2"
+                                                        d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                                                </svg>
+                                                Lihat File
+                                            </a>
+                                        @else
+                                            <span class="text-gray-400 text-xs italic">-</span>
+                                        @endif
+                                    </td>
+                                    <td class="py-4 px-6 text-center w-48">
+                                        @php
+                                            // Ambil status dari Finance Validation (via feedback)
+                                            $finDec = 'Pending';
+                                            if ($project->finance_feedback) {
+                                                if (str_starts_with($project->finance_feedback, '[Approved]')) {
+                                                    $finDec = 'Approved';
+                                                } elseif (str_starts_with($project->finance_feedback, '[Rejected]')) {
+                                                    $finDec = 'Rejected';
+                                                }
+                                            }
+
+                                            // Gunakan status akhir (keputusan PDC) jika sudah ada, jika belum gunakan status Finance
+                                            $displayStatus = in_array($project->status, ['Approved', 'Rejected'])
+                                                ? $project->status
+                                                : $finDec;
+                                        @endphp
+                                        @if ($displayStatus === 'Approved')
+                                            <span
+                                                class="inline-flex items-center gap-1.5 text-green-600 text-[11px] font-bold bg-green-50 px-3 py-1 rounded-full border border-green-100">
+                                                <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span> Approved
+                                            </span>
+                                        @elseif($displayStatus === 'Rejected')
+                                            <span
+                                                class="inline-flex items-center gap-1.5 text-red-600 text-[11px] font-bold bg-red-50 px-3 py-1 rounded-full border border-red-100">
+                                                <span class="w-1.5 h-1.5 rounded-full bg-red-500"></span> Rejected
+                                            </span>
+                                        @else
+                                            <span
+                                                class="inline-flex items-center gap-1.5 text-orange-500 text-[11px] font-bold bg-orange-50 px-3 py-1 rounded-full border border-orange-100">
+                                                <span class="w-1.5 h-1.5 rounded-full bg-orange-400"></span> Pending
+                                            </span>
+                                        @endif
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td class="py-12 px-6 text-center text-gray-400 text-xs" colspan="3">
+                                        Belum ada project yang disubmit.
+                                    </td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        {{-- ══════════════════════════════ HASIL PENILAIAN PANELIS ══════════════════════════════ --}}
+        @if ($panelisCount > 0)
+            <div class="space-y-4" id="Hasil Penilaian Panelis">
+                <div class="page-header animate-title mb-2 mt-6">
+                    <div class="page-header-icon"
+                        style="background: linear-gradient(135deg, #0f172a 0%, #38475a 100%);">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                            <path fill-rule="evenodd"
+                                d="M5.625 1.5H9a3.75 3.75 0 0 1 3.75 3.75v1.875c0 1.036.84 1.875 1.875 1.875H16.5a3.75 3.75 0 0 1 3.75 3.75v7.875c0 1.035-.84 1.875-1.875 1.875H5.625a1.875 1.875 0 0 1-1.875-1.875V3.375c0-1.036.84-1.875 1.875-1.875ZM9.75 14.25a.75.75 0 0 0 0 1.5H15a.75.75 0 0 0 0-1.5H9.75Zm0-3a.75.75 0 0 0 0 1.5h3.75a.75.75 0 0 0 0-1.5H9.75Z"
+                                clip-rule="evenodd" />
+                            <path
+                                d="M14.25 5.25a5.23 5.23 0 0 0-1.279-3.434 9.768 9.768 0 0 1 6.963 6.963A5.23 5.23 0 0 0 16.5 7.5h-1.875a.375.375 0 0 1-.375-.375V5.25Z" />
+                        </svg>
+                    </div>
+                    <div>
+                        <div class="page-header-title">Hasil Penilaian Panelis</div>
+                        <div class="page-header-sub">Rata-rata penilaian dari {{ $panelisCount }} panelis pada sesi
+                            ini
+                        </div>
+                    </div>
+                </div>
+
+                <div class="prem-card fade-up fade-up-4 overflow-visible" style="padding: 0;">
+                    @php
+                        $panelisIndicators = [
+                            'Pemahaman Bisnis & Strategi' =>
+                                'Memahami konteks industri, Business proses dan arah perusahaan',
+                            'Identifikasi Masalah' => 'Masalah yang diangkat relevan, kritis, dan berbasis data',
+                            'Analisis Akar Masalah' =>
+                                "Penggunaan tools (Fishbone, 5 Why's atau yang lain), logis dan mendalam",
+                            'Solusi yang Ditawarkan' => 'Solusi konkret, realistis, dan menjawab akar masalah',
+                            'Rencana Implementasi' => 'Timeline jelas, tahapan logis, melibatkan stakeholder',
+                            'Target Dampak & KPI' => 'Indikator keberhasilan terukur, baseline–target jelas',
+                            'Risiko & Mitigasi' => 'Mengenali risiko dan menyusun strategi antisipasi',
+                            'Gaya Presentasi & Penguasaan Materi' => 'Komunikatif, percaya diri, menjawab pertanyaan',
+                            'Refleksi Peran sebagai Posisi yang Dituju' =>
+                                'Menunjukkan kesiapan mindset kepemimpinan, Strategic Thingking dan Conceptual thinking.',
+                            'Nilai Tambah' => 'Inisiatif ekstra, kolaborasi, atau insight mendalam',
+                        ];
+                    @endphp
+
+                    <div class="flex flex-col">
+
+                        {{-- Sub-box atas: Tabel penilaian --}}
+                        <div class="overflow-x-auto">
+                            <table class="aspek-table-riwayat">
+                                <thead>
+                                    <tr>
+                                        <th class="col-aspek">Aspek yang Dinilai</th>
+                                        <th class="col-indikator">Indikator Penilaian</th>
+                                        <th class="col-skor">Rata-rata</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach ($panelisAspectAverages as $aspectName => $avgScore)
+                                        @php $indicator = $panelisIndicators[$aspectName] ?? '-'; @endphp
+                                        <tr>
+                                            <td class="col-aspek">{{ $aspectName }}</td>
+                                            <td class="col-indikator">{{ $indicator }}</td>
+                                            <td class="col-skor">
+                                                <div class="skor-badge">{{ number_format($avgScore, 1) }}</div>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="panelis-bottom-layout">
+                            <div class="panelis-comment-card">
+                                <div class="panelis-section-label">Komentar / Catatan Penilai:</div>
+                                <div class="panelis-comment-box">
+                                    @forelse ($panelisKomentar as $item)
+                                        <div class="komentar-bullet"
+                                            style="padding-top: 0; padding-bottom: {{ $loop->last ? '0' : '14px' }}; border-bottom: {{ $loop->last ? 'none' : '1px solid #f1f5f9' }};">
+                                            <div class="komentar-dot" style="margin-top: 5px; flex-shrink: 0;"></div>
+                                            <div style="flex: 1; min-width: 0;">
+                                                <p class="komentar-text line-clamp-3">{{ $item['komentar'] }}</p>
+                                                <button type="button" class="btn-expand-komentar hidden" onclick="toggleKomentar(this)">Lihat Selengkapnya</button>
+                                            </div>
+                                        </div>
+                                    @empty
+                                        <p style="margin: 0; color: #94a3b8;">Belum ada komentar dari panelis.</p>
+                                    @endforelse
+                                </div>
+                            </div>
+
+                            <div class="panelis-score-side">
+                                <div class="panelis-score-spacer" aria-hidden="true">.</div>
+                                <div class="panelis-total-card">
+                                    <div
+                                        style="font-size: 0.85rem; font-weight: 700; color: #1e293b; margin-bottom: 10px;">
+                                        Total Skor</div>
+                                    <div class="panelis-total-score">
+                                        {{ number_format($panelisScoreTotalDikaliDua, 2) }}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @endif
+
+    </div>
+
+    <script>
+        function toggleKomentar(btn) {
+            const textEl = btn.previousElementSibling;
+            if (!textEl) return;
+            if (textEl.classList.contains('line-clamp-3')) {
+                textEl.classList.remove('line-clamp-3');
+                btn.textContent = 'Sembunyikan';
+            } else {
+                textEl.classList.add('line-clamp-3');
+                btn.textContent = 'Lihat Selengkapnya';
+            }
+        }
+
+        function initKomentarExpand() {
+            document.querySelectorAll('.komentar-text').forEach(function(el) {
+                // Sementara hapus clamp untuk ukur tinggi asli
+                el.classList.remove('line-clamp-3');
+                var fullHeight = el.scrollHeight;
+                el.classList.add('line-clamp-3');
+                var clampedHeight = el.clientHeight;
+
+                if (fullHeight > clampedHeight + 4) {
+                    var btn = el.nextElementSibling;
+                    if (btn && btn.classList.contains('btn-expand-komentar')) {
+                        btn.classList.remove('hidden');
+                    }
+                }
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', initKomentarExpand);
+    </script>
+</x-talent.layout>

@@ -1,0 +1,2657 @@
+﻿<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <title>UML Diagram â€” Dashboard IDP</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #f0f4f8;
+            padding: 20px;
+            font-size: 12px
+        }
+
+        h1 {
+            text-align: center;
+            color: #1a237e;
+            font-size: 22px;
+            margin-bottom: 6px
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #555;
+            margin-bottom: 12px;
+            font-size: 13px
+        }
+
+        .tab-bar {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            margin-bottom: 16px;
+            flex-wrap: wrap
+        }
+
+        .tab-btn {
+            padding: 8px 18px;
+            border-radius: 20px;
+            border: 2px solid #3949ab;
+            background: #fff;
+            color: #3949ab;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all .2s
+        }
+
+        .tab-btn.active {
+            background: #3949ab;
+            color: #fff
+        }
+
+        .tab-pane {
+            display: none
+        }
+
+        .tab-pane.active {
+            display: block
+        }
+
+        /* USECASE */
+        .uc-wrap {
+            background: #1e1e2e;
+            border-radius: 12px;
+            padding: 24px;
+            min-height: 640px;
+            overflow-x: auto;
+            border: 2px solid #3949ab
+        }
+
+        /* ACTIVITY */
+        .act-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px
+        }
+
+        .act-card {
+            background: #fff;
+            border-radius: 10px;
+            border: 2px solid #3949ab;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, .1)
+        }
+
+        .act-card-wide {
+            background: #fff;
+            border-radius: 10px;
+            border: 2px solid #3949ab;
+            overflow: hidden;
+            overflow-x: auto;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, .1);
+            grid-column: span 2;
+        }
+
+        .act-header {
+            background: #3949ab;
+            color: #fff;
+            font-weight: bold;
+            padding: 8px 12px;
+            font-size: 12px
+        }
+
+        .act-body {
+            padding: 10px;
+            display: flex;
+            justify-content: center
+        }
+
+        /* SEQUENCE */
+        .seq-wrap {
+            overflow-x: auto;
+            background: #1e1e2e;
+            border-radius: 12px;
+            border: 2px solid #3949ab;
+            padding: 16px
+        }
+
+        /* COMPONENT */
+        .comp-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px
+        }
+
+        .comp-box {
+            background: #fff;
+            border-radius: 10px;
+            border: 2px solid #3949ab;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, .1)
+        }
+
+        .comp-header {
+            background: #1565c0;
+            color: #fff;
+            font-weight: bold;
+            padding: 8px 12px;
+            font-size: 12px
+        }
+
+        .comp-body {
+            padding: 10px 12px
+        }
+
+        .comp-item {
+            display: flex;
+            gap: 6px;
+            align-items: flex-start;
+            padding: 4px 0;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 11px
+        }
+
+        .comp-item:last-child {
+            border-bottom: none
+        }
+
+        .badge-role {
+            display: inline-block;
+            border-radius: 3px;
+            padding: 1px 6px;
+            font-size: 9px;
+            font-weight: bold;
+            white-space: nowrap;
+            flex-shrink: 0
+        }
+
+        .role-talent {
+            background: #e8f5e9;
+            color: #1b5e20
+        }
+
+        .role-mentor {
+            background: #e3f2fd;
+            color: #0d47a1
+        }
+
+        .role-atasan {
+            background: #fff8e1;
+            color: #e65100
+        }
+
+        .role-panelis {
+            background: #fce4ec;
+            color: #880e4f
+        }
+
+        .role-finance {
+            background: #f3e5f5;
+            color: #4a148c
+        }
+
+        .role-admin {
+            background: #e8eaf6;
+            color: #1a237e
+        }
+
+        .hint {
+            text-align: center;
+            color: #888;
+            font-size: 11px;
+            margin-bottom: 14px
+        }
+
+        .legend {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 14px;
+            align-items: center;
+            justify-content: center
+        }
+
+        .leg-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 10.5px;
+            color: #444
+        }
+
+        .leg-dot {
+            width: 14px;
+            height: 14px;
+            border-radius: 3px;
+            flex-shrink: 0
+        }
+
+        /* UML legend bar */
+        .uml-legend {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-bottom: 14px;
+            align-items: center;
+            background: #fff;
+            border-radius: 10px;
+            padding: 10px 16px;
+            box-shadow: 0 1px 6px rgba(0, 0, 0, .08)
+        }
+
+        .uml-leg {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            color: #333;
+            font-weight: 600
+        }
+
+        /* swimlane label inside card */
+        .swim-row {
+            font-size: 9px;
+            font-weight: 700;
+            letter-spacing: .6px;
+            text-transform: uppercase;
+            padding: 3px 8px;
+            border-radius: 3px;
+            width: 100%
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>UML Diagram - Dashboard IDP</h1>
+    <p class="subtitle">Use Case · Activity Diagram · Sequence Diagram · Component Diagram</p>
+
+    <div class="tab-bar">
+        <button class="tab-btn active" onclick="switchTab('usecase')">Use Case</button>
+        <button class="tab-btn" onclick="switchTab('activity')">Activity Diagram</button>
+        <button class="tab-btn" onclick="switchTab('taskflow')">Taskflow UX</button>
+        <button class="tab-btn" onclick="switchTab('userflow')">User Flow UX</button>
+        <button class="tab-btn" onclick="switchTab('sequence')">Sequence Diagram</button>
+        <button class="tab-btn" onclick="switchTab('component')">Component / Fitur</button>
+    </div>
+
+    <!-- ===================== USE CASE ===================== -->
+    <div id="tab-usecase" class="tab-pane active">
+        <p class="hint">Use Case Diagram - hubungan aktor dengan fitur sistem Dashboard IDP</p>
+        <div class="uc-wrap">
+            <svg id="uc-svg" width="100%" height="1050" viewBox="0 0 1300 1050" style="display:block;"></svg>
+        </div>
+    </div>
+
+    <!-- ===================== ACTIVITY DIAGRAM ===================== -->
+    <div id="tab-activity" class="tab-pane">
+        <!-- Legenda simbol UML -->
+        <div class="uml-legend">
+            <div class="uml-leg">
+                <svg width="22" height="22">
+                    <circle cx="11" cy="11" r="10" fill="#1e293b" />
+                </svg>
+                Status Awal
+            </div>
+            <div class="uml-leg">
+                <svg width="54" height="24">
+                    <rect x="1" y="3" width="52" height="18" rx="5" fill="#f8fafc" stroke="#1e293b"
+                        stroke-width="1.5" />
+                </svg>
+                Aktivitas
+            </div>
+            <div class="uml-leg">
+                <svg width="46" height="34">
+                    <polygon points="23,1 45,17 23,33 1,17" fill="#fffbeb" stroke="#d97706" stroke-width="1.5" />
+                </svg>
+                Percabangan / Decision
+            </div>
+            <div class="uml-leg">
+                <svg width="54" height="14">
+                    <rect x="1" y="4" width="52" height="6" rx="2" fill="#1e293b" />
+                </svg>
+                Penggabungan / Join
+            </div>
+            <div class="uml-leg">
+                <svg width="22" height="22">
+                    <circle cx="11" cy="11" r="10" fill="none" stroke="#1e293b" stroke-width="2" />
+                    <circle cx="11" cy="11" r="6" fill="#1e293b" />
+                </svg>
+                Status Akhir
+            </div>
+            <div class="uml-leg">
+                <svg width="46" height="22">
+                    <rect x="1" y="1" width="44" height="20" fill="rgba(59,130,246,.07)" stroke="#3b82f6"
+                        stroke-width="1" stroke-dasharray="3,2" />
+                </svg>
+                Swimlane
+            </div>
+        </div>
+        <div class="act-grid" id="act-svgs"></div>
+    </div>
+
+    <!-- ===================== TASKFLOW DIAGRAM ===================== -->
+    <div id="tab-taskflow" class="tab-pane">
+        <p class="hint">Taskflow UX - Alur antar-muka (*User Interface*) tahap demi tahap berbasis flowchart standar
+        </p>
+        <!-- Legenda flowchart -->
+        <div class="uml-legend">
+            <div class="uml-leg">
+                <svg width="40" height="24">
+                    <rect x="2" y="4" width="36" height="16" rx="8" fill="#eff6ff" stroke="#3b82f6"
+                        stroke-width="1.5" />
+                </svg> Terminator (Awal/Akhir)
+            </div>
+            <div class="uml-leg">
+                <svg width="40" height="24">
+                    <rect x="2" y="4" width="36" height="16" rx="2" fill="#f0fdf4" stroke="#22c55e"
+                        stroke-width="1.5" />
+                </svg> Process (Tindakan/Sistem)
+            </div>
+            <div class="uml-leg">
+                <svg width="40" height="24">
+                    <polygon points="8,4 38,4 32,20 2,20" fill="#fdf4ff" stroke="#d946ef" stroke-width="1.5" />
+                </svg> Data (Input/Form/Output)
+            </div>
+            <div class="uml-leg">
+                <svg width="40" height="24">
+                    <path d="M 2 4 L 38 4 L 38 18 Q 29 22 20 18 T 2 18 Z" fill="#fffbeb" stroke="#f59e0b"
+                        stroke-width="1.5" />
+                </svg> Document (Laporan/File)
+            </div>
+            <div class="uml-leg">
+                <svg width="40" height="26">
+                    <polygon points="20,1 38,13 20,25 2,13" fill="#fef2f2" stroke="#ef4444" stroke-width="1.5" />
+                </svg> Decision (Keputusan)
+            </div>
+        </div>
+        <div class="act-grid" id="tf-svgs"></div>
+    </div>
+
+    <!-- ===================== USERFLOW DIAGRAM ===================== -->
+    <div id="tab-userflow" class="tab-pane">
+        <p class="hint">User Flow UX - Perjalanan visual komprehensif interaksi pengguna dari hulu ke hilir
+            berdasarkan Role akunnya</p>
+        <!-- Legenda flowchart -->
+        <div class="uml-legend">
+            <div class="uml-leg">
+                <svg width="40" height="24">
+                    <rect x="2" y="4" width="36" height="16" rx="8" fill="#eff6ff" stroke="#3b82f6"
+                        stroke-width="1.5" />
+                </svg> Terminator (Awal/Akhir)
+            </div>
+            <div class="uml-leg">
+                <svg width="40" height="24">
+                    <rect x="2" y="4" width="36" height="16" rx="2" fill="#f0fdf4" stroke="#22c55e"
+                        stroke-width="1.5" />
+                </svg> Process (Aktivitas Layar)
+            </div>
+            <div class="uml-leg">
+                <svg width="40" height="24">
+                    <polygon points="8,4 38,4 32,20 2,20" fill="#fdf4ff" stroke="#d946ef" stroke-width="1.5" />
+                </svg> Data (Input Form)
+            </div>
+            <div class="uml-leg">
+                <svg width="40" height="24">
+                    <path d="M 2 4 L 38 4 L 38 18 Q 29 22 20 18 T 2 18 Z" fill="#fffbeb" stroke="#f59e0b"
+                        stroke-width="1.5" />
+                </svg> Document (Laporan File)
+            </div>
+            <div class="uml-leg">
+                <svg width="40" height="26">
+                    <polygon points="20,1 38,13 20,25 2,13" fill="#fef2f2" stroke="#ef4444" stroke-width="1.5" />
+                </svg> Decision (Keputusan Status)
+            </div>
+        </div>
+        <div class="act-grid" id="uf-svgs"></div>
+        <h3 style="margin-left: 20px; font-size: 13px; margin-top: 30px; margin-bottom: 5px; color: #1e293b;">
+            Userflow UX: Tanggung Jawab Komprehensif PDC Admin
+        </h3>
+        <p style="margin-left: 20px; font-size: 11px; margin-top: 0px; margin-bottom: 10px; color: #64748b;">
+            Memuat keseluruhan rute perjalanan antarmuka dari 7 Modul yang tersedia secara berdampingan.
+        </p>
+        <div class="act-grid" id="uf-admin-svg" style="padding-top: 5px; margin-bottom: 40px; padding-bottom: 20px;">
+        </div>
+    </div>
+
+    <!-- ===================== SEQUENCE DIAGRAM ===================== -->
+    <div id="tab-sequence" class="tab-pane">
+        <p class="hint">Sequence Diagram - alur komunikasi antar komponen sistem</p>
+        <div class="seq-wrap">
+            <svg id="seq-svg" width="100%" height="900" viewBox="0 0 1280 900"></svg>
+        </div>
+    </div>
+
+    <!-- ===================== COMPONENT DIAGRAM ===================== -->
+    <div id="tab-component" class="tab-pane">
+        <p class="hint">Fitur &amp; Hak Akses per Role</p>
+        <div class="legend">
+            <div class="leg-item">
+                <div class="leg-dot" style="background:#e8f5e9"></div> Talent
+            </div>
+            <div class="leg-item">
+                <div class="leg-dot" style="background:#e3f2fd"></div> Mentor
+            </div>
+            <div class="leg-item">
+                <div class="leg-dot" style="background:#fff8e1"></div> Atasan
+            </div>
+            <div class="leg-item">
+                <div class="leg-dot" style="background:#fce4ec"></div> Panelis
+            </div>
+            <div class="leg-item">
+                <div class="leg-dot" style="background:#f3e5f5"></div> Finance
+            </div>
+            <div class="leg-item">
+                <div class="leg-dot" style="background:#e8eaf6"></div> PDC Admin
+            </div>
+        </div>
+        <div class="comp-grid">
+            <div class="comp-box">
+                <div class="comp-header">ðŸ” Modul Autentikasi &amp; Profil</div>
+                <div class="comp-body">
+                    <div class="comp-item"><span class="badge-role role-talent">Talent</span>Login, verifikasi email,
+                        reset password,
+                        edit profil (foto, email)</div>
+                    <div class="comp-item"><span class="badge-role role-mentor">Mentor</span>Login, verifikasi email,
+                        reset password,
+                        edit profil</div>
+                    <div class="comp-item"><span class="badge-role role-atasan">Atasan</span>Login, verifikasi email,
+                        reset password,
+                        edit profil</div>
+                    <div class="comp-item"><span class="badge-role role-panelis">Panelis</span>Login, verifikasi email,
+                        reset
+                        password, edit profil</div>
+                    <div class="comp-item"><span class="badge-role role-finance">Finance</span>Login, verifikasi email,
+                        reset
+                        password, edit profil</div>
+                    <div class="comp-item"><span class="badge-role role-admin">PDC Admin</span>Login, pilih role,
+                        manajemen session</div>
+                </div>
+            </div>
+            <div class="comp-box">
+                <div class="comp-header">ðŸ“Š Modul Dashboard &amp; Statistik</div>
+                <div class="comp-body">
+                    <div class="comp-item"><span class="badge-role role-talent">Talent</span>Dashboard: status promosi,
+                        progress IDP, kompetensi, notifikasi</div>
+                    <div class="comp-item"><span class="badge-role role-mentor">Mentor</span>Dashboard: daftar mentee
+                        aktif, progress tiap mentee</div>
+                    <div class="comp-item"><span class="badge-role role-atasan">Atasan</span>Dashboard: daftar bawahan,
+                        status assessment, progress</div>
+                    <div class="comp-item"><span class="badge-role role-panelis">Panelis</span>Dashboard: daftar talent
+                        yang perlu dinilai</div>
+                    <div class="comp-item"><span class="badge-role role-finance">Finance</span>Dashboard: daftar project
+                        improvement yang perlu direview</div>
+                    <div class="comp-item"><span class="badge-role role-admin">PDC Admin</span>Dashboard: overview
+                        seluruh talent, statistik sistem, progress global</div>
+                </div>
+            </div>
+            <div class="comp-box">
+                <div class="comp-header">ðŸ“‹ Modul Penilaian Kompetensi (Assessment)</div>
+                <div class="comp-body">
+                    <div class="comp-item"><span class="badge-role role-talent">Talent</span>Isi self-assessment (skor
+                        per kompetensi via kuesioner)</div>
+                    <div class="comp-item"><span class="badge-role role-atasan">Atasan</span>Nilai score_atasan per
+                        kompetensi, hitung gap_score</div>
+                    <div class="comp-item"><span class="badge-role role-admin">PDC Admin</span>Lihat hasil assessment
+                        semua talent, atur standar kompetensi per jabatan</div>
+                </div>
+            </div>
+            <div class="comp-box">
+                <div class="comp-header">ðŸ““ Modul IDP Logbook (Monitoring)</div>
+                <div class="comp-body">
+                    <div class="comp-item"><span class="badge-role role-talent">Talent</span>Tambah/edit/hapus aktivitas
+                        logbook (Exposure, Mentoring, Learning), upload bukti file</div>
+                    <div class="comp-item"><span class="badge-role role-mentor">Mentor</span>Lihat &amp; verifikasi
+                        (Approve/Reject) logbook mentee</div>
+                    <div class="comp-item"><span class="badge-role role-atasan">Atasan</span>Monitoring logbook,
+                        kompetensi, dan project bawahan</div>
+                    <div class="comp-item"><span class="badge-role role-admin">PDC Admin</span>Pantau logbook semua
+                        talent, lihat riwayat per talent</div>
+                </div>
+            </div>
+            <div class="comp-box">
+                <div class="comp-header">ðŸ—ï¸ Modul Improvement Project</div>
+                <div class="comp-body">
+                    <div class="comp-item"><span class="badge-role role-talent">Talent</span>Upload proposal project
+                        (judul + file dokumen)</div>
+                    <div class="comp-item"><span class="badge-role role-mentor">Mentor</span>Melihat progress project
+                        sebagai bagian monitoring talent</div>
+                    <div class="comp-item"><span class="badge-role role-atasan">Atasan</span>Melihat progress project
+                        bawahan pada halaman monitoring dan riwayat</div>
+                    <div class="comp-item"><span class="badge-role role-finance">Finance</span>Review aspek anggaran,
+                        beri finance_feedback, Approve/Reject</div>
+                    <div class="comp-item"><span class="badge-role role-admin">PDC Admin</span>Pantau status semua
+                        project, request validasi finance, lihat riwayat</div>
+                </div>
+            </div>
+            <div class="comp-box">
+                <div class="comp-header">âš–ï¸ Modul Panelis Assessment (Sidang Akhir)</div>
+                <div class="comp-body">
+                    <div class="comp-item"><span class="badge-role role-panelis">Panelis</span>Lihat profil lengkap
+                        talent, isi skor sidang, komentar, rekomendasi (Ready Now / Ready 1-2Y / Not Ready)</div>
+                    <div class="comp-item"><span class="badge-role role-admin">PDC Admin</span>Assign panelis ke talent,
+                        ubah status ke Pending Panelis, lihat hasil penilaian panelis</div>
+                    <div class="comp-item"><span class="badge-role role-atasan">Atasan</span>Lihat hasil penilaian
+                        panelis untuk bawahan</div>
+                </div>
+            </div>
+            <div class="comp-box">
+                <div class="comp-header">ðŸš€ Modul Promotion Plan &amp; Development Session</div>
+                <div class="comp-body">
+                    <div class="comp-item"><span class="badge-role role-admin">PDC Admin</span>Buat development_session
+                        (jabatan asalâ†’tujuan), buat promotion_plan, set mentor, set target waktu</div>
+                    <div class="comp-item"><span class="badge-role role-admin">PDC Admin</span>Ubah status: Draftâ†’In
+                        Progressâ†’Pending Panelisâ†’Approved/Rejectedâ†’Promoted/Not Promoted</div>
+                    <div class="comp-item"><span class="badge-role role-admin">PDC Admin</span>Lock/unlock progress
+                        talent (is_locked)</div>
+                    <div class="comp-item"><span class="badge-role role-admin">PDC Admin</span>Assign panelis dan
+                        menutup review panelis saat semua penilaian selesai</div>
+                    <div class="comp-item"><span class="badge-role role-talent">Talent</span>Lihat status promosi,
+                        target jabatan, mentor yang assign</div>
+                </div>
+            </div>
+            <div class="comp-box">
+                <div class="comp-header">ðŸ”” Modul Notifikasi &amp; Keamanan</div>
+                <div class="comp-body">
+                    <div class="comp-item"><span class="badge-role role-talent">Talent</span>Terima notifikasi: status
+                        IDP diapprove/reject, status project, hasil panelis</div>
+                    <div class="comp-item"><span class="badge-role role-mentor">Mentor</span>Terima notifikasi: IDP baru
+                        dari mentee, project baru</div>
+                    <div class="comp-item"><span class="badge-role role-atasan">Atasan</span>Terima notifikasi:
+                        assessment talent selesai, IDP baru</div>
+                    <div class="comp-item"><span class="badge-role role-admin">PDC Admin</span>Terima semua notifikasi
+                        aktivitas sistem</div>
+                    <div class="comp-item"><span class="badge-role role-admin">PDC Admin</span>Lihat audit_activity log
+                        (IP, event, waktu, user_agent)</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ TAB SWITCHING â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        function switchTab(name) {
+            document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('tab-' + name).classList.add('active');
+            event.target.classList.add('active');
+            if (name === 'usecase') drawUseCase();
+            if (name === 'sequence') drawSequence();
+        }
+
+        // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ ACTIVITY DIAGRAM ENGINE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // Step types: S=Start, E=End, A=Activity, D=Decision, J=Join
+        // For D: {t:'D', txt, yes, no}  â€” yes=label down, no=label right (side branch text)
+        // For A: {t:'A', txt, lane}     â€” lane: color string for swimlane shade
+
+        const NS = 'http://www.w3.org/2000/svg';
+        let _mkId = 0;
+
+        function mkSVG(W, H) {
+            const svg = document.createElementNS(NS, 'svg');
+            svg.setAttribute('width', W); svg.setAttribute('height', H);
+            svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+            return svg;
+        }
+        function svgEl(svg, tag, attrs, txt) {
+            const e = document.createElementNS(NS, tag);
+            for (const k in attrs) e.setAttribute(k, attrs[k]);
+            if (txt !== undefined && txt !== null) e.textContent = txt;
+            svg.appendChild(e); return e;
+        }
+        function wrapLines(text, maxChars) {
+            const words = text.split(' '); let line = '', lines = [];
+            words.forEach(w => {
+                if ((line + w).length > maxChars) { if (line.trim()) lines.push(line.trim()); line = w + ' '; }
+                else line += w + ' ';
+            });
+            if (line.trim()) lines.push(line.trim());
+            return lines.length ? lines : [text];
+        }
+
+        function drawFlow(steps, title, laneColors) {
+            // Dimensions
+            const isWide = steps.some(s => s.t === 'CUSTOM_HISTORY');
+            const SVG_W = isWide ? 800 : 450, CX = isWide ? 400 : 225;
+            const BW = 230, BH = 32;      // activity box
+            const DW = 120, DH = 50;      // decision diamond
+            const SR = 12;               // start/end radius
+            const ARROW = 22;            // arrow height between elements
+            const SIDE_EXTRA = 22;       // extra height for side-branch text on decisions
+            const PAD_TOP = 12, PAD_BOT = 12;
+
+            // Pre-calculate total height
+            let totalH = PAD_TOP + PAD_BOT;
+            steps.forEach(s => {
+                if (s.t === 'S' || s.t === 'E') totalH += SR * 2 + ARROW;
+                else if (s.t === 'A') totalH += BH + ARROW;
+                else if (s.t === 'D') totalH += DH + (s.no ? SIDE_EXTRA : 0) + ARROW;
+                else if (s.t === 'J') totalH += 8 + ARROW;
+                else if (s.t === 'CUSTOM_IDP') totalH += 280;
+                else if (s.t === 'CUSTOM_PROJECT') totalH += 380;
+                else if (s.t === 'CUSTOM_HISTORY') totalH += 160;
+                else if (s.t === 'CUSTOM_MENTOR_VALIDASI') totalH += 100;
+                else if (s.t === 'CUSTOM_ATASAN_MONITORING') totalH += 240;
+            });
+
+            const svg = mkSVG(SVG_W, totalH);
+            // Background
+            svgEl(svg, 'rect', { x: 0, y: 0, width: SVG_W, height: totalH, fill: '#ffffff' });
+
+            // Arrow marker
+            const markId = 'mk' + (_mkId++);
+            const defs = document.createElementNS(NS, 'defs');
+            const mk = document.createElementNS(NS, 'marker');
+            mk.setAttribute('id', markId); mk.setAttribute('markerWidth', '8'); mk.setAttribute('markerHeight', '8');
+            mk.setAttribute('refX', '7'); mk.setAttribute('refY', '3'); mk.setAttribute('orient', 'auto');
+            const mp = document.createElementNS(NS, 'path');
+            mp.setAttribute('d', 'M0,0 L0,6 L8,3 z'); mp.setAttribute('fill', '#334155');
+            mk.appendChild(mp); defs.appendChild(mk); svg.appendChild(defs);
+
+            function arrow(x1, y1, x2, y2, col) {
+                svgEl(svg, 'line', { x1, y1, x2, y2, stroke: col || '#334155', 'stroke-width': 1.5, 'marker-end': `url(#${markId})` });
+            }
+            function label(x, y, txt, col, anchor, size) {
+                svgEl(svg, 'text', { x, y, 'font-size': size || 8.5, fill: col || '#334155', 'text-anchor': anchor || 'middle', 'font-family': 'Segoe UI,sans-serif', 'dominant-baseline': 'middle' }, txt);
+            }
+            function multiline(x, y, txt, maxCh, colFill, size, lineH) {
+                const lines = wrapLines(txt, maxCh);
+                const lh = lineH || 12;
+                const startY = y - (lines.length - 1) * lh / 2;
+                lines.forEach((ln, i) => svgEl(svg, 'text', { x, y: startY + i * lh, 'font-size': size || 9.5, fill: colFill || '#1e293b', 'text-anchor': 'middle', 'font-family': 'Segoe UI,sans-serif', 'dominant-baseline': 'middle' }, ln));
+            }
+
+            let y = PAD_TOP;
+
+            steps.forEach((s, i) => {
+                const isLast = (i === steps.length - 1);
+
+                // Swimlane background band
+                if (s.lane && laneColors && laneColors[s.lane]) {
+                    svgEl(svg, 'rect', { x: 0, y: y, width: SVG_W, height: s.t === 'D' ? DH + (s.no ? SIDE_EXTRA : 0) : s.t === 'A' ? BH : SR * 2, fill: laneColors[s.lane] + '18', opacity: 1 });
+                }
+
+                if (s.t === 'S') {
+                    // â— Filled circle â€” Status Awal
+                    svgEl(svg, 'circle', { cx: CX, cy: y + SR, r: SR, fill: '#1e293b' });
+                    if (!isLast) arrow(CX, y + SR * 2, CX, y + SR * 2 + ARROW - 6);
+                    y += SR * 2 + ARROW;
+                }
+                else if (s.t === 'E') {
+                    // â—‰ Bullseye â€” Status Akhir
+                    svgEl(svg, 'circle', { cx: CX, cy: y + SR, r: SR, fill: 'none', stroke: '#1e293b', 'stroke-width': 2 });
+                    svgEl(svg, 'circle', { cx: CX, cy: y + SR, r: SR - 4, fill: '#1e293b' });
+                    y += SR * 2 + ARROW;
+                }
+                else if (s.t === 'A') {
+                    // â–¡ Rounded Rectangle â€” Aktivitas
+                    const laneCol = (s.lane && laneColors) ? laneColors[s.lane] : '#3949ab';
+                    svgEl(svg, 'rect', { x: CX - BW / 2, y: y, width: BW, height: BH, rx: 6, fill: '#f8fafc', stroke: laneCol || '#1e293b', 'stroke-width': 1.5 });
+                    // Lane indicator strip
+                    if (s.lane && laneColors) {
+                        svgEl(svg, 'rect', { x: CX - BW / 2, y: y, width: 5, height: BH, rx: 3, fill: laneColors[s.lane] });
+                    }
+                    multiline(CX + (s.lane ? 3 : 0), y + BH / 2, s.txt, 28, '#1e293b', 9, 11);
+                    if (!isLast) arrow(CX, y + BH, CX, y + BH + ARROW - 6);
+                    y += BH + ARROW;
+                }
+                else if (s.t === 'D') {
+                    // â—‡ Diamond â€” Percabangan/Decision
+                    const cy = y + DH / 2;
+                    svgEl(svg, 'polygon', { points: `${CX},${y} ${CX + DW / 2},${cy} ${CX},${y + DH} ${CX - DW / 2},${cy}`, fill: '#fffbeb', stroke: '#d97706', 'stroke-width': 1.5 });
+                    multiline(CX, cy, s.txt, 18, '#92400e', 8.5, 12);
+
+                    // Arrow down (YES path)
+                    const yesY = y + DH + (s.no ? SIDE_EXTRA : 0);
+                    arrow(CX, y + DH, CX, yesY + ARROW - 7, '#059669');
+                    label(CX + 5, y + DH + (s.no ? SIDE_EXTRA / 2 : 10), s.yes || 'Ya', '#059669', 'middle', 8);
+
+                    // NO side branch (right)
+                    if (s.no) {
+                        const parts = s.no.split(' â†’ ');
+                        if (parts.length > 1) {
+                            // Draw side box and connect arrow
+                            const arrowLabel = parts[0];
+                            const boxText = parts[1];
+                            const rbw = 120, rbh = 32;
+                            const rx = CX + DW / 2 + 40;
+                            const ry = cy - rbh / 2;
+                            svgEl(svg, 'line', { x1: CX + DW / 2, y1: cy, x2: rx, y2: cy, stroke: '#b91c1c', 'stroke-width': 1.5, 'marker-end': `url(#${markId})` });
+                            svgEl(svg, 'text', { x: CX + DW / 2 + 20, y: cy - 6, 'font-size': 8, fill: '#b91c1c', 'font-family': 'Segoe UI,sans-serif', 'dominant-baseline': 'middle', 'text-anchor': 'middle' }, arrowLabel);
+                            svgEl(svg, 'rect', { x: rx, y: ry, width: rbw, height: rbh, rx: 6, fill: '#f8fafc', stroke: '#1e293b', 'stroke-width': 1.5 });
+                            multiline(rx + rbw / 2, cy, boxText, 18, '#1e293b', 8, 10);
+
+                            const isLoopback = boxText.toLowerCase().includes('daftar ke register') || boxText.toLowerCase().includes('mengedit logbooknya');
+                            if (isLoopback) {
+                                const nextY = y + DH + (s.no ? SIDE_EXTRA : 0) + ARROW;
+                                svgEl(svg, 'path', { d: `M ${rx + rbw / 2} ${ry + rbh} L ${rx + rbw / 2} ${nextY - 8} L ${CX + 10} ${nextY - 8}`, fill: 'none', stroke: '#334155', 'stroke-width': 1.5, 'marker-end': `url(#${markId})` });
+                            }
+                        } else {
+                            // Arrow right from diamond
+                            svgEl(svg, 'line', { x1: CX + DW / 2, y1: cy, x2: CX + DW / 2 + 16, y2: cy, stroke: '#b91c1c', 'stroke-width': 1.5, 'marker-end': `url(#${markId})` });
+                            // Side note text
+                            const noLines = wrapLines(s.no, 20);
+                            noLines.forEach((ln, li) => {
+                                svgEl(svg, 'text', { x: CX + DW / 2 + 20, y: cy + (li - (noLines.length - 1) / 2) * 11, 'font-size': 8, fill: '#b91c1c', 'font-family': 'Segoe UI,sans-serif', 'dominant-baseline': 'middle' }, ln);
+                            });
+                        }
+                    }
+                    y += DH + (s.no ? SIDE_EXTRA : 0) + ARROW;
+                }
+                else if (s.t === 'J') {
+                    // â• â• â•  Thick bar â€” Penggabungan/Join
+                    svgEl(svg, 'rect', { x: CX - 80, y: y + 2, width: 160, height: 6, rx: 2, fill: '#1e293b' });
+                    if (!isLast) arrow(CX, y + 8, CX, y + 8 + ARROW - 6);
+                    y += 8 + ARROW;
+                }
+                else if (s.t === 'CUSTOM_IDP') {
+                    const X_L = CX - 100;
+                    const X_R = CX + 100;
+
+                    svgEl(svg, 'path', { d: `M ${X_L} ${y} L ${X_R} ${y}`, stroke: '#334155', 'stroke-width': 1.5 });
+                    arrow(X_L, y, X_L, y + 20);
+                    arrow(X_R, y, X_R, y + 20);
+
+                    const drawRectCustom = (cx, cy, w, h, txt) => {
+                        svgEl(svg, 'rect', { x: cx - w / 2, y: cy - h / 2, width: w, height: h, rx: 6, fill: '#f8fafc', stroke: '#1d4ed8', 'stroke-width': 1.5 });
+                        multiline(cx, cy, txt, 20, '#1e293b', 8, 10);
+                    };
+                    const drawDiamondCustom = (cx, cy, w, h, txt) => {
+                        svgEl(svg, 'polygon', { points: `${cx},${cy - h / 2} ${cx + w / 2},${cy} ${cx},${cy + h / 2} ${cx - w / 2},${cy}`, fill: '#fffbeb', stroke: '#d97706', 'stroke-width': 1.5 });
+                        multiline(cx, cy, txt, 20, '#92400e', 8.5, 12);
+                    };
+
+                    const y_box1 = y + 20 + 20;
+                    drawRectCustom(X_L, y_box1, 140, 40, 'Mentor memberikan validasi Approved');
+                    drawRectCustom(X_R, y_box1, 140, 40, 'Mentor memberikan validasi Rejected');
+
+                    arrow(X_R, y_box1 + 20, X_R, y_box1 + 40);
+                    const y_box2 = y_box1 + 40 + 30; // 30 is half height of 60
+                    drawRectCustom(X_R, y_box2, 140, 60, 'Talent mengedit logbooknya untuk mendapatkan Approved');
+
+                    arrow(X_R, y_box2 + 30, X_R, y_box2 + 50);
+                    const y_box3 = y_box2 + 50 + 35;
+                    drawDiamondCustom(X_R, y_box3, 110, 70, 'Mentor memberikan Validasi Approved');
+
+                    // Loopback
+                    svgEl(svg, 'path', { d: `M ${X_R + 55} ${y_box3} L ${X_R + 90} ${y_box3} L ${X_R + 90} ${y_box2}`, fill: 'none', stroke: '#334155', 'stroke-width': 1.5 });
+                    arrow(X_R + 90, y_box2, X_R + 70, y_box2);
+                    label(X_R + 70, y_box3 - 8, 'Tidak', '#b91c1c', 'middle', 8);
+
+                    // Ya
+                    svgEl(svg, 'path', { d: `M ${X_R} ${y_box3 + 35} L ${X_R} ${y_box3 + 55}`, fill: 'none', stroke: '#334155', 'stroke-width': 1.5 });
+                    label(X_R + 15, y_box3 + 45, 'Ya', '#059669', 'middle', 8);
+
+                    // Merge line
+                    const y_merge = y_box3 + 55;
+                    svgEl(svg, 'path', { d: `M ${X_L} ${y_box1 + 20} L ${X_L} ${y_merge}`, fill: 'none', stroke: '#334155', 'stroke-width': 1.5 });
+                    svgEl(svg, 'path', { d: `M ${X_L} ${y_merge} L ${X_R} ${y_merge}`, stroke: '#334155', 'stroke-width': 1.5 });
+
+                    if (!isLast) arrow(CX, y_merge, CX, y_merge + ARROW - 6);
+                    y = y_merge + ARROW;
+                }
+                else if (s.t === 'CUSTOM_PROJECT') {
+                    const X_L = CX - 105;
+                    const X_R = CX + 105;
+                    const drawRectCustom = (cx, cy, w, h, txt) => {
+                        svgEl(svg, 'rect', { x: cx - w / 2, y: cy - h / 2, width: w, height: h, rx: 6, fill: '#f8fafc', stroke: '#1d4ed8', 'stroke-width': 1.5 });
+                        multiline(cx, cy, txt, 20, '#1e293b', 8, 10);
+                    };
+                    const drawDiamondCustom = (cx, cy, w, h, txt) => {
+                        svgEl(svg, 'polygon', { points: `${cx},${cy - h / 2} ${cx + w / 2},${cy} ${cx},${cy + h / 2} ${cx - w / 2},${cy}`, fill: '#fffbeb', stroke: '#d97706', 'stroke-width': 1.5 });
+                        multiline(cx, cy, txt, 20, '#92400e', 8.5, 12);
+                    };
+
+                    const y_start = y;
+                    const dh1 = 60;
+                    drawDiamondCustom(CX, y_start + dh1 / 2, 140, dh1, 'PDC Admin sudah memberikan validasi?');
+
+                    // Split
+                    const splitY = y_start + dh1 + 12;
+                    svgEl(svg, 'path', { d: `M ${CX} ${y_start + dh1} L ${CX} ${splitY} L ${X_L} ${splitY} L ${X_L} ${y_start + dh1 + 20}`, fill: 'none', stroke: '#334155', 'stroke-width': 1.5 });
+                    svgEl(svg, 'path', { d: `M ${CX} ${splitY} L ${X_R} ${splitY} L ${X_R} ${y_start + dh1 + 20}`, fill: 'none', stroke: '#334155', 'stroke-width': 1.5 });
+                    arrow(X_L, y_start + dh1 + 20, X_L, y_start + dh1 + 30);
+                    arrow(X_R, y_start + dh1 + 20, X_R, y_start + dh1 + 30);
+
+                    const y_box1_start = y_start + dh1 + 30;
+                    const bh1 = 46;
+                    drawRectCustom(X_L, y_box1_start + bh1 / 2, 150, bh1, 'PDC Admin memberikan validasi Approved');
+                    drawRectCustom(X_R, y_box1_start + bh1 / 2, 150, bh1, 'PDC Admin memberikan validasi Rejected');
+
+                    const y_box2_start = y_box1_start + bh1 + 30;
+                    arrow(X_R, y_box1_start + bh1, X_R, y_box2_start);
+                    const bh2 = 60;
+                    drawRectCustom(X_R, y_box2_start + bh2 / 2, 160, bh2, 'Talent menguploud ulang Project Improvementnya sampai Approved');
+
+                    const y_d2_start = y_box2_start + bh2 + 30;
+                    arrow(X_R, y_box2_start + bh2, X_R, y_d2_start);
+                    const dh2 = 60;
+                    drawDiamondCustom(X_R, y_d2_start + dh2 / 2, 110, dh2, 'PDC Admin memberikan Approved?');
+
+                    // Loopback
+                    svgEl(svg, 'path', { d: `M ${X_R + 55} ${y_d2_start + dh2 / 2} L ${X_R + 100} ${y_d2_start + dh2 / 2} L ${X_R + 100} ${y_box2_start + bh2 / 2}`, fill: 'none', stroke: '#334155', 'stroke-width': 1.5 });
+                    arrow(X_R + 100, y_box2_start + bh2 / 2, X_R + 80, y_box2_start + bh2 / 2);
+                    label(X_R + 80, y_d2_start + dh2 / 2 - 10, 'Tidak', '#b91c1c', 'middle', 8);
+
+                    const y_merge = y_d2_start + dh2 + 40;
+                    // Ya arrow
+                    svgEl(svg, 'path', { d: `M ${X_R} ${y_d2_start + dh2} L ${X_R} ${y_merge}`, fill: 'none', stroke: '#334155', 'stroke-width': 1.5 });
+                    label(X_R + 15, y_d2_start + dh2 + 10, 'Ya', '#059669', 'middle', 8);
+
+                    // Left branch
+                    svgEl(svg, 'path', { d: `M ${X_L} ${y_box1_start + bh1} L ${X_L} ${y_merge}`, fill: 'none', stroke: '#334155', 'stroke-width': 1.5 });
+
+                    // Merge line
+                    svgEl(svg, 'path', { d: `M ${X_L} ${y_merge} L ${X_R} ${y_merge}`, stroke: '#334155', 'stroke-width': 1.5 });
+
+                    if (!isLast) arrow(CX, y_merge, CX, y_merge + ARROW - 6);
+                    y = y_merge + ARROW;
+                }
+                else if (s.t === 'CUSTOM_HISTORY') {
+                    const X1 = CX - 320, X2 = CX - 160, X3 = CX, X4 = CX + 160, X5 = CX + 320;
+                    const splitY = y;
+
+                    svgEl(svg, 'path', { d: `M ${X1} ${splitY} L ${X5} ${splitY}`, stroke: '#334155', 'stroke-width': 1.5 });
+                    [X1, X2, X3, X4, X5].forEach(x => arrow(x, splitY, x, splitY + 20));
+
+                    const drawRectCustom = (cx, cy, w, h, txt) => {
+                        svgEl(svg, 'rect', { x: cx - w / 2, y: cy - h / 2, width: w, height: h, rx: 6, fill: '#f8fafc', stroke: '#1d4ed8', 'stroke-width': 1.5 });
+                        multiline(cx, cy, txt, 20, '#1e293b', 8, 10);
+                    };
+
+                    const y_box = splitY + 20;
+                    drawRectCustom(X1, y_box + 30, 140, 60, 'Menampilkan riwayat hasil kompetensi');
+                    drawRectCustom(X2, y_box + 30, 140, 60, 'Menampilkan riwayat IDP Monitoring');
+                    drawRectCustom(X3, y_box + 30, 140, 60, 'Menampilkan riwayat Project Improvement');
+                    drawRectCustom(X4, y_box + 30, 140, 60, 'Menampilkan Hasil Penilaian Panelis');
+                    drawRectCustom(X5, y_box + 30, 140, 60, 'Menampilkan Komentar Panelis dan total skor');
+
+                    const y_merge = y_box + 60 + 20;
+                    [X1, X2, X3, X4, X5].forEach(x => svgEl(svg, 'path', { d: `M ${x} ${y_box + 60} L ${x} ${y_merge}`, fill: 'none', stroke: '#334155', 'stroke-width': 1.5 }));
+                    svgEl(svg, 'path', { d: `M ${X1} ${y_merge} L ${X5} ${y_merge}`, stroke: '#334155', 'stroke-width': 1.5 });
+
+                    if (!isLast) arrow(CX, y_merge, CX, y_merge + ARROW - 6);
+                    y = y_merge + ARROW;
+                }
+                else if (s.t === 'CUSTOM_MENTOR_VALIDASI') {
+                    const X_L = CX - 105;
+                    const X_R = CX + 105;
+
+                    const splitY = y;
+                    svgEl(svg, 'path', { d: `M ${X_L} ${splitY} L ${X_R} ${splitY}`, stroke: '#334155', 'stroke-width': 1.5 });
+                    arrow(X_L, splitY, X_L, splitY + 20);
+                    arrow(X_R, splitY, X_R, splitY + 20);
+
+                    const drawRectCustom = (cx, cy, w, h, txt) => {
+                        svgEl(svg, 'rect', { x: cx - w / 2, y: cy - h / 2, width: w, height: h, rx: 6, fill: '#f8fafc', stroke: '#1d4ed8', 'stroke-width': 1.5 });
+                        multiline(cx, cy, txt, 20, '#1e293b', 8, 10);
+                    };
+
+                    const y_box = splitY + 20;
+                    drawRectCustom(X_L, y_box + 23, 150, 46, 'Mentor memberikan Approved');
+                    drawRectCustom(X_R, y_box + 23, 150, 46, 'Mentor memberikan Rejected');
+
+                    const y_merge = y_box + 46 + 20;
+                    svgEl(svg, 'path', { d: `M ${X_L} ${y_box + 46} L ${X_L} ${y_merge}`, fill: 'none', stroke: '#334155', 'stroke-width': 1.5 });
+                    svgEl(svg, 'path', { d: `M ${X_R} ${y_box + 46} L ${X_R} ${y_merge}`, fill: 'none', stroke: '#334155', 'stroke-width': 1.5 });
+                    svgEl(svg, 'path', { d: `M ${X_L} ${y_merge} L ${X_R} ${y_merge}`, stroke: '#334155', 'stroke-width': 1.5 });
+
+                    if (!isLast) arrow(CX, y_merge, CX, y_merge + ARROW - 6);
+                    y = y_merge + ARROW;
+                }
+                else if (s.t === 'CUSTOM_ATASAN_MONITORING') {
+                    const X_L = CX - 140, X_C = CX, X_R = CX + 140;
+                    const drawRectMon = (cx, cy, w, h, txt) => {
+                        svgEl(svg, 'rect', { x: cx - w / 2, y: cy - h / 2, width: w, height: h, rx: 4, fill: '#f8fafc', stroke: '#334155', 'stroke-width': 1.5 });
+                        multiline(cx, cy, txt, 20, '#1e293b', 8, 10);
+                    };
+                    const drawRhombMon = (cx, cy, w, h, txt) => {
+                        svgEl(svg, 'polygon', { points: `${cx - w / 2 + 12},${cy - h / 2} ${cx + w / 2},${cy - h / 2} ${cx + w / 2 - 12},${cy + h / 2} ${cx - w / 2},${cy + h / 2}`, fill: '#f8fafc', stroke: '#334155', 'stroke-width': 1.5 });
+                        multiline(cx, cy, txt, 20, '#1e293b', 8, 10);
+                    };
+
+                    const splitY = y;
+                    svgEl(svg, 'path', { d: `M ${X_L} ${splitY} L ${X_R} ${splitY}`, stroke: '#334155', 'stroke-width': 1.5 });
+                    [X_L, X_C, X_R].forEach(x => arrow(x, splitY, x, splitY + 18));
+
+                    const y_row1 = splitY + 18;
+                    const rh1 = 54;
+                    drawRhombMon(X_L, y_row1 + rh1 / 2, 130, rh1, 'Menampilkan Tab Kompetensi');
+                    drawRhombMon(X_C, y_row1 + rh1 / 2, 130, rh1, 'Menampilkan Tab IDP Monitoring');
+                    drawRhombMon(X_R, y_row1 + rh1 / 2, 130, rh1, 'Menampilkan Tab Project Improvement');
+
+                    [X_L, X_C, X_R].forEach(x => arrow(x, y_row1 + rh1, x, y_row1 + rh1 + 16));
+
+                    const y_row2 = y_row1 + rh1 + 16;
+                    const rh2 = 64;
+                    drawRhombMon(X_L, y_row2 + rh2 / 2, 130, rh2, 'Menampilkan Top 3 Gap Kompetensi dan Headmap Kompetensi Talent');
+                    drawRhombMon(X_C, y_row2 + rh2 / 2, 130, rh2, 'Menampilkan Progres IDP Monitoring Talent');
+                    drawRhombMon(X_R, y_row2 + rh2 / 2, 130, rh2, 'Menampilkan Project Improvement Talent');
+
+                    const y_merge = y_row2 + rh2 + 20;
+                    [X_L, X_C, X_R].forEach(x => svgEl(svg, 'path', { d: `M ${x} ${y_row2 + rh2} L ${x} ${y_merge}`, fill: 'none', stroke: '#334155', 'stroke-width': 1.5 }));
+                    svgEl(svg, 'path', { d: `M ${X_L} ${y_merge} L ${X_R} ${y_merge}`, stroke: '#334155', 'stroke-width': 1.5 });
+
+                    if (!isLast) arrow(CX, y_merge, CX, y_merge + ARROW - 6);
+                    y = y_merge + ARROW;
+                }
+                else if (s.t === 'CUSTOM_FINANCE_REVIEW') {
+                    const X_L = CX - 100;
+                    const X_R = CX + 100;
+
+                    const drawRectCustom = (cx, cy, w, h, txt) => {
+                        svgEl(svg, 'rect', { x: cx - w / 2, y: cy - h / 2, width: w, height: h, rx: 6, fill: '#f8fafc', stroke: '#1d4ed8', 'stroke-width': 1.5 });
+                        multiline(cx, cy, txt, 20, '#1e293b', 8, 10);
+                    };
+                    const drawDiamondCustom = (cx, cy, w, h, txt) => {
+                        svgEl(svg, 'polygon', { points: `${cx},${cy - h / 2} ${cx + w / 2},${cy} ${cx},${cy + h / 2} ${cx - w / 2},${cy}`, fill: '#fffbeb', stroke: '#d97706', 'stroke-width': 1.5 });
+                        multiline(cx, cy, txt, 20, '#92400e', 8.5, 12);
+                    };
+
+                    const dh1 = 50;
+                    drawDiamondCustom(CX, y + dh1 / 2, 120, dh1, 'Beri Keputusan');
+
+                    const splitY = y + dh1 + 10;
+                    svgEl(svg, 'path', { d: `M ${CX} ${y + dh1} L ${CX} ${splitY} L ${X_L} ${splitY} L ${X_L} ${splitY + 15}`, fill: 'none', stroke: '#334155', 'stroke-width': 1.5 });
+                    svgEl(svg, 'path', { d: `M ${CX} ${splitY} L ${X_R} ${splitY} L ${X_R} ${splitY + 15}`, fill: 'none', stroke: '#334155', 'stroke-width': 1.5 });
+                    arrow(X_L, splitY + 15, X_L, splitY + 25);
+                    arrow(X_R, splitY + 15, X_R, splitY + 25);
+
+                    const y_box = splitY + 25;
+                    const bh = 50;
+                    drawRectCustom(X_L, y_box + bh / 2, 140, bh, 'Finance memberikan Approved');
+                    drawRectCustom(X_R, y_box + bh / 2, 140, bh, 'Finance memberikan Rejected');
+
+                    const y_merge = y_box + bh + 25;
+                    svgEl(svg, 'path', { d: `M ${X_L} ${y_box + bh} L ${X_L} ${y_merge}`, fill: 'none', stroke: '#334155', 'stroke-width': 1.5 });
+                    svgEl(svg, 'path', { d: `M ${X_R} ${y_box + bh} L ${X_R} ${y_merge}`, fill: 'none', stroke: '#334155', 'stroke-width': 1.5 });
+                    svgEl(svg, 'path', { d: `M ${X_L} ${y_merge} L ${X_R} ${y_merge}`, stroke: '#334155', 'stroke-width': 1.5 });
+
+                    if (!isLast) arrow(CX, y_merge, CX, y_merge + ARROW - 6);
+                    y = y_merge + ARROW;
+                }
+                else if (s.t === 'CUSTOM_FINANCE_RIWAYAT') {
+                    const X_L = CX - 140;
+                    const X_R = CX + 140;
+                    const X_C = CX;
+
+                    const splitY = y;
+                    svgEl(svg, 'path', { d: `M ${X_L} ${splitY} L ${X_R} ${splitY}`, stroke: '#334155', 'stroke-width': 1.5 });
+                    [X_L, X_C, X_R].forEach(x => arrow(x, splitY, x, splitY + 20));
+
+                    const y_box = splitY + 20;
+                    const bh = 50;
+
+                    const drawRectCustom = (cx, cy, w, h, txt) => {
+                        svgEl(svg, 'rect', { x: cx - w / 2, y: cy - h / 2, width: w, height: h, rx: 6, fill: '#f8fafc', stroke: '#1d4ed8', 'stroke-width': 1.5 });
+                        multiline(cx, cy, txt, 20, '#1e293b', 8, 10);
+                    };
+
+                    drawRectCustom(X_L, y_box + bh / 2, 125, bh, 'Menampilkan catatan dari PDC Admin');
+                    drawRectCustom(X_C, y_box + bh / 2, 125, bh, 'Menampilkan Feddback dari Finance');
+                    drawRectCustom(X_R, y_box + bh / 2, 125, bh, 'Menampilkan Status dari finance');
+
+                    const y_merge = y_box + bh + 25;
+                    [X_L, X_C, X_R].forEach(x => svgEl(svg, 'path', { d: `M ${x} ${y_box + bh} L ${x} ${y_merge}`, fill: 'none', stroke: '#334155', 'stroke-width': 1.5 }));
+                    svgEl(svg, 'path', { d: `M ${X_L} ${y_merge} L ${X_R} ${y_merge}`, stroke: '#334155', 'stroke-width': 1.5 });
+
+                    if (!isLast) arrow(CX, y_merge, CX, y_merge + ARROW - 6);
+                    y = y_merge + ARROW;
+                }
+                else if (s.t === 'CUSTOM_PANELIS_SIDANG') {
+                    const X_L3 = CX - 180;
+                    const X_R3 = CX + 180;
+                    const X_C3 = CX;
+
+                    const split1Y = y;
+                    svgEl(svg, 'path', { d: `M ${X_L3} ${split1Y} L ${X_R3} ${split1Y}`, stroke: '#334155', 'stroke-width': 1.5 });
+                    [X_L3, X_C3, X_R3].forEach(x => arrow(x, split1Y, x, split1Y + 20));
+
+                    const drawRectCustom = (cx, cy, w, h, txt) => {
+                        svgEl(svg, 'rect', { x: cx - w / 2, y: cy - h / 2, width: w, height: h, rx: 6, fill: '#f8fafc', stroke: '#1d4ed8', 'stroke-width': 1.5 });
+                        multiline(cx, cy, txt, 20, '#1e293b', 8, 10);
+                    };
+
+                    const row1Y = split1Y + 20;
+                    drawRectCustom(X_L3, row1Y + 25, 140, 50, 'Tab Kompetensi');
+                    drawRectCustom(X_C3, row1Y + 25, 140, 50, 'Tab IDP Monitoring');
+                    drawRectCustom(X_R3, row1Y + 25, 140, 50, 'Tab Project Improvement');
+
+                    [X_L3, X_C3, X_R3].forEach(x => arrow(x, row1Y + 50, x, row1Y + 70));
+
+                    const row2Y = row1Y + 70;
+                    drawRectCustom(X_L3, row2Y + 30, 160, 60, 'Menampilkan Top 3 Gap Kompetensi dan Headmap Kompetensi');
+                    drawRectCustom(X_C3, row2Y + 30, 150, 60, 'Menampilkan Logbook IDP Monitoring Talent');
+                    drawRectCustom(X_R3, row2Y + 30, 150, 60, 'Menampilkan Project Improvement Talent');
+
+                    const merge1Y = row2Y + 60 + 20;
+                    [X_L3, X_R3].forEach(x => svgEl(svg, 'path', { d: `M ${x} ${row2Y + 60} L ${x} ${merge1Y}`, fill: 'none', stroke: '#334155', 'stroke-width': 1.5 }));
+                    svgEl(svg, 'path', { d: `M ${X_C3} ${row2Y + 60} L ${X_C3} ${merge1Y + 20}`, fill: 'none', stroke: '#334155', 'stroke-width': 1.5 });
+                    svgEl(svg, 'path', { d: `M ${X_L3} ${merge1Y} L ${X_R3} ${merge1Y}`, stroke: '#334155', 'stroke-width': 1.5 });
+
+                    let currY = merge1Y + 20;
+                    const straightTexts = [
+                        'Panelis memberikan Penilaian',
+                        'Menampilkan 10 aspek penilaian ( skor 1 - 5 )',
+                        'Menambahkan komentar / catatan dari panelis',
+                        'Memberi keputusan Rekomendasi Panelis'
+                    ];
+
+                    straightTexts.forEach(txt => {
+                        drawRectCustom(CX, currY + 25, 170, 50, txt);
+                        currY += 50;
+                        arrow(CX, currY, CX, currY + 20);
+                        currY += 20;
+                    });
+
+                    const split2Y = currY;
+                    const X1 = CX - 270;
+                    const X2 = CX - 90;
+                    const X3 = CX + 90;
+                    const X4 = CX + 270;
+
+                    svgEl(svg, 'path', { d: `M ${X1} ${split2Y} L ${X4} ${split2Y}`, stroke: '#334155', 'stroke-width': 1.5 });
+                    [X1, X2, X3, X4].forEach(x => arrow(x, split2Y, x, split2Y + 20));
+
+                    const row3Y = split2Y + 20;
+                    drawRectCustom(X1, row3Y + 30, 160, 60, 'Ready Now (Siap dipromosikan dalam < 6 bulan)');
+                    drawRectCustom(X2, row3Y + 30, 160, 60, 'Ready in 1 – 2 Years (Siap dengan pengembangan terarah)');
+                    drawRectCustom(X3, row3Y + 30, 160, 60, 'Ready in > 2 Years (Masih membutuhkan pengembangan signifikan)');
+                    drawRectCustom(X4, row3Y + 30, 160, 60, 'Not Ready (Belum direkomendasikan untuk jalur suksesi saat ini)');
+
+                    const merge2Y = row3Y + 60 + 20;
+                    [X1, X2, X3, X4].forEach(x => svgEl(svg, 'path', { d: `M ${x} ${row3Y + 60} L ${x} ${merge2Y}`, fill: 'none', stroke: '#334155', 'stroke-width': 1.5 }));
+                    svgEl(svg, 'path', { d: `M ${X1} ${merge2Y} L ${X4} ${merge2Y}`, stroke: '#334155', 'stroke-width': 1.5 });
+
+                    if (!isLast) arrow(CX, merge2Y, CX, merge2Y + ARROW - 6);
+                    y = merge2Y + ARROW;
+                }
+                else if (s.t === 'CUSTOM_PANELIS_RIWAYAT') {
+                    const X_L2 = CX - 150;
+                    const X_L1 = CX - 50;
+                    const X_R1 = CX + 50;
+                    const X_R2 = CX + 150;
+
+                    const splitY = y;
+                    svgEl(svg, 'path', { d: `M ${X_L2} ${splitY} L ${X_R2} ${splitY}`, stroke: '#334155', 'stroke-width': 1.5 });
+                    [X_L2, X_L1, X_R1, X_R2].forEach(x => arrow(x, splitY, x, splitY + 20));
+
+                    const y_box = splitY + 20;
+                    const bh = 50;
+
+                    const drawRectCustom = (cx, cy, w, h, txt) => {
+                        svgEl(svg, 'rect', { x: cx - w / 2, y: cy - h / 2, width: w, height: h, rx: 6, fill: '#f8fafc', stroke: '#1d4ed8', 'stroke-width': 1.5 });
+                        multiline(cx, cy, txt, 20, '#1e293b', 8, 10);
+                    };
+
+                    drawRectCustom(X_L2, y_box + bh / 2, 95, bh, 'Menampilkan Hasil Penilaian');
+                    drawRectCustom(X_L1, y_box + bh / 2, 95, bh, 'Menampilkan Komentar Panelis');
+                    drawRectCustom(X_R1, y_box + bh / 2, 95, bh, 'Menampilkan status rekomendasi');
+                    drawRectCustom(X_R2, y_box + bh / 2, 95, bh, 'Menampilkan Total Skor');
+
+                    const y_merge = y_box + bh + 25;
+                    [X_L2, X_L1, X_R1, X_R2].forEach(x => svgEl(svg, 'path', { d: `M ${x} ${y_box + bh} L ${x} ${y_merge}`, fill: 'none', stroke: '#334155', 'stroke-width': 1.5 }));
+                    svgEl(svg, 'path', { d: `M ${X_L2} ${y_merge} L ${X_R2} ${y_merge}`, stroke: '#334155', 'stroke-width': 1.5 });
+
+                    if (!isLast) arrow(CX, y_merge, CX, y_merge + ARROW - 6);
+                    y = y_merge + ARROW;
+                }
+            });
+            return svg;
+        }
+
+        // â”€â”€â”€ LANE COLOR PALETTE â”€â”€â”€
+        const LC = {
+            user: '#2563eb',
+            sistem: '#059669',
+            admin: '#1d4ed8',
+            mentor: '#2563eb',
+            atasan: '#d97706',
+            panelis: '#db2777',
+            finance: '#7c3aed',
+        };
+
+        // â”€â”€â”€ FLOW DEFINITIONS (9 diagrams) â”€â”€â”€
+        const FLOWS = [
+            {
+                title: 'Alur Autentikasi & Login',
+                steps: [
+                    { t: 'S' },
+                    { t: 'A', txt: 'Buka halaman login', lane: 'user' },
+                    { t: 'D', txt: 'Sudah punya akun?', yes: 'Ya', no: 'Tidak â†’ Daftar ke Register' },
+                    { t: 'A', txt: 'Masuk dengan Akun Google atau Input Username dan Password', lane: 'user' },
+                    { t: 'A', txt: 'Sistem validasi kredensial ke tabel user', lane: 'sistem' },
+                    { t: 'D', txt: 'Kredensial Valid?', yes: 'Ya', no: 'Tidak â†’ Tampil error' },
+                    { t: 'A', txt: 'Cek jumlah role yang dimiliki user', lane: 'sistem' },
+                    { t: 'D', txt: 'Lebih dari 1 role?', yes: 'Ya', no: 'Tidak â†’ Langsung masuk dashboard sesuai rolenya' },
+                    { t: 'A', txt: 'Pilih Akses Menu untuk login sebagai role apa', lane: 'user' },
+                    { t: 'A', txt: 'Masuk ke dashboard sesuai role yang dipilih', lane: 'sistem' },
+                    { t: 'E' },
+                ]
+            },
+            {
+                title: 'Alur Reset Password',
+                steps: [
+                    { t: 'S' },
+                    { t: 'A', txt: 'User Klik "lupa password"', lane: 'user', forceType: 'DATA' },
+                    { t: 'A', txt: 'User memasukkan Username / Email', lane: 'user', forceType: 'DATA' },
+                    { t: 'A', txt: 'Sistem mengecek username / email di tabel users', lane: 'sistem', forceType: 'PROC' },
+                    { t: 'D', txt: 'Email atau Username ditemukan?', yes: 'Ya', no: 'Tidak â†’ Tampil Error' },
+                    { t: 'A', txt: 'Sistem mengirim email berisi link reset', lane: 'sistem', forceType: 'DATA' },
+                    { t: 'A', txt: 'User klik tombol reset password', lane: 'user', forceType: 'DATA' },
+                    { t: 'A', txt: 'User mengisi password baru dan konfirmasi password', lane: 'user', forceType: 'DATA' },
+                    { t: 'A', txt: 'Sistem akan mengganti passwordnya sesuai dengan password yang baru', lane: 'sistem', forceType: 'PROC' },
+                    { t: 'E' },
+                ]
+            },
+            {
+                title: 'Alur Talent: Submit IDP Logbook',
+                steps: [
+                    { t: 'S' },
+                    { t: 'A', txt: 'Talent buka halaman IDP Monitoring', lane: 'user' },
+                    { t: 'A', txt: 'Pilih tipe : Exposure / Mentoring / Learning', lane: 'user' },
+                    { t: 'A', txt: 'Isi form', lane: 'user' },
+                    { t: 'A', txt: 'Upload bukti dokumen', lane: 'user' },
+                    { t: 'A', txt: 'Sistem akan menyimpan ke Logbook dan status berubah menjadi pending', lane: 'sistem' },
+                    { t: 'A', txt: 'Sistem akan mengirim ke Mentor dan PDC Admin', lane: 'sistem' },
+                    { t: 'D', txt: 'Mentor sudah memberikan validasi?', yes: 'Ya', no: 'Tidak â†’ Status masih pending' },
+                    { t: 'CUSTOM_IDP' },
+                    { t: 'E' }
+                ]
+            },
+            {
+                title: 'Alur Talent: Submit Project Improvement',
+                steps: [
+                    { t: 'S' },
+                    { t: 'A', txt: 'Talent buka halaman Project Improvement', lane: 'user' },
+                    { t: 'A', txt: 'Mengisi Nama Project Improvement', lane: 'user' },
+                    { t: 'A', txt: 'Upload dokumen Project Improvement', lane: 'user' },
+                    { t: 'A', txt: 'Sistem akan menyimpan dengan status pending dan mengirimkan ke PDC Admin untuk meminta validasi', lane: 'sistem' },
+                    { t: 'CUSTOM_PROJECT' },
+                    { t: 'E' }
+                ]
+            },
+            {
+                title: 'Alur Talent: Lihat Riwayat Talent',
+                steps: [
+                    { t: 'S' },
+                    { t: 'A', txt: 'Talent buka halaman Riwayat', lane: 'user' },
+                    { t: 'D', txt: 'Talent sudah menyelesaikan penilaian akhir?', yes: 'Ya', no: 'Tidak â†’ menunggu penilaian akhir selesai' },
+                    { t: 'CUSTOM_HISTORY' },
+                    { t: 'E' }
+                ]
+            },
+            {
+                title: 'Alur Talent: Self-Assessment Kompetensi',
+                steps: [
+                    { t: 'S' },
+                    { t: 'A', txt: 'Buka Halaman Kompetensi', lane: 'user' },
+                    { t: 'A', txt: 'Talent isi skor tiap kompetensi', lane: 'user' },
+                    { t: 'A', txt: 'Sistem akan mengirimkan jawaban ke PDC Admin dan Atasan', lane: 'sistem' },
+                    { t: 'D', txt: 'Atasan sudah memberi nilai?', yes: 'Ya', no: 'Tidak â†’ Menunggu Nilai dari Atasan' },
+                    { t: 'A', txt: 'Dashboard Kompetensi akan menampikan Final Hasil dan gapnya', lane: 'sistem' },
+                    { t: 'E' }
+                ]
+            },
+            {
+                title: 'Alur Mentor: Validasi IDP Monitoring',
+                steps: [
+                    { t: 'S' },
+                    { t: 'A', txt: 'Mentor buka halaman validasi', lane: 'mentor' },
+                    { t: 'A', txt: 'Mentor klik detail IDP pada talent dan memberikan validasi', lane: 'mentor' },
+                    { t: 'CUSTOM_MENTOR_VALIDASI' },
+                    { t: 'E' },
+                ]
+            },
+            {
+                title: 'Alur Mentor: Riwayat Logbook Talent',
+                steps: [
+                    { t: 'S' },
+                    { t: 'A', txt: 'Mentor buka halaman Riwayat', lane: 'mentor' },
+                    { t: 'D', txt: 'Talent sudah menyelesaikan penilaian akhir?', yes: 'Ya', no: 'Tidak â†’ menunggu penilaian akhir selesai' },
+                    { t: 'A', txt: 'Muncul Riwayat Logbook Talent', lane: 'sistem' },
+                    { t: 'A', txt: 'Mentor dapat melihat Riwayat Logbook Talent', lane: 'mentor' },
+                    { t: 'E' }
+                ]
+            },
+            {
+                title: 'Alur Atasan: Monitoring Talent',
+                steps: [
+                    { t: 'S' },
+                    { t: 'A', txt: 'Atasan buka halaman Monitoring', lane: 'atasan' },
+                    { t: 'CUSTOM_ATASAN_MONITORING' },
+                    { t: 'E' }
+                ]
+            },
+            {
+                title: 'Alur Atasan: Isi Kompetensi Talent',
+                steps: [
+                    { t: 'S' },
+                    { t: 'A', txt: 'Atasan buka halaman Dashboard', lane: 'atasan' },
+                    { t: 'A', txt: 'Atasan memilih talent untuk di nilai kompetensinya', lane: 'atasan' },
+                    { t: 'A', txt: 'Atasan mengisi kompetensi talent yang dipilih', lane: 'atasan' },
+                    { t: 'A', txt: 'Sistem akan otomatis menghitung gap score ( score atasan + score talent)/2 - score position_target', lane: 'sistem', forceType: 'PROC' },
+                    { t: 'A', txt: 'Sistem otomatis menampilkan Top 3 Gap Kompetensi', lane: 'sistem', forceType: 'PROC' },
+                    { t: 'A', txt: 'Sistem akan mengimkan datanya serta notifikasi ke PDC Admin dan Talent', lane: 'sistem', forceType: 'PROC' },
+                    { t: 'E' },
+                ]
+            },
+            {
+                title: 'Alur PDC Admin: Progress Talent',
+                steps: [
+                    { t: 'S' },
+                    { t: 'A', txt: 'Admin buka menu Progress Talent', lane: 'admin' },
+                    { t: 'A', txt: 'Pilih Talent dan klik "Buat Promotion Plan"', lane: 'admin' },
+                    { t: 'A', txt: 'Input target Jabatan dan pilih Mentor', lane: 'admin' },
+                    { t: 'A', txt: 'Simpan promotion_plan dengan status Draft', lane: 'sistem' },
+                    { t: 'A', txt: 'Admin mengubah status menjadi In Progress', lane: 'admin' },
+                    { t: 'A', txt: 'Akses fitur logbook & assessment terbuka bagi Talent', lane: 'sistem' },
+                    { t: 'E' },
+                ]
+            },
+            {
+                title: 'Alur PDC Admin: Kompetensi',
+                steps: [
+                    { t: 'S' },
+                    { t: 'A', txt: 'Admin buka menu Kompetensi', lane: 'admin' },
+                    { t: 'A', txt: 'Sistem menampilkan daftar bank kompetensi', lane: 'sistem' },
+                    { t: 'A', txt: 'Input target nilai standar (1-5) untuk tiap Jabatan', lane: 'admin' },
+                    { t: 'A', txt: 'Simpan profil position_target_competence', lane: 'sistem' },
+                    { t: 'A', txt: 'Digunakan sebagai basis hitung gap score saat assessment', lane: 'sistem' },
+                    { t: 'E' },
+                ]
+            },
+            {
+                title: 'Alur PDC Admin: Company Management',
+                steps: [
+                    { t: 'S' },
+                    { t: 'A', txt: 'Admin buka menu Company Management', lane: 'admin' },
+                    { t: 'A', txt: 'Tampilkan hirarki struktur organisasi dari database', lane: 'sistem' },
+                    { t: 'A', txt: 'Admin tambah/edit Master Data Department', lane: 'admin' },
+                    { t: 'A', txt: 'Admin tambah/edit Master Data Position', lane: 'admin' },
+                    { t: 'A', txt: 'Simpan ke tabel departments & positions', lane: 'sistem' },
+                    { t: 'E' },
+                ]
+            },
+            {
+                title: 'Alur Panelis: Sidang Akhir',
+                steps: [
+                    { t: 'S' },
+                    { t: 'A', txt: 'Panelis masuk ke Dashboard', lane: 'panelis', forceType: 'DATA' },
+                    { t: 'A', txt: 'Panelis lihat detail talent', lane: 'panelis', forceType: 'DATA' },
+                    { t: 'CUSTOM_PANELIS_SIDANG' },
+                    { t: 'E' },
+                ]
+            },
+            {
+                title: 'Alur Panelis: Riwayat Panelis',
+                steps: [
+                    { t: 'S' },
+                    { t: 'A', txt: 'Panelis masuk ke Halaman Riwayat', lane: 'panelis', forceType: 'DATA' },
+                    { t: 'A', txt: 'Menampilkan Riwayat Penilaian Talent', lane: 'sistem', forceType: 'DATA' },
+                    { t: 'CUSTOM_PANELIS_RIWAYAT' },
+                    { t: 'E' },
+                ]
+            },
+            {
+                title: 'Alur Finance: Review Improvement Project',
+                steps: [
+                    { t: 'S' },
+                    { t: 'A', txt: 'Finance masuk ke halaman Validasi', lane: 'finance', forceType: 'DATA' },
+                    { t: 'A', txt: 'Buka / Download file Improvement Project Talent', lane: 'finance', forceType: 'DOC' },
+                    { t: 'A', txt: 'Isi pada finance feedback', lane: 'finance', forceType: 'DATA' },
+                    { t: 'CUSTOM_FINANCE_REVIEW' },
+                    { t: 'A', txt: 'Kirim keputusan ke PDC Admin', lane: 'sistem', forceType: 'PROC' },
+                    { t: 'E' },
+                ]
+            },
+            {
+                title: 'Alur Finance: Lihat Riwayat Talent',
+                steps: [
+                    { t: 'S' },
+                    { t: 'A', txt: 'Finance masuk ke halaman Riwayat', lane: 'finance', forceType: 'DATA' },
+                    { t: 'A', txt: 'Menampilkan Riwayat Validasi Project Improvement Talent', lane: 'sistem', forceType: 'DATA' },
+                    { t: 'CUSTOM_FINANCE_RIWAYAT' },
+                    { t: 'E' },
+                ]
+            },
+            {
+                title: 'Alur PDC Admin: User Management',
+                steps: [
+                    { t: 'S' },
+                    { t: 'A', txt: 'Admin buka menu User Management', lane: 'admin' },
+                    { t: 'A', txt: 'Pilih "Tambah User" atau "Edit Role"', lane: 'admin' },
+                    { t: 'A', txt: 'Tampilkan modal form (department, position, select role)', lane: 'sistem' },
+                    { t: 'A', txt: 'Sembunyikan filter jabatan opsional jika role=Finance/Admin', lane: 'sistem' },
+                    { t: 'A', txt: 'Admin input data dan klik Simpan perubahan', lane: 'admin' },
+                    { t: 'A', txt: 'Sinkronisasi ke tabel users & tabel pivot user_role', lane: 'sistem' },
+                    { t: 'E' },
+                ]
+            },
+            {
+                title: 'Alur PDC Admin: Finance Validation',
+                steps: [
+                    { t: 'S' },
+                    { t: 'A', txt: 'Admin buka menu Finance Validation', lane: 'admin' },
+                    { t: 'A', txt: 'Sistem load riwayat project yang telah direview', lane: 'sistem' },
+                    { t: 'A', txt: 'Admin memantau status validasi anggaran dari Finance', lane: 'admin' },
+                    { t: 'D', txt: 'Project Approved Finance?', yes: 'Ya', no: 'Tidak â†’ Talent revisi' },
+                    { t: 'A', txt: 'Progress promosi siap dilanjutkan ke tahapan Panelis', lane: 'sistem' },
+                    { t: 'E' },
+                ]
+            },
+            {
+                title: 'Alur PDC Admin: Panelis Review',
+                steps: [
+                    { t: 'S' },
+                    { t: 'A', txt: 'Admin buka menu Panelis Review', lane: 'admin' },
+                    { t: 'A', txt: 'Pilih Talent yang memenuhi syarat akhir', lane: 'admin' },
+                    { t: 'A', txt: 'Klik Assign Panelis lalu input nama-nama penguji', lane: 'admin' },
+                    { t: 'A', txt: 'Ubah status promotion_plan menjadi Pending Panelis', lane: 'sistem' },
+                    { t: 'A', txt: 'Kirim notifikasi tugas assessment kepada Panelis', lane: 'sistem' },
+                    { t: 'E' },
+                ]
+            },
+            {
+                title: 'Alur PDC Admin: Progress Archive',
+                steps: [
+                    { t: 'S' },
+                    { t: 'A', txt: 'Admin buka menu Progress Archive', lane: 'admin' },
+                    { t: 'A', txt: 'Sistem meload riwayat promotion_plan (status=Finished)', lane: 'sistem' },
+                    { t: 'A', txt: 'Admin melihat histori riwayat detail pencapaian', lane: 'admin' },
+                    { t: 'A', txt: 'Melakukan eksport laporan akhir berformat PDF/Excel', lane: 'admin' },
+                    { t: 'A', txt: 'Akses data dienkripsi as-is (is_locked = true)', lane: 'sistem' },
+                    { t: 'E' },
+                ]
+            }
+        ];
+
+        function renderActivityDiagrams() {
+            const container = document.getElementById('act-svgs');
+            container.innerHTML = '';
+            FLOWS.forEach(flow => {
+                const card = document.createElement('div');
+                card.className = 'act-card';
+                const header = document.createElement('div');
+                header.className = 'act-header';
+                header.textContent = flow.title;
+                card.appendChild(header);
+                const body = document.createElement('div');
+                body.className = 'act-body';
+                // Draw swimlane legend inside card
+                const lanedSteps = flow.steps.filter(s => s.lane);
+                const usedLanes = [...new Set(lanedSteps.map(s => s.lane))];
+                if (usedLanes.length > 0) {
+                    const laneBar = document.createElement('div');
+                    laneBar.style.cssText = 'display:flex;gap:4px;flex-wrap:wrap;padding:4px 6px 0;width:100%;justify-content:center;margin-bottom:2px';
+                    usedLanes.forEach(ln => {
+                        const chip = document.createElement('span');
+                        chip.style.cssText = `background:${LC[ln]};color:#fff;font-size:8px;font-weight:700;padding:1px 7px;border-radius:10px;letter-spacing:.4px`;
+                        chip.textContent = ln.toUpperCase();
+                        laneBar.appendChild(chip);
+                    });
+                    card.appendChild(laneBar);
+                }
+                const svgEl = drawFlow(flow.steps, flow.title, LC);
+                body.appendChild(svgEl);
+                card.appendChild(body);
+                container.appendChild(card);
+            });
+        }
+
+        // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ USE CASE DIAGRAM â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        function drawUseCase() {
+            const svg = document.getElementById('uc-svg');
+            svg.innerHTML = '';
+            svg.style.cursor = 'default';
+
+            const NS = 'http://www.w3.org/2000/svg';
+            const UC_RX = 82, UC_RY = 22; // default ellipse radii
+
+            /* ── low-level helpers ── */
+            function el(tag, attrs, txt) {
+                const e = document.createElementNS(NS, tag);
+                for (const k in attrs) e.setAttribute(k, attrs[k]);
+                if (txt !== undefined && txt !== null) e.textContent = txt;
+                svg.appendChild(e);
+                return e;
+            }
+            function gel(parent, tag, attrs, txt) {
+                const e = document.createElementNS(NS, tag);
+                for (const k in attrs) e.setAttribute(k, attrs[k]);
+                if (txt !== undefined && txt !== null) e.textContent = txt;
+                parent.appendChild(e);
+                return e;
+            }
+            function txt(x, y, t, size, color, anchor) {
+                el('text', {
+                    x, y, 'font-size': size || 11, fill: color || '#fff',
+                    'text-anchor': anchor || 'middle', 'dominant-baseline': 'middle',
+                    'font-family': 'Segoe UI,sans-serif'
+                }, t);
+            }
+
+            /* ── defs: arrowhead for include/extend ── */
+            const defs = el('defs', {});
+            const mkUc = document.createElementNS(NS, 'marker');
+            mkUc.setAttribute('id', 'arr-uc'); mkUc.setAttribute('markerWidth', '10');
+            mkUc.setAttribute('markerHeight', '10'); mkUc.setAttribute('refX', '9');
+            mkUc.setAttribute('refY', '5'); mkUc.setAttribute('orient', 'auto');
+            const pUc = document.createElementNS(NS, 'path');
+            pUc.setAttribute('d', 'M0,0 L10,5 L0,10 z');
+            pUc.setAttribute('fill', '#cbd5e1'); pUc.setAttribute('stroke', '#cbd5e1');
+            mkUc.appendChild(pUc); defs.appendChild(mkUc);
+
+            /* ── system boundary ── */
+            el('rect', {
+                x: 155, y: 12, width: 960, height: 1018, rx: 10,
+                fill: 'rgba(255,255,255,0.02)', stroke: 'rgba(148,163,184,0.3)',
+                'stroke-width': 1.5, 'stroke-dasharray': '7,4'
+            });
+            txt(635, 30, '<< System >> Dashboard IDP - Enterprise Talent & Competency System', 11, 'rgba(148,163,184,0.7)', 'middle');
+
+            /* ──────────────────────────────────────────────────
+               DRAG SYSTEM + HOVER SYSTEM
+            ────────────────────────────────────────────────── */
+            const ORANGE = '#f97316';
+            const DEFAULT_LINE = 'rgba(148,163,184,0.25)';
+            const DEFAULT_LINE_W = '1.2';
+
+            // Registry of all node positions (actors + usecases) for live line redraw
+            const nodePositions = {}; // id -> { x, y, rw, rh }
+
+            // Redraw all lines connected to a given node id
+            function redrawLines(nodeid) {
+                // Lines where this node is an ACTOR
+                svg.querySelectorAll(`line[data-actorid="${nodeid}"]`).forEach(ln => {
+                    const ucid = ln.getAttribute('data-ucid');
+                    const a = nodePositions[nodeid];
+                    const u = nodePositions[ucid];
+                    if (!a || !u) return;
+                    const angle = Math.atan2(a.y - u.y, a.x - u.x);
+                    const ex = u.x + u.rw * Math.cos(angle);
+                    const ey = u.y + u.rh * Math.sin(angle);
+                    ln.setAttribute('x1', a.x); ln.setAttribute('y1', a.y);
+                    ln.setAttribute('x2', ex); ln.setAttribute('y2', ey);
+                });
+                // Lines where this node is a USE CASE
+                svg.querySelectorAll(`line[data-ucid="${nodeid}"]`).forEach(ln => {
+                    const acid = ln.getAttribute('data-actorid');
+                    const a = nodePositions[acid];
+                    const u = nodePositions[nodeid];
+                    if (!a || !u) return;
+                    const angle = Math.atan2(a.y - u.y, a.x - u.x);
+                    const ex = u.x + u.rw * Math.cos(angle);
+                    const ey = u.y + u.rh * Math.sin(angle);
+                    ln.setAttribute('x1', a.x); ln.setAttribute('y1', a.y);
+                    ln.setAttribute('x2', ex); ln.setAttribute('y2', ey);
+                });
+            }
+
+            // Make an SVG <g> element draggable
+            function makeDraggable(g, nodeId) {
+                let isDragging = false, startX = 0, startY = 0, ox = 0, oy = 0;
+
+                g.addEventListener('mousedown', e => {
+                    if (e.button !== 0) return;
+                    e.preventDefault();
+                    isDragging = true;
+                    const pt = svg.createSVGPoint();
+                    pt.x = e.clientX; pt.y = e.clientY;
+                    const svgP = pt.matrixTransform(svg.getScreenCTM().inverse());
+                    startX = svgP.x; startY = svgP.y;
+                    ox = nodePositions[nodeId].x;
+                    oy = nodePositions[nodeId].y;
+                    svg.style.cursor = 'grabbing';
+                    g.style.cursor = 'grabbing';
+                });
+
+                svg.addEventListener('mousemove', e => {
+                    if (!isDragging) return;
+                    e.preventDefault();
+                    const pt = svg.createSVGPoint();
+                    pt.x = e.clientX; pt.y = e.clientY;
+                    const svgP = pt.matrixTransform(svg.getScreenCTM().inverse());
+                    const dx = svgP.x - startX;
+                    const dy = svgP.y - startY;
+                    const np = nodePositions[nodeId];
+                    np.x = ox + dx;
+                    np.y = oy + dy;
+                    g.setAttribute('transform', `translate(${dx},${dy})`);
+                    // We need absolute position: store initial translate too
+                    const base = g._baseTranslate || { x: 0, y: 0 };
+                    g.setAttribute('transform', `translate(${base.x + dx},${base.y + dy})`);
+                    redrawLines(nodeId);
+                });
+
+                svg.addEventListener('mouseup', e => {
+                    if (!isDragging) return;
+                    isDragging = false;
+                    // Commit the translate as new base
+                    const t = g.getAttribute('transform') || 'translate(0,0)';
+                    const m = t.match(/translate\(([-\d.]+),([-\d.]+)\)/);
+                    if (m) g._baseTranslate = { x: parseFloat(m[1]), y: parseFloat(m[2]) };
+                    svg.style.cursor = 'default';
+                    g.style.cursor = 'grab';
+                });
+
+                svg.addEventListener('mouseleave', () => { isDragging = false; svg.style.cursor = 'default'; });
+            }
+
+            function onEnter(actorid, origColor) {
+                svg.querySelectorAll(`line[data-actorid="${actorid}"]`).forEach(ln => {
+                    ln.setAttribute('stroke', ORANGE);
+                    ln.setAttribute('stroke-width', 2);
+                    const ucid = ln.getAttribute('data-ucid');
+                    if (ucid) {
+                        const ucg = svg.querySelector(`[data-ucid-group="${ucid}"]`);
+                        if (ucg) {
+                            ucg.querySelector('ellipse').setAttribute('stroke', ORANGE);
+                            ucg.querySelectorAll('text').forEach(t => t.setAttribute('fill', ORANGE));
+                        }
+                    }
+                });
+                const ag = svg.querySelector(`[data-actor-group="${actorid}"]`);
+                if (ag) {
+                    ag.querySelectorAll('circle').forEach(c => c.setAttribute('fill', ORANGE));
+                    ag.querySelectorAll('line').forEach(l => l.setAttribute('stroke', ORANGE));
+                    ag.querySelectorAll('text').forEach(t => t.setAttribute('fill', ORANGE));
+                }
+            }
+            function onLeave(actorid, origColor) {
+                svg.querySelectorAll(`line[data-actorid="${actorid}"]`).forEach(ln => {
+                    ln.setAttribute('stroke', DEFAULT_LINE);
+                    ln.setAttribute('stroke-width', DEFAULT_LINE_W);
+                    const ucid = ln.getAttribute('data-ucid');
+                    if (ucid) {
+                        const ucg = svg.querySelector(`[data-ucid-group="${ucid}"]`);
+                        if (ucg) {
+                            const origStroke = ucg.getAttribute('data-orig-stroke');
+                            ucg.querySelector('ellipse').setAttribute('stroke', origStroke);
+                            ucg.querySelectorAll('text').forEach(t => t.setAttribute('fill', '#e2e8f0'));
+                        }
+                    }
+                });
+                const ag = svg.querySelector(`[data-actor-group="${actorid}"]`);
+                if (ag) {
+                    ag.querySelectorAll('circle').forEach(c => c.setAttribute('fill', origColor));
+                    ag.querySelectorAll('line').forEach(l => l.setAttribute('stroke', '#fff'));
+                    ag.querySelectorAll('text').forEach(t => t.setAttribute('fill', origColor));
+                }
+            }
+
+            /* ── draw actor (stick figure in a draggable hoverable group) ── */
+            function actor(x, y, label, color, actorid) {
+                const g = document.createElementNS(NS, 'g');
+                g.setAttribute('data-actor-group', actorid);
+                g._baseTranslate = { x: 0, y: 0 };
+                g.style.cursor = 'grab';
+                svg.appendChild(g);
+                // Register position
+                nodePositions[actorid] = { x, y, rw: 20, rh: 20 };
+
+                gel(g, 'circle', {
+                    cx: x, cy: y - 30, r: 14, fill: color,
+                    stroke: '#fff', 'stroke-width': 2
+                });
+                gel(g, 'line', {
+                    x1: x, y1: y - 16, x2: x, y2: y + 10,
+                    stroke: '#fff', 'stroke-width': 2
+                });
+                gel(g, 'line', {
+                    x1: x - 16, y1: y - 5, x2: x + 16, y2: y - 5,
+                    stroke: '#fff', 'stroke-width': 2
+                });
+                gel(g, 'line', {
+                    x1: x, y1: y + 10, x2: x - 12, y2: y + 30,
+                    stroke: '#fff', 'stroke-width': 2
+                });
+                gel(g, 'line', {
+                    x1: x, y1: y + 10, x2: x + 12, y2: y + 30,
+                    stroke: '#fff', 'stroke-width': 2
+                });
+                gel(g, 'text', {
+                    x, y: y + 48, 'font-size': 11, fill: color,
+                    'text-anchor': 'middle', 'dominant-baseline': 'middle',
+                    'font-family': 'Segoe UI,sans-serif', 'font-weight': 'bold'
+                }, label);
+
+                const hitArea = gel(g, 'rect', {
+                    x: x - 22, y: y - 46, width: 44, height: 110,
+                    fill: 'transparent', stroke: 'none'
+                });
+
+                g.addEventListener('mouseenter', () => onEnter(actorid, color));
+                g.addEventListener('mouseleave', () => onLeave(actorid, color));
+                makeDraggable(g, actorid);
+
+                return { x, lineY: y, id: actorid };
+            }
+
+            /* ── draw use case ellipse (draggable) ── */
+            function usecase(x, y, label, color, ucid, rw, rh) {
+                rw = rw || UC_RX; rh = rh || UC_RY;
+                const g = document.createElementNS(NS, 'g');
+                g.setAttribute('data-ucid-group', ucid);
+                g.setAttribute('data-orig-stroke', color);
+                g._baseTranslate = { x: 0, y: 0 };
+                g.style.cursor = 'grab';
+                svg.appendChild(g);
+                // Register position
+                nodePositions[ucid] = { x, y, rw, rh };
+
+                gel(g, 'ellipse', {
+                    cx: x, cy: y, rx: rw, ry: rh,
+                    fill: '#1e293b', stroke: color, 'stroke-width': 1.5
+                });
+
+                const lines = label.split('\n');
+                const sy = y - ((lines.length - 1) * 7.5);
+                lines.forEach((ln, i) => {
+                    gel(g, 'text', {
+                        x, y: sy + i * 15,
+                        'font-size': 9.5, fill: '#e2e8f0',
+                        'text-anchor': 'middle', 'dominant-baseline': 'middle',
+                        'font-family': 'Segoe UI,sans-serif'
+                    }, ln);
+                });
+                makeDraggable(g, ucid);
+                return { x, y, rw, rh, id: ucid };
+            }
+
+            /* ── draw link line (actor → usecase) ── */
+            function link(ax, ay, uc, actorid) {
+                const angle = Math.atan2(ay - uc.y, ax - uc.x);
+                const ex = uc.x + uc.rw * Math.cos(angle);
+                const ey = uc.y + uc.rh * Math.sin(angle);
+                // Insert BEFORE actor groups so actors render on top
+                const ln = document.createElementNS(NS, 'line');
+                ln.setAttribute('x1', ax); ln.setAttribute('y1', ay);
+                ln.setAttribute('x2', ex); ln.setAttribute('y2', ey);
+                ln.setAttribute('stroke', DEFAULT_LINE);
+                ln.setAttribute('stroke-width', DEFAULT_LINE_W);
+                ln.setAttribute('data-actorid', actorid);
+                ln.setAttribute('data-ucid', uc.id);
+                svg.insertBefore(ln, svg.firstChild);
+            }
+
+            /* ── draw include / extend relation ── */
+            function relation(ucA, ucB, type) {
+                const angle = Math.atan2(ucB.y - ucA.y, ucB.x - ucA.x);
+                // Helper to get ellipse perimeter point
+                function ellipseP(cx, cy, a, rx, ry) {
+                    const ex = rx * ry / Math.sqrt(Math.pow(ry * Math.cos(a), 2) + Math.pow(rx * Math.sin(a), 2));
+                    return { x: cx + ex * Math.cos(a), y: cy + ex * Math.sin(a) };
+                }
+                const p1 = ellipseP(ucA.x, ucA.y, angle, ucA.rw, ucA.rh);
+                const p2 = ellipseP(ucB.x, ucB.y, angle + Math.PI, ucB.rw, ucB.rh);
+
+                el('line', {
+                    x1: p1.x, y1: p1.y, x2: p2.x, y2: p2.y,
+                    stroke: '#94a3b8', 'stroke-width': 1.2,
+                    'stroke-dasharray': '5,4', 'marker-end': 'url(#arr-uc)'
+                });
+                const mx = (p1.x + p2.x) / 2, my = (p1.y + p2.y) / 2;
+                const dx = p2.x - p1.x, dy = p2.y - p1.y;
+                const len = Math.sqrt(dx * dx + dy * dy) || 1;
+                const nx = -dy / len, ny = dx / len;
+                const bias = type === 'include' ? -16 : 16;
+                const lx = mx + nx * bias, ly = my + ny * bias;
+                const lbl = type === 'include' ? '\u00abinclude\u00bb' : '\u00abextend\u00bb';
+                const bw = type === 'include' ? 70 : 66;
+                el('rect', {
+                    x: lx - bw / 2, y: ly - 9, width: bw, height: 18,
+                    rx: 3, fill: '#1e293b'
+                });
+                el('text', {
+                    x: lx, y: ly + 1, 'font-size': 10, fill: '#cbd5e1',
+                    'text-anchor': 'middle', 'dominant-baseline': 'middle',
+                    'font-family': 'Segoe UI,sans-serif'
+                }, lbl);
+            }
+
+            /* ════════════════════════════════════════════════════
+               LAYOUT & DATA based exactly on reference image
+            ════════════════════════════════════════════════════ */
+            const LX = 80;    // left actor column
+            const RX = 1220;  // right actor column
+
+            // X-coordinates roughly estimating the image spacing
+            const C1 = 260;
+            const C2 = 380;
+            const C3 = 650;
+            const C4 = 920;
+            const C5 = 1040;
+
+            /* ── USE CASES ── */
+            // Left-Top cluster (Talent)
+            const colTal = '#10b981';
+            const uUpB = usecase(C1 + 40, 50, 'Uploud Bukti\nDokumen', colTal, 'UpB', 68, 22);
+            const uUpL = usecase(C1 - 80, 160, 'Uploud\nLogbook IDP', colTal, 'UpL', 68, 22); // left of uUpB
+            const uUpP = usecase(C2 + 30, 160, 'Uploud\nImprovement\nProject', colTal, 'UpP', 68, 26); // right of uUpB
+            const uSef = usecase(C1 + 20, 310, 'Self -\nAssessment\nKompetensi', colTal, 'Sef', 74, 26);
+
+            // Mentor/Atasan uses
+            const colMen = '#60a5fa';
+            const colAts = '#f59e0b';
+            const uMonT = usecase(C1 - 60, 400, 'Monitoring\nTalent', colMen, 'MonT', 68, 22);
+            const uVLog = usecase(C1 - 120, 450, 'Validasi\nLogbook IDP', colMen, 'VLog', 68, 22);
+            const uNilK = usecase(C1 - 40, 600, 'Menilai\nKompetensi\nTalent', colAts, 'NilK', 72, 26);
+
+            // Center Column cluster (Shared/Auth)
+            const colAuth = '#38bdf8';
+            const uVer = usecase(C3, 50, 'Verifikasi\nEmail', colAuth, 'Ver', 65, 22);
+            const uReg = usecase(C3, 140, 'Registrasi', colAuth, 'Reg', 65, 18);
+            const uLog = usecase(C3, 210, 'Login', colAuth, 'Log', 65, 18);
+            const uRst = usecase(C3, 270, 'Reset\nPassword', colAuth, 'Rst', 65, 22);
+            const uPrf = usecase(C3, 330, 'Update\nProfile', colAuth, 'Prf', 60, 22);
+            const uNot = usecase(C3, 390, 'Lihat\nNotifikasi', colAuth, 'Not', 60, 22);
+            const uRiw = usecase(C3, 460, 'Lihat Riwayat\nTalent', colAuth, 'Riw', 72, 22);
+
+            // Right-Side clusters (Finance)
+            const colFin = '#a78bfa';
+            const uLihat = usecase(C4 - 20, 140, 'Lihat\nPermintaan\nValidasi', colFin, 'Lihat', 68, 26);
+            const uBeri = usecase(C5 - 30, 80, 'Beri\nKeputusan\nFinance', colFin, 'Beri', 68, 26);
+
+            // Panelis
+            const colPan = '#ec4899';
+            // uIsiPan is the base, uIsiRek extends it via include — spread them further apart
+            const uIsiPan = usecase(C5 + 60, 360, 'Isi Penilaian\nPanelis', colPan, 'IsiPan', 64, 22); // pushed right
+            const uIsiRek = usecase(C4 - 40, 410, 'Isi\nRekomendasi\nPromosi', colPan, 'IsiRek', 64, 26); // pushed left
+            const uDtl = usecase(C5 + 80, 460, 'Lihat Detail\nTalent', colPan, 'Dtl', 60, 22);
+
+            // PDC Admin
+            const colAdm = '#3b82f6';
+            const uKK = usecase(C4 + 90, 510, 'Kelola\nKompetensi dan\nPosition target', colAdm, 'KK', 74, 26);
+            // uKPT <<include>> uKDP — separate them by ~200px
+            const uKPT = usecase(C4 + 20, 600, 'Kelola\nProgress\nTalent', colAdm, 'KPT', 64, 26);
+            const uKDP = usecase(C4 - 200, 600, 'Kelola\nDevelopment\nPlan', colAdm, 'KDP', 64, 26);
+            const uKCP = usecase(C4 - 60, 680, 'Kelola Company\ndan Departmen', colAdm, 'KCP', 74, 22);
+            const uKUM = usecase(C4 - 60, 760, 'Kelola User\nManagement', colAdm, 'KUM', 72, 22);
+            const uRFV = usecase(C4 + 20, 840, 'Request Finance\nValidation', colAdm, 'RFV', 74, 22);
+            const uRPR = usecase(C4 + 180, 890, 'Request Panelis\nReview', colAdm, 'RPR', 74, 22);
+            const uArc = usecase(C5 + 130, 940, 'Kelola Progress\nArchive', colAdm, 'Arc', 74, 22);
+
+            /* ── ACTORS ── */
+            const tal = actor(LX, 220, 'Talent', colTal, 'Tal');
+            const men = actor(LX, 420, 'Mentor', colMen, 'Men');
+            const ats = actor(LX, 630, 'Atasan', colAts, 'Ats');
+            const fin = actor(RX, 180, 'Finance', colFin, 'Fin');
+            const pan = actor(RX, 370, 'Panelis', colPan, 'Pan');
+            const adm = actor(RX, 600, 'PDC Admin', colAdm, 'Adm');
+
+            /* ── LINKS ── */
+            [tal, men, ats, pan, fin, adm].forEach(a => {
+                const ox = (a.x === LX) ? 13 : -13;
+                link(a.x + ox, a.lineY, uLog, a.id);
+                link(a.x + ox, a.lineY, uPrf, a.id);
+                link(a.x + ox, a.lineY, uNot, a.id);
+                link(a.x + ox, a.lineY, uRiw, a.id);
+            });
+
+            // Talent
+            [uReg, uRst, uUpL, uUpP, uSef].forEach(u => link(tal.x + 13, tal.lineY, u, 'Tal'));
+            // Mentor
+            [uMonT, uVLog].forEach(u => link(men.x + 13, men.lineY, u, 'Men'));
+            // Atasan
+            [uNilK, uMonT].forEach(u => link(ats.x + 13, ats.lineY, u, 'Ats'));
+            // Finance
+            [uReg, uRst, uBeri, uLihat].forEach(u => link(fin.x - 13, fin.lineY, u, 'Fin'));
+            // Panelis
+            [uRst, uIsiPan, uIsiRek, uDtl].forEach(u => link(pan.x - 13, pan.lineY, u, 'Pan'));
+            // PDC Admin
+            [uRst, uKPT, uKCP, uKUM, uRFV, uRPR, uKK, uArc].forEach(u => link(adm.x - 13, adm.lineY, u, 'Adm'));
+
+            /* ── INCLUDE / EXTEND RELATIONS ── */
+            relation(uReg, uVer, 'include');
+            relation(uUpL, uUpB, 'include');
+            relation(uUpP, uUpB, 'include');
+            relation(uKPT, uKDP, 'include');
+            relation(uIsiPan, uIsiRek, 'include');
+        }
+
+        function drawSequence() {
+            const svg = document.getElementById('seq-svg');
+            svg.innerHTML = '';
+            const H = 900;
+            function el(tag, attrs, txt) {
+                const e = document.createElementNS(NS, tag);
+                for (const k in attrs) e.setAttribute(k, attrs[k]);
+                if (txt) e.textContent = txt;
+                svg.appendChild(e); return e;
+            }
+            const actors = [
+                { label: 'Talent', x: 80, color: '#059669' }, { label: 'Browser\n/ UI', x: 200, color: '#64748b' },
+                { label: 'Laravel\nRouter', x: 330, color: '#7c3aed' }, { label: 'Controller', x: 470, color: '#1d4ed8' },
+                { label: 'Model /\nDatabase', x: 610, color: '#b45309' }, { label: 'Mentor /\nAtasan', x: 760, color: '#2563eb' },
+                { label: 'Panelis', x: 900, color: '#db2777' }, { label: 'PDC\nAdmin', x: 1040, color: '#1d4ed8' },
+                { label: 'Notif\nService', x: 1165, color: '#c62828' },
+            ];
+            actors.forEach(a => {
+                el('rect', { x: a.x - 45, y: 8, width: 90, height: 36, rx: 6, fill: a.color, stroke: '#fff', 'stroke-width': 1.5 });
+                (a.label || '').split('\n').forEach((ln, i) => el('text', { x: a.x, y: 18 + (i * 13), 'font-size': 9, 'font-weight': 'bold', fill: '#fff', 'text-anchor': 'middle', 'dominant-baseline': 'middle' }, ln));
+                el('line', { x1: a.x, y1: 44, x2: a.x, y2: H - 10, stroke: 'rgba(148,163,184,0.3)', 'stroke-width': 1, 'stroke-dasharray': '4,4' });
+            });
+            let y = 70; const msgH = 28;
+            const defs = el('defs', {});
+            const mk = document.createElementNS(NS, 'marker');
+            mk.setAttribute('id', 'arr'); mk.setAttribute('markerWidth', '6'); mk.setAttribute('markerHeight', '6');
+            mk.setAttribute('refX', '5'); mk.setAttribute('refY', '3'); mk.setAttribute('orient', 'auto');
+            const p2 = document.createElementNS(NS, 'path');
+            p2.setAttribute('d', 'M0,0 L0,6 L6,3 z'); p2.setAttribute('fill', '#38bdf8');
+            mk.appendChild(p2); svg.appendChild(mk);
+            function msg(fI, tI, lbl, type) {
+                const from = actors[fI].x, to = actors[tI].x, yLine = y + msgH / 2;
+                const col = type === 'return' ? 'rgba(148,163,184,0.5)' : '#38bdf8';
+                const dash = type === 'return' ? '5,3' : 'none';
+                el('line', { x1: from, y1: yLine, x2: to, y2: yLine, stroke: col, 'stroke-width': 1.5, 'stroke-dasharray': dash, 'marker-end': 'url(#arr)' });
+                el('text', { x: (from + to) / 2, y: yLine - 5, 'font-size': 9, fill: '#94a3b8', 'text-anchor': 'middle' }, lbl);
+                y += msgH;
+            }
+            function note(txt) {
+                el('rect', { x: 15, y: y, width: 1250, height: 16, rx: 3, fill: 'rgba(255,255,255,0.04)', stroke: 'rgba(148,163,184,0.2)', 'stroke-width': 1 });
+                el('text', { x: 30, y: y + 8, 'font-size': 9, fill: 'rgba(148,163,184,0.7)', 'dominant-baseline': 'middle' }, txt);
+                y += 17;
+            }
+            note('â”€â”€ ALUR 1: LOGIN & ROUTING â”€â”€'); y += 4;
+            msg(0, 1, 'Buka URL / Isi Form Login'); msg(1, 2, 'POST /login (username, password)');
+            msg(2, 3, 'AuthenticatedSessionController'); msg(3, 4, 'Validasi user di tabel users');
+            msg(4, 3, 'User found + password match', 'return'); msg(3, 4, 'Cek user_role (multi-role?)');
+            msg(4, 3, 'Jumlah role user', 'return'); msg(3, 1, 'Redirect: /role/select atau /dashboard', 'return');
+            msg(1, 0, 'Tampil Dashboard sesuai role', 'return');
+            y += 8; note('â”€â”€ ALUR 2: TALENT SUBMIT IDP LOGBOOK â”€â”€'); y += 4;
+            msg(0, 1, 'Buka form IDP Logbook + isi data + upload file');
+            msg(1, 2, 'POST /talent/idp-monitoring/{tab}');
+            msg(2, 3, 'TalentDashboardController@storeIdpMonitoring');
+            msg(3, 4, 'Cek is_locked & development_session aktif');
+            msg(4, 3, 'Session aktif ditemukan', 'return');
+            msg(3, 4, 'Simpan idp_activity (status=Pending)');
+            msg(3, 8, 'Notifikasi â†’ Mentor & PDC Admin');
+            msg(1, 0, 'Redirect dashboard + pesan sukses', 'return');
+            y += 8; note('â”€â”€ ALUR 3: MENTOR VERIFIKASI LOGBOOK â”€â”€'); y += 4;
+            msg(5, 1, 'Buka halaman Validasi Logbook'); msg(1, 2, 'GET /mentor/logbook');
+            msg(2, 3, 'MentorDashboardController@logbook'); msg(3, 4, 'Load idp_activity mentee (status=Pending)');
+            msg(4, 3, 'Data logbook', 'return'); msg(1, 5, 'Tampil list logbook pending', 'return');
+            msg(5, 1, 'Klik Approve / Reject'); msg(1, 2, 'POST /mentor/logbook/{id}/verify');
+            msg(2, 3, 'verifyLogbook()'); msg(3, 4, 'Update idp_activity.status = Approved/Rejected');
+            msg(3, 8, 'Notifikasi ke Talent'); msg(1, 5, 'Redirect + sukses', 'return');
+            y += 8; note('â”€â”€ ALUR 4: PANELIS SIDANG AKHIR â”€â”€'); y += 4;
+            msg(6, 1, 'Login & buka Daftar Talent'); msg(1, 2, 'GET /panelis/dashboard');
+            msg(2, 3, 'PanelisController@index'); msg(3, 4, 'Load panelis_assessments & talent');
+            msg(1, 6, 'Tampil daftar talent', 'return'); msg(6, 1, 'Isi skor, komentar, rekomendasi');
+            msg(1, 2, 'POST /panelis/assess/{talent}'); msg(2, 3, 'PanelisController@store');
+            msg(3, 4, 'Simpan panelis_assessments'); msg(3, 4, 'Update promotion_plan.status_promotion');
+            msg(3, 8, 'Notifikasi ke Talent & PDC Admin'); msg(1, 6, 'Selesai', 'return');
+        }
+
+        function drawTaskflow(steps, title) {
+            const isWide = steps.some(s => s.t === 'CUSTOM_HISTORY' || s.t === 'CUSTOM_PANELIS_SIDANG');
+            const svg = document.createElementNS(NS, 'svg');
+            const X_CENTER = isWide ? 400 : 215;
+            const W = isWide ? 800 : 450;
+            const SPACING = 25;
+            let H = 30;
+            steps.forEach(s => {
+                let nodeH = 34;
+                if (s.t === 'DEC') nodeH = 46;
+                else if (s.t === 'CUSTOM_IDP') nodeH = 260;
+                else if (s.t === 'CUSTOM_PROJECT') nodeH = 340;
+                else if (s.t === 'CUSTOM_HISTORY') nodeH = 160;
+                else if (s.t === 'CUSTOM_MENTOR_VALIDASI') nodeH = 100;
+                else if (s.t === 'CUSTOM_ATASAN_MONITORING') nodeH = 220;
+                else if (s.t === 'CUSTOM_FINANCE_REVIEW') nodeH = 160;
+                else if (s.t === 'CUSTOM_FINANCE_RIWAYAT') nodeH = 100;
+                else if (s.t === 'CUSTOM_PANELIS_SIDANG') nodeH = 580;
+                else if (s.t === 'CUSTOM_PANELIS_RIWAYAT') nodeH = 100;
+                else if (s.txt) {
+                    if (s.txt.length > 45) nodeH = 64;
+                    else if (s.txt.length > 25) nodeH = 46;
+                }
+                H += nodeH + SPACING;
+                if (s.no) H += 15;
+            });
+            H += 20;
+
+            svg.setAttribute('width', '100%');
+            svg.setAttribute('height', '100%');
+            svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+            svg.style.minHeight = Math.max(H, 400) + 'px';
+
+            const defs = document.createElementNS(NS, 'defs');
+            const markId = 'arr-tf-' + Math.random().toString(36).substr(2, 6);
+            const mk = document.createElementNS(NS, 'marker');
+            mk.setAttribute('id', markId); mk.setAttribute('markerWidth', '6'); mk.setAttribute('markerHeight', '6');
+            mk.setAttribute('refX', '5'); mk.setAttribute('refY', '3'); mk.setAttribute('orient', 'auto');
+            const p2 = document.createElementNS(NS, 'path');
+            p2.setAttribute('d', 'M0,0 L0,6 L6,3 z'); p2.setAttribute('fill', '#94a3b8');
+            mk.appendChild(p2); defs.appendChild(mk); svg.appendChild(defs);
+
+            function svgEl(parent, tag, attrs) {
+                const e = document.createElementNS(NS, tag);
+                for (const k in attrs) e.setAttribute(k, attrs[k]);
+                parent.appendChild(e); return e;
+            }
+            function arrow(x1, y1, x2, y2, col) {
+                svgEl(svg, 'line', { x1, y1, x2, y2, stroke: col || '#94a3b8', 'stroke-width': 1.5, 'marker-end': `url(#${markId})` });
+            }
+            function label(x, y, txt, col) {
+                const e = svgEl(svg, 'text', { x, y, 'font-size': 8.5, fill: col, 'text-anchor': 'middle', 'dominant-baseline': 'middle', 'font-family': 'Segoe UI,sans-serif', 'font-weight': 'bold' });
+                e.textContent = txt;
+            }
+            function multiline(x, y, txt, col) {
+                const words = txt.split(' ');
+                let lines = []; let cur = '';
+                words.forEach(w => {
+                    if ((cur + w).length > 20) { lines.push(cur); cur = w + ' '; }
+                    else { cur += w + ' '; }
+                });
+                if (cur.trim()) lines.push(cur.trim());
+                const startY = y - (lines.length - 1) * 6;
+                lines.forEach((ln, i) => {
+                    const e = svgEl(svg, 'text', { x, y: startY + i * 12, 'font-size': 8.5, fill: col, 'text-anchor': 'middle', 'dominant-baseline': 'middle', 'font-family': 'Segoe UI,sans-serif' });
+                    e.textContent = ln;
+                });
+            }
+
+            let y = 15;
+            steps.forEach((s, i) => {
+                const isLast = (i === steps.length - 1);
+                let rectW = 150, rectH = 34;
+                if (s.txt && s.t !== 'DEC') {
+                    if (s.txt.length > 45) { rectH = 64; rectW = 170; }
+                    else if (s.txt.length > 25) { rectH = 46; rectW = 160; }
+                }
+
+                if (s.t === 'TERM') {
+                    svgEl(svg, 'rect', { x: X_CENTER - 50, y, width: 100, height: 30, rx: 15, fill: '#eff6ff', stroke: '#3b82f6', 'stroke-width': 1.5 });
+                    multiline(X_CENTER, y + 15, s.txt, '#1e3a8a');
+                    y += 30;
+                } else if (s.t === 'PROC') {
+                    svgEl(svg, 'rect', { x: X_CENTER - rectW / 2, y, width: rectW, height: rectH, rx: 3, fill: '#f0fdf4', stroke: '#22c55e', 'stroke-width': 1.5 });
+                    multiline(X_CENTER, y + rectH / 2, s.txt, '#14532d');
+                    y += rectH;
+                } else if (s.t === 'DOC') {
+                    svgEl(svg, 'path', { d: `M ${X_CENTER - rectW / 2} ${y} L ${X_CENTER + rectW / 2} ${y} L ${X_CENTER + rectW / 2} ${y + rectH - 6} Q ${X_CENTER + rectW / 4} ${y + rectH + 6} ${X_CENTER} ${y + rectH - 3} T ${X_CENTER - rectW / 2} ${y + rectH - 6} Z`, fill: '#fffbeb', stroke: '#f59e0b', 'stroke-width': 1.5 });
+                    multiline(X_CENTER, y + rectH / 2 - 2, s.txt, '#78350f');
+                    y += rectH;
+                } else if (s.t === 'DATA') {
+                    svgEl(svg, 'polygon', { points: `${X_CENTER - rectW / 2 + 10},${y} ${X_CENTER + rectW / 2},${y} ${X_CENTER + rectW / 2 - 10},${y + rectH} ${X_CENTER - rectW / 2},${y + rectH}`, fill: '#fdf4ff', stroke: '#d946ef', 'stroke-width': 1.5 });
+                    multiline(X_CENTER, y + rectH / 2, s.txt, '#701a75');
+                    y += rectH;
+                } else if (s.t === 'DEC') {
+                    const dh = 46;
+                    svgEl(svg, 'polygon', { points: `${X_CENTER},${y} ${X_CENTER + 65},${y + dh / 2} ${X_CENTER},${y + dh} ${X_CENTER - 65},${y + dh / 2}`, fill: '#fef2f2', stroke: '#ef4444', 'stroke-width': 1.5 });
+                    multiline(X_CENTER, y + dh / 2, s.txt, '#7f1d1d');
+                    y += dh;
+                } else if (s.t === 'CUSTOM_IDP') {
+                    const X_L = X_CENTER - 110;
+                    const X_R = X_CENTER + 110;
+
+                    svgEl(svg, 'path', { d: `M ${X_L} ${y} L ${X_R} ${y}`, stroke: '#94a3b8', 'stroke-width': 1.5 });
+                    arrow(X_L, y, X_L, y + 20);
+                    arrow(X_R, y, X_R, y + 20);
+
+                    const drawPgramCustom = (cx, cy, w, h, txt) => {
+                        const ry = cy - h / 2;
+                        const rx = cx - w / 2;
+                        svgEl(svg, 'polygon', { points: `${rx + 10},${ry} ${rx + w},${ry} ${rx + w - 10},${ry + h} ${rx},${ry + h}`, fill: '#fdf4ff', stroke: '#d946ef', 'stroke-width': 1.5 });
+                        multiline(cx, cy, txt, '#701a75');
+                    };
+                    const drawDiamondCustom = (cx, cy, w, h, txt) => {
+                        svgEl(svg, 'polygon', { points: `${cx},${cy - h / 2} ${cx + w / 2},${cy} ${cx},${cy + h / 2} ${cx - w / 2},${cy}`, fill: '#fef2f2', stroke: '#ef4444', 'stroke-width': 1.5 });
+                        multiline(cx, cy, txt, '#7f1d1d');
+                    };
+
+                    const y_box1 = y + 20 + 23;
+                    drawPgramCustom(X_L, y_box1, 150, 46, 'Mentor memberikan validasi Approved');
+                    drawPgramCustom(X_R, y_box1, 150, 46, 'Mentor memberikan validasi Rejected');
+
+                    arrow(X_R, y_box1 + 23, X_R, y_box1 + 45);
+                    const y_box2 = y_box1 + 45 + 30; // 30 is half height of 60
+                    drawPgramCustom(X_R, y_box2, 160, 60, 'Talent mengedit logbooknya untuk mendapatkan Approved');
+
+                    arrow(X_R, y_box2 + 30, X_R, y_box2 + 50);
+                    const y_box3 = y_box2 + 50 + 35;
+                    drawDiamondCustom(X_R, y_box3, 110, 70, 'Mentor memberikan Validasi Approved');
+
+                    // Loopback
+                    svgEl(svg, 'path', { d: `M ${X_R + 55} ${y_box3} L ${X_R + 100} ${y_box3} L ${X_R + 100} ${y_box2}`, fill: 'none', stroke: '#94a3b8', 'stroke-width': 1.5 });
+                    arrow(X_R + 100, y_box2, X_R + 80, y_box2);
+                    label(X_R + 80, y_box3 - 10, 'Tidak', '#ef4444');
+
+                    // Ya
+                    svgEl(svg, 'path', { d: `M ${X_R} ${y_box3 + 35} L ${X_R} ${y_box3 + 55}`, fill: 'none', stroke: '#94a3b8', 'stroke-width': 1.5 });
+                    label(X_R + 15, y_box3 + 45, 'Ya', '#22c55e');
+
+                    // Merge line
+                    const y_merge = y_box3 + 55;
+                    svgEl(svg, 'path', { d: `M ${X_L} ${y_box1 + 23} L ${X_L} ${y_merge}`, fill: 'none', stroke: '#94a3b8', 'stroke-width': 1.5 });
+                    svgEl(svg, 'path', { d: `M ${X_L} ${y_merge} L ${X_R} ${y_merge}`, stroke: '#94a3b8', 'stroke-width': 1.5 });
+
+                    y = y_merge; // Don't add spacing, framework does it!
+                } else if (s.t === 'CUSTOM_PROJECT') {
+                    const X_L = X_CENTER - 110;
+                    const X_R = X_CENTER + 110;
+
+                    const drawPgramCustom = (cx, cy, w, h, txt) => {
+                        const ry = cy - h / 2;
+                        const rx = cx - w / 2;
+                        svgEl(svg, 'polygon', { points: `${rx + 10},${ry} ${rx + w},${ry} ${rx + w - 10},${ry + h} ${rx},${ry + h}`, fill: '#fdf4ff', stroke: '#d946ef', 'stroke-width': 1.5 });
+                        multiline(cx, cy, txt, '#701a75');
+                    };
+                    const drawDiamondCustom = (cx, cy, w, h, txt) => {
+                        svgEl(svg, 'polygon', { points: `${cx},${cy - h / 2} ${cx + w / 2},${cy} ${cx},${cy + h / 2} ${cx - w / 2},${cy}`, fill: '#fef2f2', stroke: '#ef4444', 'stroke-width': 1.5 });
+                        multiline(cx, cy, txt, '#7f1d1d');
+                    };
+
+                    const y_start = y;
+                    const dh1 = 50;
+                    drawDiamondCustom(X_CENTER, y_start + dh1 / 2, 160, dh1, 'PDC Admin sudah memberikan validasi?');
+
+                    // Split
+                    const splitY = y_start + dh1 + 12;
+                    svgEl(svg, 'path', { d: `M ${X_CENTER} ${y_start + dh1} L ${X_CENTER} ${splitY} L ${X_L} ${splitY} L ${X_L} ${y_start + dh1 + 20}`, fill: 'none', stroke: '#94a3b8', 'stroke-width': 1.5 });
+                    svgEl(svg, 'path', { d: `M ${X_CENTER} ${splitY} L ${X_R} ${splitY} L ${X_R} ${y_start + dh1 + 20}`, fill: 'none', stroke: '#94a3b8', 'stroke-width': 1.5 });
+                    arrow(X_L, y_start + dh1 + 20, X_L, y_start + dh1 + 30);
+                    arrow(X_R, y_start + dh1 + 20, X_R, y_start + dh1 + 30);
+
+                    const y_box1_start = y_start + dh1 + 30;
+                    const bh1 = 46;
+                    drawPgramCustom(X_L, y_box1_start + bh1 / 2, 150, bh1, 'PDC Admin memberikan validasi Approved');
+                    drawPgramCustom(X_R, y_box1_start + bh1 / 2, 150, bh1, 'PDC Admin memberikan validasi Rejected');
+
+                    const y_box2_start = y_box1_start + bh1 + 30;
+                    arrow(X_R, y_box1_start + bh1, X_R, y_box2_start);
+                    const bh2 = 60;
+                    drawPgramCustom(X_R, y_box2_start + bh2 / 2, 160, bh2, 'Talent menguploud ulang Project Improvementnya sampai Approved');
+
+                    const y_d2_start = y_box2_start + bh2 + 30;
+                    arrow(X_R, y_box2_start + bh2, X_R, y_d2_start);
+                    const dh2 = 60;
+                    drawDiamondCustom(X_R, y_d2_start + dh2 / 2, 120, dh2, 'PDC Admin memberikan Approved?');
+
+                    // Loopback
+                    svgEl(svg, 'path', { d: `M ${X_R + 60} ${y_d2_start + dh2 / 2} L ${X_R + 105} ${y_d2_start + dh2 / 2} L ${X_R + 105} ${y_box2_start + bh2 / 2}`, fill: 'none', stroke: '#94a3b8', 'stroke-width': 1.5 });
+                    arrow(X_R + 105, y_box2_start + bh2 / 2, X_R + 80, y_box2_start + bh2 / 2);
+                    label(X_R + 85, y_d2_start + dh2 / 2 - 10, 'Tidak', '#ef4444');
+
+                    const y_merge = y_d2_start + dh2 + 40;
+                    // Ya arrow
+                    svgEl(svg, 'path', { d: `M ${X_R} ${y_d2_start + dh2} L ${X_R} ${y_merge}`, fill: 'none', stroke: '#94a3b8', 'stroke-width': 1.5 });
+                    label(X_R + 15, y_d2_start + dh2 + 10, 'Ya', '#22c55e');
+
+                    // Left branch to merge
+                    svgEl(svg, 'path', { d: `M ${X_L} ${y_box1_start + bh1} L ${X_L} ${y_merge}`, fill: 'none', stroke: '#94a3b8', 'stroke-width': 1.5 });
+
+                    // Merge line
+                    svgEl(svg, 'path', { d: `M ${X_L} ${y_merge} L ${X_R} ${y_merge}`, stroke: '#94a3b8', 'stroke-width': 1.5 });
+
+                    y = y_merge; // Don't add spacing, framework does it!
+                } else if (s.t === 'CUSTOM_HISTORY') {
+                    const X1 = X_CENTER - 320, X2 = X_CENTER - 160, X3 = X_CENTER, X4 = X_CENTER + 160, X5 = X_CENTER + 320;
+                    const splitY = y;
+
+                    svgEl(svg, 'path', { d: `M ${X1} ${splitY} L ${X5} ${splitY}`, stroke: '#94a3b8', 'stroke-width': 1.5 });
+                    [X1, X2, X3, X4, X5].forEach(x => arrow(x, splitY, x, splitY + 20));
+
+                    const drawPgramCustom = (cx, cy, w, h, txt) => {
+                        const ry = cy - h / 2;
+                        const rx = cx - w / 2;
+                        svgEl(svg, 'polygon', { points: `${rx + 10},${ry} ${rx + w},${ry} ${rx + w - 10},${ry + h} ${rx},${ry + h}`, fill: '#fdf4ff', stroke: '#d946ef', 'stroke-width': 1.5 });
+                        multiline(cx, cy, txt, '#701a75');
+                    };
+
+                    const y_box = splitY + 20;
+                    drawPgramCustom(X1, y_box + 30, 140, 60, 'Menampilkan riwayat hasil kompetensi');
+                    drawPgramCustom(X2, y_box + 30, 140, 60, 'Menampilkan riwayat IDP Monitoring');
+                    drawPgramCustom(X3, y_box + 30, 140, 60, 'Menampilkan riwayat Project Improvement');
+                    drawPgramCustom(X4, y_box + 30, 140, 60, 'Menampilkan Hasil Penilaian Panelis');
+                    drawPgramCustom(X5, y_box + 30, 140, 60, 'Menampilkan Komentar Panelis dan total skor');
+
+                    const y_merge = y_box + 60 + 20;
+                    [X1, X2, X3, X4, X5].forEach(x => svgEl(svg, 'path', { d: `M ${x} ${y_box + 60} L ${x} ${y_merge}`, fill: 'none', stroke: '#94a3b8', 'stroke-width': 1.5 }));
+                    svgEl(svg, 'path', { d: `M ${X1} ${y_merge} L ${X5} ${y_merge}`, stroke: '#94a3b8', 'stroke-width': 1.5 });
+
+                    y = y_merge; // Don't add spacing
+                } else if (s.t === 'CUSTOM_MENTOR_VALIDASI') {
+                    const X_L = X_CENTER - 110;
+                    const X_R = X_CENTER + 110;
+
+                    const splitY = y;
+                    svgEl(svg, 'path', { d: `M ${X_L} ${splitY} L ${X_R} ${splitY}`, stroke: '#94a3b8', 'stroke-width': 1.5 });
+                    arrow(X_L, splitY, X_L, splitY + 20);
+                    arrow(X_R, splitY, X_R, splitY + 20);
+
+                    const drawPgramCustom = (cx, cy, w, h, txt) => {
+                        const ry = cy - h / 2;
+                        const rx = cx - w / 2;
+                        svgEl(svg, 'polygon', { points: `${rx + 10},${ry} ${rx + w},${ry} ${rx + w - 10},${ry + h} ${rx},${ry + h}`, fill: '#fdf4ff', stroke: '#d946ef', 'stroke-width': 1.5 });
+                        multiline(cx, cy, txt, '#701a75');
+                    };
+
+                    const y_box = splitY + 20;
+                    drawPgramCustom(X_L, y_box + 23, 150, 46, 'Mentor memberikan Approved');
+                    drawPgramCustom(X_R, y_box + 23, 150, 46, 'Mentor memberikan Rejected');
+
+                    const y_merge = y_box + 46 + 20;
+                    svgEl(svg, 'path', { d: `M ${X_L} ${y_box + 46} L ${X_L} ${y_merge}`, fill: 'none', stroke: '#94a3b8', 'stroke-width': 1.5 });
+                    svgEl(svg, 'path', { d: `M ${X_R} ${y_box + 46} L ${X_R} ${y_merge}`, fill: 'none', stroke: '#94a3b8', 'stroke-width': 1.5 });
+                    svgEl(svg, 'path', { d: `M ${X_L} ${y_merge} L ${X_R} ${y_merge}`, stroke: '#94a3b8', 'stroke-width': 1.5 });
+
+                    y = y_merge; // Don't add spacing
+                } else if (s.t === 'CUSTOM_ATASAN_MONITORING') {
+                    const X_L = X_CENTER - 140, X_C = X_CENTER, X_R = X_CENTER + 140;
+                    const drawRhombMon = (cx, cy, w, h, txt) => {
+                        const ry = cy - h / 2; const rx = cx - w / 2;
+                        svgEl(svg, 'polygon', { points: `${rx + 12},${ry} ${rx + w},${ry} ${rx + w - 12},${ry + h} ${rx},${ry + h}`, fill: '#fdf4ff', stroke: '#d946ef', 'stroke-width': 1.5 });
+                        multiline(cx, cy, txt, '#701a75');
+                    };
+
+                    const splitY = y;
+                    svgEl(svg, 'path', { d: `M ${X_L} ${splitY} L ${X_R} ${splitY}`, stroke: '#94a3b8', 'stroke-width': 1.5 });
+                    [X_L, X_C, X_R].forEach(x => arrow(x, splitY, x, splitY + 18));
+
+                    const y_row1 = splitY + 18;
+                    const rh1 = 54;
+                    drawRhombMon(X_L, y_row1 + rh1 / 2, 130, rh1, 'Menampilkan Tab Kompetensi');
+                    drawRhombMon(X_C, y_row1 + rh1 / 2, 130, rh1, 'Menampilkan Tab IDP Monitoring');
+                    drawRhombMon(X_R, y_row1 + rh1 / 2, 130, rh1, 'Menampilkan Tab Project Improvement');
+
+                    [X_L, X_C, X_R].forEach(x => arrow(x, y_row1 + rh1, x, y_row1 + rh1 + 16));
+
+                    const y_row2 = y_row1 + rh1 + 16;
+                    const rh2 = 64;
+                    drawRhombMon(X_L, y_row2 + rh2 / 2, 130, rh2, 'Menampilkan Top 3 Gap Kompetensi dan Headmap Kompetensi Talent');
+                    drawRhombMon(X_C, y_row2 + rh2 / 2, 130, rh2, 'Menampilkan Progres IDP Monitoring Talent');
+                    drawRhombMon(X_R, y_row2 + rh2 / 2, 130, rh2, 'Menampilkan Project Improvement Talent');
+
+                    const y_merge = y_row2 + rh2 + 20;
+                    [X_L, X_C, X_R].forEach(x => svgEl(svg, 'path', { d: `M ${x} ${y_row2 + rh2} L ${x} ${y_merge}`, fill: 'none', stroke: '#94a3b8', 'stroke-width': 1.5 }));
+                    svgEl(svg, 'path', { d: `M ${X_L} ${y_merge} L ${X_R} ${y_merge}`, stroke: '#94a3b8', 'stroke-width': 1.5 });
+
+                    y = y_merge;
+                } else if (s.t === 'CUSTOM_FINANCE_REVIEW') {
+                    const X_L = X_CENTER - 110;
+                    const X_R = X_CENTER + 110;
+
+                    const drawPgramCustom = (cx, cy, w, h, txt) => {
+                        const ry = cy - h / 2;
+                        const rx = cx - w / 2;
+                        svgEl(svg, 'polygon', { points: `${rx + 10},${ry} ${rx + w},${ry} ${rx + w - 10},${ry + h} ${rx},${ry + h}`, fill: '#fdf4ff', stroke: '#d946ef', 'stroke-width': 1.5 });
+                        multiline(cx, cy, txt, '#701a75');
+                    };
+                    const drawDiamondCustom = (cx, cy, w, h, txt) => {
+                        svgEl(svg, 'polygon', { points: `${cx},${cy - h / 2} ${cx + w / 2},${cy} ${cx},${cy + h / 2} ${cx - w / 2},${cy}`, fill: '#fef2f2', stroke: '#ef4444', 'stroke-width': 1.5 });
+                        multiline(cx, cy, txt, '#7f1d1d');
+                    };
+
+                    const dh1 = 46;
+                    drawDiamondCustom(X_CENTER, y + dh1 / 2, 120, dh1, 'Beri Keputusan');
+
+                    const splitY = y + dh1 + 10;
+                    svgEl(svg, 'path', { d: `M ${X_CENTER} ${y + dh1} L ${X_CENTER} ${splitY} L ${X_L} ${splitY} L ${X_L} ${splitY + 15}`, fill: 'none', stroke: '#94a3b8', 'stroke-width': 1.5 });
+                    svgEl(svg, 'path', { d: `M ${X_CENTER} ${splitY} L ${X_R} ${splitY} L ${X_R} ${splitY + 15}`, fill: 'none', stroke: '#94a3b8', 'stroke-width': 1.5 });
+                    arrow(X_L, splitY + 15, X_L, splitY + 25);
+                    arrow(X_R, splitY + 15, X_R, splitY + 25);
+
+                    const y_box = splitY + 25;
+                    const bh = 50;
+                    drawPgramCustom(X_L, y_box + bh / 2, 140, bh, 'Finance memberikan Approved');
+                    drawPgramCustom(X_R, y_box + bh / 2, 140, bh, 'Finance memberikan Rejected');
+
+                    const y_merge = y_box + bh + 25;
+                    svgEl(svg, 'path', { d: `M ${X_L} ${y_box + bh} L ${X_L} ${y_merge}`, fill: 'none', stroke: '#94a3b8', 'stroke-width': 1.5 });
+                    svgEl(svg, 'path', { d: `M ${X_R} ${y_box + bh} L ${X_R} ${y_merge}`, fill: 'none', stroke: '#94a3b8', 'stroke-width': 1.5 });
+                    svgEl(svg, 'path', { d: `M ${X_L} ${y_merge} L ${X_R} ${y_merge}`, stroke: '#94a3b8', 'stroke-width': 1.5 });
+
+                    y = y_merge; // Don't add spacing
+                } else if (s.t === 'CUSTOM_FINANCE_RIWAYAT') {
+                    const X_L = X_CENTER - 140;
+                    const X_R = X_CENTER + 140;
+                    const X_C = X_CENTER;
+
+                    const splitY = y;
+                    svgEl(svg, 'path', { d: `M ${X_L} ${splitY} L ${X_R} ${splitY}`, stroke: '#94a3b8', 'stroke-width': 1.5 });
+                    [X_L, X_C, X_R].forEach(x => arrow(x, splitY, x, splitY + 20));
+
+                    const y_box = splitY + 20;
+                    const bh = 50;
+
+                    const drawPgramCustom = (cx, cy, w, h, txt) => {
+                        const ry = cy - h / 2;
+                        const rx = cx - w / 2;
+                        svgEl(svg, 'polygon', { points: `${rx + 10},${ry} ${rx + w},${ry} ${rx + w - 10},${ry + h} ${rx},${ry + h}`, fill: '#fdf4ff', stroke: '#d946ef', 'stroke-width': 1.5 });
+                        multiline(cx, cy, txt, '#701a75');
+                    };
+
+                    drawPgramCustom(X_L, y_box + bh / 2, 125, bh, 'Menampilkan catatan dari PDC Admin');
+                    drawPgramCustom(X_C, y_box + bh / 2, 125, bh, 'Menampilkan Feddback dari Finance');
+                    drawPgramCustom(X_R, y_box + bh / 2, 125, bh, 'Menampilkan Status dari finance');
+
+                    const y_merge = y_box + bh + 25;
+                    [X_L, X_C, X_R].forEach(x => svgEl(svg, 'path', { d: `M ${x} ${y_box + bh} L ${x} ${y_merge}`, fill: 'none', stroke: '#94a3b8', 'stroke-width': 1.5 }));
+                    svgEl(svg, 'path', { d: `M ${X_L} ${y_merge} L ${X_R} ${y_merge}`, stroke: '#94a3b8', 'stroke-width': 1.5 });
+
+                    y = y_merge; // Don't add spacing
+                } else if (s.t === 'CUSTOM_PANELIS_SIDANG') {
+                    const X_L3 = X_CENTER - 180;
+                    const X_R3 = X_CENTER + 180;
+                    const X_C3 = X_CENTER;
+
+                    const split1Y = y;
+                    svgEl(svg, 'path', { d: `M ${X_L3} ${split1Y} L ${X_R3} ${split1Y}`, stroke: '#94a3b8', 'stroke-width': 1.5 });
+                    [X_L3, X_C3, X_R3].forEach(x => arrow(x, split1Y, x, split1Y + 20));
+
+                    const drawPgramCustom = (cx, cy, w, h, txt) => {
+                        const ry = cy - h / 2; const rx = cx - w / 2;
+                        svgEl(svg, 'polygon', { points: `${rx + 10},${ry} ${rx + w},${ry} ${rx + w - 10},${ry + h} ${rx},${ry + h}`, fill: '#fdf4ff', stroke: '#d946ef', 'stroke-width': 1.5 });
+                        multiline(cx, cy, txt, '#701a75');
+                    };
+
+                    const row1Y = split1Y + 20;
+                    drawPgramCustom(X_L3, row1Y + 25, 140, 50, 'Tab Kompetensi');
+                    drawPgramCustom(X_C3, row1Y + 25, 140, 50, 'Tab IDP Monitoring');
+                    drawPgramCustom(X_R3, row1Y + 25, 140, 50, 'Tab Project Improvement');
+
+                    [X_L3, X_C3, X_R3].forEach(x => arrow(x, row1Y + 50, x, row1Y + 70));
+
+                    const row2Y = row1Y + 70;
+                    drawPgramCustom(X_L3, row2Y + 30, 160, 60, 'Menampilkan Top 3 Gap Kompetensi dan Headmap Kompetensi');
+                    drawPgramCustom(X_C3, row2Y + 30, 150, 60, 'Menampilkan Logbook IDP Monitoring Talent');
+                    drawPgramCustom(X_R3, row2Y + 30, 150, 60, 'Menampilkan Project Improvement Talent');
+
+                    const merge1Y = row2Y + 60 + 20;
+                    [X_L3, X_R3].forEach(x => svgEl(svg, 'path', { d: `M ${x} ${row2Y + 60} L ${x} ${merge1Y}`, fill: 'none', stroke: '#94a3b8', 'stroke-width': 1.5 }));
+                    svgEl(svg, 'path', { d: `M ${X_C3} ${row2Y + 60} L ${X_C3} ${merge1Y + 20}`, fill: 'none', stroke: '#94a3b8', 'stroke-width': 1.5 });
+                    svgEl(svg, 'path', { d: `M ${X_L3} ${merge1Y} L ${X_R3} ${merge1Y}`, stroke: '#94a3b8', 'stroke-width': 1.5 });
+
+                    let currY = merge1Y + 20;
+
+                    const straightTexts = [
+                        'Panelis memberikan Penilaian',
+                        'Menampilkan 10 aspek penilaian ( skor 1 - 5 )',
+                        'Menambahkan komentar / catatan dari panelis',
+                        'Memberi keputusan Rekomendasi Panelis'
+                    ];
+
+                    straightTexts.forEach(txt => {
+                        drawPgramCustom(X_CENTER, currY + 25, 180, 50, txt);
+                        currY += 50;
+                        arrow(X_CENTER, currY, X_CENTER, currY + 20);
+                        currY += 20;
+                    });
+
+                    const split2Y = currY;
+                    const X1 = X_CENTER - 270;
+                    const X2 = X_CENTER - 90;
+                    const X3 = X_CENTER + 90;
+                    const X4 = X_CENTER + 270;
+
+                    svgEl(svg, 'path', { d: `M ${X1} ${split2Y} L ${X4} ${split2Y}`, stroke: '#94a3b8', 'stroke-width': 1.5 });
+                    [X1, X2, X3, X4].forEach(x => arrow(x, split2Y, x, split2Y + 20));
+
+                    const row3Y = split2Y + 20;
+                    drawPgramCustom(X1, row3Y + 30, 160, 60, 'Ready Now (Siap dipromosikan dalam < 6 bulan)');
+                    drawPgramCustom(X2, row3Y + 30, 160, 60, 'Ready in 1 – 2 Years (Siap dengan pengembangan terarah)');
+                    drawPgramCustom(X3, row3Y + 30, 160, 60, 'Ready in > 2 Years (Masih membutuhkan pengembangan signifikan)');
+                    drawPgramCustom(X4, row3Y + 30, 160, 60, 'Not Ready (Belum direkomendasikan untuk jalur suksesi saat ini)');
+
+                    const merge2Y = row3Y + 60 + 20;
+                    [X1, X2, X3, X4].forEach(x => svgEl(svg, 'path', { d: `M ${x} ${row3Y + 60} L ${x} ${merge2Y}`, fill: 'none', stroke: '#94a3b8', 'stroke-width': 1.5 }));
+                    svgEl(svg, 'path', { d: `M ${X1} ${merge2Y} L ${X4} ${merge2Y}`, stroke: '#94a3b8', 'stroke-width': 1.5 });
+
+                    y = merge2Y;
+                } else if (s.t === 'CUSTOM_PANELIS_RIWAYAT') {
+                    const X_L2 = X_CENTER - 150;
+                    const X_L1 = X_CENTER - 50;
+                    const X_R1 = X_CENTER + 50;
+                    const X_R2 = X_CENTER + 150;
+
+                    const splitY = y;
+                    svgEl(svg, 'path', { d: `M ${X_L2} ${splitY} L ${X_R2} ${splitY}`, stroke: '#94a3b8', 'stroke-width': 1.5 });
+                    [X_L2, X_L1, X_R1, X_R2].forEach(x => arrow(x, splitY, x, splitY + 20));
+
+                    const y_box = splitY + 20;
+                    const bh = 50;
+
+                    const drawPgramCustom = (cx, cy, w, h, txt) => {
+                        const ry = cy - h / 2;
+                        const rx = cx - w / 2;
+                        svgEl(svg, 'polygon', { points: `${rx + 10},${ry} ${rx + w},${ry} ${rx + w - 10},${ry + h} ${rx},${ry + h}`, fill: '#fdf4ff', stroke: '#d946ef', 'stroke-width': 1.5 });
+                        multiline(cx, cy, txt, '#701a75');
+                    };
+
+                    drawPgramCustom(X_L2, y_box + bh / 2, 95, bh, 'Menampilkan Hasil Penilaian');
+                    drawPgramCustom(X_L1, y_box + bh / 2, 95, bh, 'Menampilkan Komentar Panelis');
+                    drawPgramCustom(X_R1, y_box + bh / 2, 95, bh, 'Menampilkan status rekomendasi');
+                    drawPgramCustom(X_R2, y_box + bh / 2, 95, bh, 'Menampilkan Total Skor');
+
+                    const y_merge = y_box + bh + 25;
+                    [X_L2, X_L1, X_R1, X_R2].forEach(x => svgEl(svg, 'path', { d: `M ${x} ${y_box + bh} L ${x} ${y_merge}`, fill: 'none', stroke: '#94a3b8', 'stroke-width': 1.5 }));
+                    svgEl(svg, 'path', { d: `M ${X_L2} ${y_merge} L ${X_R2} ${y_merge}`, stroke: '#94a3b8', 'stroke-width': 1.5 });
+
+                    y = y_merge; // Don't add spacing
+                }
+
+                if (!isLast) {
+                    if (s.t === 'DEC' && s.no) {
+                        const parts = s.no.split(' â†’ ');
+                        if (parts.length > 1) {
+                            const dCenterY = y - 46 / 2;
+                            const arrowLabel = parts[0];
+                            const boxText = parts[1];
+                            const rbw = 130, rbh = 34;
+                            const rx = X_CENTER + 95;
+                            const ry = dCenterY - rbh / 2;
+
+                            svgEl(svg, 'line', { x1: X_CENTER + 65, y1: dCenterY, x2: rx, y2: dCenterY, stroke: '#ef4444', 'stroke-width': 1.5, 'marker-end': `url(#${markId})` });
+                            label(X_CENTER + 80, dCenterY - 8, arrowLabel, '#ef4444');
+
+                            // Parallelogram for DATA
+                            svgEl(svg, 'polygon', { points: `${rx + 10},${ry} ${rx + rbw},${ry} ${rx + rbw - 10},${ry + rbh} ${rx},${ry + rbh}`, fill: '#fdf4ff', stroke: '#d946ef', 'stroke-width': 1.5 });
+                            multiline(rx + rbw / 2, ry + rbh / 2, boxText, '#701a75');
+
+                            const isLoopback = boxText.toLowerCase().includes('daftar ke register') || boxText.toLowerCase().includes('mengedit logbooknya');
+                            if (isLoopback) {
+                                const nextYCenter = y + SPACING + 17;
+                                svgEl(svg, 'path', { d: `M ${rx + rbw / 2} ${ry + rbh} L ${rx + rbw / 2} ${nextYCenter} L ${X_CENTER + 70} ${nextYCenter}`, fill: 'none', stroke: '#94a3b8', 'stroke-width': 1.5, 'marker-end': `url(#${markId})` });
+                            }
+                        } else {
+                            svgEl(svg, 'line', { x1: X_CENTER + 65, y1: y - 23, x2: X_CENTER + 80, y2: y - 23, stroke: '#ef4444', 'stroke-width': 1.5 });
+                            label(X_CENTER + 75, y - 32, "Tidak", '#ef4444');
+                            const sideWords = s.no.replace('Tidak â†’ ', '').split(' ');
+                            let sy = y - 18;
+                            sideWords.forEach((word) => {
+                                const we = svgEl(svg, 'text', { x: X_CENTER + 85, y: sy, 'font-size': 8.5, fill: '#ef4444', 'dominant-baseline': 'middle', 'font-family': 'Segoe UI,sans-serif' });
+                                we.textContent = word;
+                                sy += 11;
+                            });
+                        }
+
+                        arrow(X_CENTER, y, X_CENTER, y + SPACING, '#22c55e');
+                        label(X_CENTER + 12, y + 10, "Ya", '#22c55e');
+                    } else {
+                        arrow(X_CENTER, y, X_CENTER, y + SPACING, '#94a3b8');
+                    }
+                    y += SPACING;
+                }
+            });
+            return svg;
+        }
+
+        function renderTaskFlows() {
+            const container = document.getElementById('tf-svgs');
+            if (!container) return;
+            container.innerHTML = '';
+
+            const tfMaps = FLOWS.map(f => {
+                const newSteps = f.steps.map((s, i) => {
+                    let type = 'PROC';
+                    if (s.t === 'S') return { t: 'TERM', txt: 'Mulai' };
+                    if (s.t === 'E') return { t: 'TERM', txt: 'Selesai' };
+                    if (s.t === 'D') return { t: 'DEC', txt: s.txt, no: s.no, yes: s.yes };
+                    if (s.t === 'J') return null;
+                    if (s.t === 'CUSTOM_IDP') return { t: 'CUSTOM_IDP', txt: '' };
+                    if (s.t === 'CUSTOM_PROJECT') return { t: 'CUSTOM_PROJECT', txt: '' };
+                    if (s.t === 'CUSTOM_HISTORY') return { t: 'CUSTOM_HISTORY', txt: '' };
+                    if (s.t === 'CUSTOM_MENTOR_VALIDASI') return { t: 'CUSTOM_MENTOR_VALIDASI', txt: '' };
+                    if (s.t === 'CUSTOM_ATASAN_MONITORING') return { t: 'CUSTOM_ATASAN_MONITORING', txt: '' };
+                    if (s.t === 'CUSTOM_FINANCE_REVIEW') return { t: 'CUSTOM_FINANCE_REVIEW', txt: '' };
+                    if (s.t === 'CUSTOM_FINANCE_RIWAYAT') return { t: 'CUSTOM_FINANCE_RIWAYAT', txt: '' };
+                    if (s.t === 'CUSTOM_PANELIS_SIDANG') return { t: 'CUSTOM_PANELIS_SIDANG', txt: '' };
+                    if (s.t === 'CUSTOM_PANELIS_RIWAYAT') return { t: 'CUSTOM_PANELIS_RIWAYAT', txt: '' };
+
+                    const tL = (s.txt || '').toLowerCase();
+                    if (tL.includes('input') || tL.includes('isi') || tL.includes('pilih') || tL.includes('buka halaman') || tL.includes('tampil')) type = 'DATA';
+                    if (tL.includes('upload') || tL.includes('dokumen') || tL.includes('laporan') || tL.includes('catat di audit')) type = 'DOC';
+
+                    if (s.forceType) type = s.forceType;
+
+                    return { t: type, txt: s.txt };
+                }).filter(Boolean);
+                return { title: f.title.replace('Alur', 'UX Taskflow:'), steps: newSteps };
+            });
+
+            tfMaps.forEach(tf => {
+                const isWide = tf.steps.some(s => s.t === 'CUSTOM_HISTORY' || s.t === 'CUSTOM_PANELIS_SIDANG');
+                const card = document.createElement('div');
+                card.className = isWide ? 'act-card-wide' : 'act-card';
+                const header = document.createElement('div');
+                header.className = 'act-header';
+                header.textContent = tf.title;
+                card.appendChild(header);
+
+                const body = document.createElement('div');
+                body.className = 'act-body';
+                body.style.overflowX = isWide ? 'auto' : '';
+                const svgEl = drawTaskflow(tf.steps, tf.title);
+                body.appendChild(svgEl);
+                card.appendChild(body);
+                if (tf.title.includes('Finance')) {
+                    card.style.borderColor = '#82b366';
+                    header.style.backgroundColor = '#d5e8d4';
+                    header.style.color = '#1a1a1a';
+                } else if (tf.title.includes('Panelis')) {
+                    card.style.borderColor = '#d6b656';
+                    header.style.backgroundColor = '#fff2cc';
+                    header.style.color = '#1a1a1a';
+                } else if (tf.title.includes('Reset Password') || tf.title.includes('Autentikasi')) {
+                    card.style.borderColor = '#5d9c24';
+                    header.style.backgroundColor = '#65aa28';
+                    header.style.color = '#ffffff';
+                }
+                container.appendChild(card);
+            });
+        }
+
+        const USERFLOWS = [
+            {
+                title: 'Userflow UX: Karir Talent',
+                steps: [
+                    { t: 'TERM', txt: 'Mulai' },
+                    { t: 'DATA', txt: 'Login ke Dashboard Talent' },
+                    { t: 'PROC', txt: 'Cek Status Promosi Terkini' },
+                    { t: 'DEC', txt: 'Ada Jadwal Terbuka?', yes: 'Ada', no: 'Tidak (lanjut)' },
+                    { t: 'DATA', txt: 'Isi Self-Assesment Kompetensi' },
+                    { t: 'DEC', txt: 'Harus Isi Logbook?', yes: 'Ya', no: 'Tidak (lanjut)' },
+                    { t: 'DOC', txt: 'Upload Laporan & File Logbook' },
+                    { t: 'DEC', txt: 'Submit Project Akhir?', yes: 'Ya', no: 'Belum' },
+                    { t: 'DOC', txt: 'Upload Proposal Project' },
+                    { t: 'PROC', txt: 'Pantau Status Persetujuan Anda' },
+                    { t: 'TERM', txt: 'Selesai / Logout' }
+                ]
+            },
+            {
+                title: 'Userflow UX: Tugas Mentor',
+                steps: [
+                    { t: 'TERM', txt: 'Mulai' },
+                    { t: 'DATA', txt: 'Login ke Dashboard Mentor' },
+                    { t: 'PROC', txt: 'Lihat Daftar Mentee Aktif' },
+                    { t: 'DEC', txt: 'Ada Logbook Pending?', yes: 'Ada', no: 'Tidak' },
+                    { t: 'DOC', txt: 'Review Bukti Logbook Mentee' },
+                    { t: 'DEC', txt: 'Keputusan Validasi Logbook', yes: 'Approve', no: 'Reject' },
+                    { t: 'DEC', txt: 'Ada Project Pending?', yes: 'Ada', no: 'Selesai' },
+                    { t: 'DOC', txt: 'Review Proposal Project Mentee' },
+                    { t: 'DEC', txt: 'Keputusan Validasi Project', yes: 'Approve', no: 'Reject' },
+                    { t: 'TERM', txt: 'Selesai / Logout' }
+                ]
+            },
+            {
+                title: 'Userflow UX: Validasi Atasan',
+                steps: [
+                    { t: 'TERM', txt: 'Mulai' },
+                    { t: 'DATA', txt: 'Login ke Dashboard Atasan' },
+                    { t: 'PROC', txt: 'Lihat Progres Bawahan' },
+                    { t: 'DEC', txt: 'Tugas Self-Assessment?', yes: 'Ada', no: 'Selesai' },
+                    { t: 'DATA', txt: 'Isi Skor Penilaian Kompetensi Bawahan' },
+                    { t: 'DEC', txt: 'Ada Pending Logbook/Project?', yes: 'Ada', no: 'Selesai' },
+                    { t: 'DOC', txt: 'Review Dokumen Logbook / Project' },
+                    { t: 'DEC', txt: 'Keputusan Validasi Kelengkapan', yes: 'Approve', no: 'Reject' },
+                    { t: 'TERM', txt: 'Selesai / Logout' }
+                ]
+            },
+            {
+                title: 'Userflow UX: Ujian Panelis',
+                steps: [
+                    { t: 'TERM', txt: 'Mulai' },
+                    { t: 'DATA', txt: 'Login ke Dashboard Panelis' },
+                    { t: 'PROC', txt: 'Lihat Antrean Ujian' },
+                    { t: 'DEC', txt: 'Ada Jadwal Sidang?', yes: 'Ada', no: 'Tidak' },
+                    { t: 'DOC', txt: 'Review Seluruh Dokumen Riwayat Talent' },
+                    { t: 'DATA', txt: 'Isi Lembar Skor Hasil Ujian' },
+                    { t: 'DATA', txt: 'Tulis Komentar & Rekomendasi Promosi' },
+                    { t: 'TERM', txt: 'Selesai / Logout' }
+                ]
+            },
+            {
+                title: 'Userflow UX: Validasi Finance',
+                steps: [
+                    { t: 'TERM', txt: 'Mulai' },
+                    { t: 'DATA', txt: 'Login ke Dashboard Finance' },
+                    { t: 'PROC', txt: 'Pantau Antrean Project' },
+                    { t: 'DEC', txt: 'Ada Review Anggaran?', yes: 'Ada', no: 'Kosong' },
+                    { t: 'DOC', txt: 'Buka Proposal Improvement Project' },
+                    { t: 'DATA', txt: 'Catat Analisis Kelayakan & Finansial' },
+                    { t: 'DEC', txt: 'Validasi Persetujuan Dana', yes: 'Approve', no: 'Reject' },
+                    { t: 'TERM', txt: 'Selesai / Logout' }
+                ]
+            },
+            {
+                title: 'Userflow UX: Tanggung Jawab PDC Admin',
+                customBranchingAdmin: true,
+                steps: []
+            }
+        ];
+
+        function drawAdminBranching() {
+            const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+            const W = 700, H = 580;
+            svg.setAttribute('width', '100%'); svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.style.minHeight = H + 'px';
+
+            const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+            const mk = document.createElementNS('http://www.w3.org/2000/svg', 'marker');
+            mk.setAttribute('id', 'ad-arr'); mk.setAttribute('markerWidth', '6'); mk.setAttribute('markerHeight', '6');
+            mk.setAttribute('refX', '5'); mk.setAttribute('refY', '3'); mk.setAttribute('orient', 'auto');
+            const p2 = document.createElementNS('http://www.w3.org/2000/svg', 'path'); p2.setAttribute('d', 'M0,0 L0,6 L6,3 z'); p2.setAttribute('fill', '#94a3b8');
+            mk.appendChild(p2); defs.appendChild(mk); svg.appendChild(defs);
+
+            function el(tag, attrs) { const e = document.createElementNS('http://www.w3.org/2000/svg', tag); for (const k in attrs) e.setAttribute(k, attrs[k]); svg.appendChild(e); return e; }
+            function t(x, y, txt, col) { const e = el('text', { x, y, 'font-size': 9, fill: col || '#1e293b', 'text-anchor': 'middle', 'dominant-baseline': 'middle', 'font-family': 'Segoe UI,sans-serif', 'font-weight': 'bold' }); e.textContent = txt; }
+            function tw(x, y, txt, col) {
+                const arr = txt.split('|');
+                const startY = y - (arr.length - 1) * 6;
+                arr.forEach((str, i) => { t(x, startY + i * 13, str, col); });
+            }
+            function arr(x1, y1, x2, y2) { el('line', { x1, y1, x2, y2, stroke: '#94a3b8', 'stroke-width': 1.5, 'marker-end': 'url(#ad-arr)' }); }
+            function path(d) { el('path', { d, fill: 'none', stroke: '#94a3b8', 'stroke-width': 1.5, 'marker-end': 'url(#ad-arr)' }); }
+
+            function _term(x, y, txt) { el('rect', { x: x - 50, y, width: 100, height: 26, rx: 13, fill: '#eff6ff', stroke: '#3b82f6', 'stroke-width': 1.5 }); tw(x, y + 13, txt, '#1d4ed8'); }
+            function _proc(x, y, txt) { el('rect', { x: x - 65, y, width: 130, height: 32, rx: 2, fill: '#f0fdf4', stroke: '#22c55e', 'stroke-width': 1.5 }); tw(x, y + 16, txt, '#15803d'); }
+            function _data(x, y, txt) { el('polygon', { points: `${x - 60},${y} ${x + 70},${y} ${x + 60},${y + 32} ${x - 70},${y + 32}`, fill: '#fdf4ff', stroke: '#d946ef', 'stroke-width': 1.5 }); tw(x, y + 16, txt, '#a21caf'); }
+            function _dec(x, y, txt) { el('polygon', { points: `${x},${y} ${x + 65},${y + 22} ${x},${y + 44} ${x - 65},${y + 22}`, fill: '#fef2f2', stroke: '#ef4444', 'stroke-width': 1.5 }); tw(x, y + 22, txt, '#b91c1c'); }
+            function _doc(x, y, txt) { el('path', { d: `M ${x - 65} ${y} L ${x + 65} ${y} L ${x + 65} ${y + 25} Q ${x} ${y + 36} ${x - 65} ${y + 25} Z`, fill: '#fffbeb', stroke: '#f59e0b', 'stroke-width': 1.5 }); tw(x, y + 14, txt, '#b45309'); }
+            function msg(x, y, txt) { t(x, y, txt, '#b91c1c') }
+
+            const C = 350, L = 160, R = 540;
+
+            arr(C, 36, C, 60);
+            arr(C, 92, C, 120);
+
+            path(`M ${C - 65} 142 L ${L} 142 L ${L} 180`);
+            msg(C - 110, 134, 'Mode Master Data');
+
+            path(`M ${C + 65} 142 L ${R} 142 L ${R} 180`);
+            msg(C + 110, 134, 'Mode Rekap Siklus');
+
+            // Left
+            arr(L, 212, L, 240);
+            arr(L, 272, L, 300);
+            arr(L, 332, L, 360);
+            arr(L, 392, L, 420);
+            arr(L, 452, L, 480);
+            path(`M ${L} 512 L ${L} 540 L ${C - 5} 540`);
+
+            // Right
+            arr(R, 212, R, 240);
+            arr(R, 272, R, 300);
+            arr(R, 344, R, 370);
+            arr(R, 402, R, 430);
+            path(`M ${R - 65} 322 L ${R - 90} 322 L ${R - 90} 256 L ${R - 55} 256`);
+            msg(R - 80, 248, 'Revisi / Mundur');
+            path(`M ${R} 455 L ${R} 540 L ${C + 5} 540`);
+
+            arr(C, 540, C, 560);
+
+            _term(C, 10, 'Mulai');
+            _data(C, 60, 'Login Dashboard|PDC Admin');
+            _dec(C, 120, 'Menu Dashboard|Pilih Tujuan?');
+
+            _proc(L, 180, 'Company Management');
+            _data(L, 240, 'Atur Struktur Department|& Position Jabatan');
+            _proc(L, 300, 'Kompetensi');
+            _data(L, 360, 'Input Standarisasi Nilai|Target per Jabatan');
+            _proc(L, 420, 'User Management');
+            _data(L, 480, 'Assign Multi-Role User|& Modifikasi Akun');
+
+            _proc(R, 180, 'Progress Talent');
+            _data(R, 240, 'Buat Promotion Plan &|Registrasi Mentor');
+            _dec(R, 300, 'Finance Validation|Disetujui?');
+            _proc(R, 370, 'Panelis Review');
+            _doc(R, 430, 'Progress Archive|Ekspor Laporan PDF');
+
+            _term(C, 560, 'Selesai / Logout');
+
+            return svg;
+        }
+
+        function renderUserFlows() {
+            const container = document.getElementById('uf-svgs');
+            const adminContainer = document.getElementById('uf-admin-svg');
+            if (!container) return;
+            container.innerHTML = '';
+            if (adminContainer) adminContainer.innerHTML = '';
+
+            USERFLOWS.forEach(uf => {
+                const card = document.createElement('div');
+                card.className = 'act-card';
+                card.style.minWidth = uf.customBranchingAdmin ? '720px' : '300px';
+
+                const header = document.createElement('div');
+                header.className = 'act-header';
+                header.textContent = uf.title;
+                card.appendChild(header);
+
+                const body = document.createElement('div');
+                body.className = 'act-body';
+                const svgEl = uf.customBranchingAdmin ? drawAdminBranching() : drawTaskflow(uf.steps, uf.title);
+                body.appendChild(svgEl);
+                card.appendChild(body);
+
+                if (uf.customBranchingAdmin && adminContainer) {
+                    adminContainer.appendChild(card);
+                } else {
+                    container.appendChild(card);
+                }
+            });
+        }
+
+        // Auto render on load
+        window.addEventListener('load', () => {
+            drawUseCase();
+            renderActivityDiagrams();
+            renderTaskFlows();
+            renderUserFlows();
+        });
+    </script>
+</body>
+
+</html>

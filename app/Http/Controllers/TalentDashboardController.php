@@ -1,0 +1,1134 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
+use App\Models\IdpActivity;
+use App\Models\ImprovementProject;
+use App\Models\User;
+use App\Models\DevelopmentSession;
+
+class TalentDashboardController extends Controller
+{
+    protected function hasCompleteDevelopmentPlan(User $user, ?DevelopmentSession $developmentSession = null): bool
+    {
+        $plan = $user->promotion_plan;
+        $developmentSession ??= $this->activeDevelopmentSessionFor($user);
+
+        $hasTargetPosition = !empty($plan?->target_position_id) || !empty($developmentSession?->target_position_id);
+        $hasAtasan = !empty($developmentSession?->atasan_id) || !empty($user->atasan_id);
+        $hasMentor = collect($plan?->mentor_ids ?? $developmentSession?->mentor_ids ?? [])
+            ->filter()
+            ->isNotEmpty() || !empty($user->mentor_id);
+        $hasPeriod = !empty($plan?->start_date) && !empty($plan?->target_date);
+
+        return $hasTargetPosition && $hasAtasan && $hasMentor && $hasPeriod;
+    }
+
+    protected function incompleteDevelopmentPlanMessage(): string
+    {
+        return 'Development plan belum lengkap. PDC Admin harus mengisi posisi yang dituju, mentor, atasan, dan periode terlebih dahulu.';
+    }
+
+    protected function hasIsActiveColumn(string $table): bool
+    {
+        return Schema::hasColumn($table, 'is_active');
+    }
+
+    protected function activeDevelopmentSessionFor(User $user): ?DevelopmentSession
+    {
+        return DevelopmentSession::where('user_id_talent', $user->id)
+            ->where('is_active', true)
+            ->latest('created_at')
+            ->first();
+    }
+
+    protected function resolveMentorNotificationRecipients(User $user, ?int $verifyById = null): array
+    {
+        $mentorIds = collect(optional($user->promotion_plan)->mentor_ids ?? [])
+            ->merge([$user->mentor_id, $verifyById])
+            ->filter()
+            ->unique()
+            ->values();
+
+        return User::query()
+            ->whereIn('id', $mentorIds)
+            ->whereHas('roles', fn($q) => $q->where('role_name', 'mentor'))
+            ->pluck('id')
+            ->all();
+    }
+
+    protected function notifyLogbookStakeholders(User $user, ?int $verifyById, string $title, string $mentorDesc, string $pdcDesc, string $type = 'info'): void
+    {
+        $mentorRecipientIds = $this->resolveMentorNotificationRecipients($user, $verifyById);
+
+        $this->addNotificationToUsers(
+            $mentorRecipientIds,
+            $title,
+            $mentorDesc,
+            $type
+        );
+
+        $this->notifyPdcAdmins($title, $pdcDesc, $type);
+    }
+
+    public function index()
+    {
+        try {
+            $user = Auth::user()->load(['company', 'department', 'position', 'role', 'promotion_plan.targetPosition', 'mentor', 'atasan']);
+
+            if ($user->role->role_name !== 'talent' && $user->role->role_name !== 'talent') {
+                abort(403, 'Hanya talent/talent yang bisa mengakses dashboard ini.');
+            }
+
+            $notifications = $this->getNotifications();
+
+            return view('talent.dashboard', compact(
+                'user',
+                'notifications'
+            ));
+        } catch (\Exception $e) {
+            Log::error('talentDashboard error: ' . $e->getMessage());
+            throw $e;
+        }
+    }
+
+    public function downloadProjectTemplate()
+    {
+        $path = 'templates/Template Presentasi Suksesi.pptx';
+
+        abort_unless(Storage::disk('public')->exists($path), 404, 'Template presentasi tidak ditemukan.');
+
+        return Storage::disk('public')->download($path, 'Template Presentasi Suksesi.pptx');
+    }
+
+    public function competency()
+    {
+        try {
+            $user = Auth::user()->load(['promotion_plan.targetPosition']);
+            if ($user->role->role_name !== 'talent' && $user->role->role_name !== 'talent') {
+                abort(403, 'Hanya talent yang bisa mengakses halaman ini.');
+            }
+
+            $competencies = \App\Models\Competence::with([
+                'questions' => function ($q) {
+                    $q->orderBy('level');
+                }
+            ])->get();
+
+            // Ambil target level per kompetensi sesuai posisi yang dituju talent
+            $targetPositionId = optional($user->promotion_plan)->target_position_id;
+            $targetLevels = [];
+            if ($targetPositionId) {
+                $targetLevels = \App\Models\PositionTargetCompetence::where('position_id', $targetPositionId)
+                    ->pluck('target_level', 'competence_id')
+                    ->toArray();
+            }
+
+            return view('talent.competency', compact('user', 'competencies', 'targetLevels'));
+        } catch (\Exception $e) {
+            Log::error('talent competency error: ' . $e->getMessage());
+            throw $e;
+        }
+    }
+
+    public function storeCompetency(Request $request)
+    {
+        try {
+            $user = Auth::user();
+            if ($user->role->role_name !== 'talent') {
+                abort(403, 'Hanya talent yang bisa mengakses halaman ini.');
+            }
+
+            if (optional($user->promotion_plan)->is_locked) {
+                return back()->with('error', 'Progress Anda telah dikunci oleh Admin PDC. Anda tidak dapat mengirim atau mengubah data.');
+            }
+
+            $developmentSession = $this->activeDevelopmentSessionFor($user);
+
+            // Validasi Input Array Score dari request POST
+            // min:0 karena Level 1 + Ragu-ragu = skor 0
+            $data = $request->validate([
+                'scores' => 'required|array',
+                'scores.*' => 'required|integer|min:0|max:5',
+            ]);
+
+            DB::beginTransaction();
+
+            $bulanTahun = now()->format('F Y');
+            $userIdAtasan = $developmentSession?->atasan_id ?: ($user->atasan_id ?: null);
+
+            // Pastikan hanya ada satu assessment aktif terbaru per talent.
+            DB::table('assessment_session')
+                ->where('user_id_talent', $user->id)
+                ->where('is_active', true)
+                ->update(['is_active' => false]);
+
+            // 1. Buat Header / Sesi Assessment Baru
+            $assessmentId = DB::table('assessment_session')->insertGetId([
+                'development_session_id' => $developmentSession?->id,
+                'user_id_talent' => $user->id,
+                'user_id_atasan' => $userIdAtasan,
+                'period' => $developmentSession
+                    ? "Assessment {$bulanTahun}"
+                    : "Assessment Awal {$bulanTahun}",
+                'is_active' => true,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+
+            // 2. Siapkan Data Multiple Detail Assessment untuk di-insert
+            $details = [];
+            foreach ($data['scores'] as $competenceId => $scoreTalent) {
+                $details[] = [
+                    'assessment_id' => $assessmentId,
+                    'competence_id' => (int) $competenceId,
+                    'score_atasan' => 0, // diisi nanti oleh Atasan
+                    'score_talent' => (int) $scoreTalent,
+                    'gap_score' => 0, // diisi nanti
+                    'notes' => 'Completed by talent',
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ];
+            }
+
+            // 3. Batch Insert ke tabel detail_assessment
+            DB::table('detail_assessment')->insert($details);
+
+            DB::commit();
+
+            if ($user->atasan_id) {
+                $this->addNotificationToUser(
+                    $user->atasan_id,
+                    'Assessment Kompetensi Baru dari Talent',
+                    '<span class="font-semibold">' . e($user->nama) . '</span> telah mengisi assessment kompetensi dan menunggu penilaian Anda.',
+                    'info'
+                );
+            }
+
+            $this->notifyPdcAdmins(
+                'Kompetensi Talent Selesai Diisi',
+                'Talent <span class="font-semibold">' . e($user->nama) . '</span> telah menyelesaikan assessment kompetensi.',
+                'info'
+            );
+
+            return redirect()->route('talent.dashboard');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return back()->withErrors($e->errors())->withInput()
+                ->with('error', 'Data assessment tidak valid. Pastikan semua kompetensi sudah dinilai.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('talent store competency error: ' . $e->getMessage());
+            return back()->with('error', 'Gagal memproses penilaian kompetensi: ' . $e->getMessage());
+        }
+    }
+
+    public function idpMonitoring($tab = 'exposure')
+    {
+        try {
+            $user = Auth::user()->load(['company', 'department', 'position', 'role', 'mentor', 'atasan', 'promotion_plan']);
+            if ($user->role->role_name !== 'talent' && $user->role->role_name !== 'talent') {
+                abort(403, 'Hanya talent/talent yang bisa mengakses halaman ini.');
+            }
+
+            $developmentSession = $this->activeDevelopmentSessionFor($user);
+            if (!$this->hasCompleteDevelopmentPlan($user, $developmentSession)) {
+                return redirect(route('talent.dashboard') . '#IDP Monitoring')
+                    ->with('error', $this->incompleteDevelopmentPlanMessage());
+            }
+
+            // Ambil mentor dari promotion plan (multiple mentors)
+            $mentors = $user->promotion_plan ? $user->promotion_plan->mentor_models : collect();
+            $atasans = $user->atasan ? collect([$user->atasan]) : collect();
+
+            $notifications = $this->getNotifications();
+
+            return view('talent.idp-monitoring', compact('user', 'tab', 'mentors', 'atasans', 'notifications'));
+        } catch (\Exception $e) {
+            Log::error('talentDashboard idpMonitoring error: ' . $e->getMessage());
+            throw $e;
+        }
+    }
+
+    public function storeIdpMonitoring(Request $request, $tab = 'exposure')
+    {
+        try {
+            $user = Auth::user();
+            if ($user->role->role_name !== 'talent' && $user->role->role_name !== 'talent') {
+                abort(403, 'Hanya talent/talent yang bisa mengakses halaman ini.');
+            }
+
+            if (optional($user->promotion_plan)->is_locked) {
+                return back()->with('error', 'Progress Anda telah dikunci oleh Admin PDC. Anda tidak dapat mengirim atau mengubah data.');
+            }
+
+            $developmentSession = $this->activeDevelopmentSessionFor($user);
+            if (!$developmentSession) {
+                return back()->with('error', 'Development plan aktif belum tersedia. Hubungi Admin PDC terlebih dahulu.');
+            }
+
+            // ── Validasi input ──────────────────────────────────────────────
+            if (!$this->hasCompleteDevelopmentPlan($user, $developmentSession)) {
+                return back()->with('error', $this->incompleteDevelopmentPlanMessage());
+            }
+
+            $rules = [
+                'theme' => 'required|string|max:255',
+                'activity_date' => 'required|date',
+                'documents' => 'required|array|min:1|max:5', // maks 5 file
+                'documents.*' => 'required|file|max:5120|mimes:png,jpg,jpeg,pdf,doc,docx,xls,xlsx',
+            ];
+
+            if ($tab === 'learning') {
+                $rules['activity'] = 'required|string|max:255';
+                $rules['platform'] = 'required|string|max:255';
+            } else {
+                $rules['mentor_name'] = 'required|string|max:255';
+                $rules['location'] = 'required|string|max:255';
+            }
+
+            if ($tab === 'mentoring') {
+                $rules['description'] = 'required|string';
+                $rules['action_plan'] = 'required|string';
+            } elseif ($tab === 'exposure') {
+                $rules['activity'] = 'required|string';
+                $rules['description'] = 'required|string';
+            }
+
+            // Merge activity and description based on tab
+            $tab_from_request = $request->input('tab_type', $tab);
+            if ($tab_from_request === 'learning') {
+                $request->merge(['activity' => $request->input('activity_learning')]);
+            } elseif ($tab_from_request === 'exposure') {
+                $request->merge([
+                    'activity' => $request->input('activity_exposure'),
+                    'description' => $request->input('description_exposure')
+                ]);
+            } elseif ($tab_from_request === 'mentoring') {
+                $request->merge(['description' => $request->input('description_mentoring')]);
+            }
+
+            $validated = $request->validate($rules, [
+                'documents.required' => 'Dokumentasi wajib dilampirkan.',
+                'documents.min' => 'Dokumentasi wajib dilampirkan minimal 1 file.',
+                'documents.max' => 'Maksimal 5 file yang bisa diupload.',
+                'documents.*.max' => 'Ukuran setiap file tidak boleh melebihi 5 MB.',
+                'documents.*.mimes' => 'Format file harus: PNG, JPG, PDF, DOC, DOCX, XLS, XLSX.',
+            ]);
+
+            // Gunakan tab dari request jika ada
+            $tab = $tab_from_request;
+
+            // ── Type IDP ────────────────────────────────────────────────────
+            $typeId = DB::table('idp_type')->where('type_name', ucfirst($tab))->value('id');
+            if (!$typeId) {
+                return back()->with('error', 'Tipe IDP tidak valid.');
+            }
+
+            // ── Upload file(s) ──────────────────────────────────────────────
+            $documentPaths = [];
+            $fileNames = [];
+
+            if ($request->hasFile('documents')) {
+                foreach ($request->file('documents') as $file) {
+                    $fileNames[] = $file->getClientOriginalName();
+                    $documentPaths[] = $file->store('idp_documents', 'public');
+                }
+            }
+
+            $documentPath = count($documentPaths) === 1
+                ? $documentPaths[0] // satu file → simpan string biasa
+                : (count($documentPaths) > 1 ? json_encode($documentPaths) : ''); // banyak → JSON
+
+            $fileName = count($fileNames) === 1
+                ? $fileNames[0]
+                : (count($fileNames) > 1 ? implode(', ', $fileNames) : null);
+
+            // ── Verify by (mentor) ──────────────────────────────────────────
+            $verifyById = null;
+            if ($request->filled('mentor_name')) {
+                $verifyById = User::where('nama', $request->mentor_name)->value('id');
+            }
+
+            // ── Simpan ke DB ────────────────────────────────────────────────
+            IdpActivity::create([
+                'user_id_talent' => $user->id,
+                'development_session_id' => $developmentSession->id,
+                'type_idp' => $typeId,
+                'verify_by' => $verifyById,
+                'theme' => $validated['theme'],
+                'activity_date' => $validated['activity_date'],
+                'location' => $request->location ?? '',
+                'activity' => $request->activity ?? '',
+                'description' => $request->description ?? '',
+                'action_plan' => $request->action_plan ?? '',
+                'document_path' => $documentPath,
+                'file_name' => $fileName,
+                'status' => 'Pending',
+                'platform' => $request->platform ?? '',
+            ]);
+
+            $mentorRecipientIds = $this->resolveMentorNotificationRecipients($user, $verifyById);
+            $this->addNotificationToUsers(
+                $mentorRecipientIds,
+                'IDP Activity Baru',
+                $user->nama . ' telah mengunggah IDP Monitoring baru (<span class="font-semibold">' . ucfirst($tab) . '</span>) dengan tema <span class="font-semibold">' . e($validated['theme']) . '</span>.',
+                'info'
+            );
+
+            $this->notifyPdcAdmins(
+                'IDP Monitoring Baru dari Talent',
+                'Talent <span class="font-semibold">' . e($user->nama) . '</span> telah mengunggah IDP Monitoring <span class="font-semibold">' . e(ucfirst($tab)) . '</span> dengan tema <span class="font-semibold">' . e($validated['theme']) . '</span>.',
+                'info'
+            );
+
+            return redirect(route('talent.dashboard') . '#IDP Monitoring')
+                ->with('success', 'IDP Activity berhasil disubmit.');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return back()->withErrors($e->errors())->withInput();
+        } catch (\Exception $e) {
+            Log::error('talentDashboard storeIdpMonitoring error: ' . $e->getMessage());
+            return back()->with('error', 'Terjadi kesalahan saat menyimpan data.');
+        }
+    }
+
+    public function storeProject(Request $request)
+    {
+        try {
+            $user = Auth::user();
+            if (optional($user->promotion_plan)->is_locked) {
+                return back()->with('error', 'Progress Anda telah dikunci oleh Admin PDC. Anda tidak dapat mengirim atau mengubah data.');
+            }
+
+            $developmentSession = $this->activeDevelopmentSessionFor($user);
+            if (!$developmentSession) {
+                return back()->with('error', 'Development plan aktif belum tersedia. Hubungi Admin PDC terlebih dahulu.');
+            }
+
+            if (!$this->hasCompleteDevelopmentPlan($user, $developmentSession)) {
+                return back()->with('error', $this->incompleteDevelopmentPlanMessage());
+            }
+
+            $request->validate([
+                'judul_project' => 'required|string|max:255',
+                'project_file' => 'required|file|max:10240|mimes:png,jpg,jpeg,pdf,doc,docx,xls,xlsx,ppt,pptx,zip',
+            ], [
+                'judul_project.required' => 'Judul project harus diisi.',
+                'project_file.required' => 'File project harus diunggah.',
+                'project_file.max' => 'Ukuran file tidak boleh melebihi 10 MB.',
+                'project_file.mimes' => 'Format file tidak didukung.',
+            ]);
+
+            $extension = $request->file('project_file')->getClientOriginalExtension();
+            $baseName = Str::slug($request->judul_project) ?: 'project-improvement';
+            $storedFileName = $baseName . '-' . now()->format('Ymd-His') . '.' . $extension;
+            $documentPath = $request->file('project_file')
+                ->storeAs('improvement_projects', $storedFileName, 'public');
+
+            ImprovementProject::create([
+                'user_id_talent' => Auth::id(),
+                'development_session_id' => $developmentSession->id,
+                'title' => $request->judul_project,
+                'document_path' => $documentPath,
+                'status' => 'Pending',
+            ]);
+
+            $this->notifyPdcAdmins(
+                'Project Improvement Baru',
+                'Talent <span class="font-semibold">' . e($user->nama) . '</span> telah mengunggah Project Improvement berjudul <span class="font-semibold">' . e($request->judul_project) . '</span>.',
+                'info'
+            );
+
+            return redirect(route('talent.dashboard') . '#Project Improvement')
+                ->with('success_project', 'Project Improvement berhasil disubmit.');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return back()->withErrors($e->errors())->withInput();
+        } catch (\Exception $e) {
+            Log::error('storeProject error: ' . $e->getMessage());
+            return back()->with('error', 'Terjadi kesalahan saat menyimpan project.');
+        }
+    }
+
+    // public function riwayat()
+    // {
+    //     $user = Auth::user();
+
+    //     $talent = User::with([
+    //         'company',
+    //         'department',
+    //         'position',
+    //         'mentor',
+    //         'atasan',
+    //         'promotion_plan.targetPosition',
+    //         'assessmentSession.details.competence',
+    //         'idpActivities.type',
+    //         'improvementProjects.verifier',
+    //         'panelisAssessments.panelis.company',
+    //     ])->findOrFail($user->id);
+
+    //     $competencies = \App\Models\Competence::all();
+
+    //     $positionId = optional($talent->promotion_plan)->target_position_id;
+    //     $standards = $positionId
+    //         ?\App\Models\PositionTargetCompetence::where('position_id', $positionId)->pluck('target_level', 'competence_id')
+    //         : collect();
+
+    //     // Build top 3 GAP list
+    //     $sess = $talent->assessmentSession;
+    //     $gaps = collect();
+    //     if ($sess && $sess->details->count()) {
+    //         $overrides = $sess->details->filter(fn($d) => str_starts_with($d->notes ?? '', 'priority_'))
+    //             ->sortBy(fn($d) => (int)explode('|', str_replace('priority_', '', $d->notes))[0]);
+    //         $gaps = $overrides->count() > 0
+    //             ? $overrides->values()
+    //             : $sess->details->sortBy('gap_score')->take(3)->values();
+    //     }
+
+    //     // IDP activity counts
+    //     $exposureCount = 0;
+    //     $mentoringCount = 0;
+    //     $learningCount = 0;
+    //     if ($talent->idpActivities) {
+    //         foreach ($talent->idpActivities as $act) {
+    //             $typeName = strtolower(optional($act->type)->type_name ?? '');
+    //             if (str_contains($typeName, 'exposure'))
+    //                 $exposureCount++;
+    //             elseif (str_contains($typeName, 'mentor'))
+    //                 $mentoringCount++;
+    //             elseif (str_contains($typeName, 'learn'))
+    //                 $learningCount++;
+    //         }
+    //     }
+
+    //     $notifications = $this->getNotifications();
+
+    //     return view('talent.riwayat', compact(
+    //         'user',
+    //         'talent',
+    //         'competencies',
+    //         'standards',
+    //         'gaps',
+    //         'exposureCount',
+    //         'mentoringCount',
+    //         'learningCount',
+    //         'notifications'
+    //     ));
+    // }
+
+    public function notifikasi()
+    {
+        $user = Auth::user();
+        $notifications = $this->getNotifications();
+        return view('talent.notifikasi', compact('user', 'notifications'));
+    }
+
+
+
+    public function logbookDetail(Request $request)
+    {
+        $user = Auth::user()->load(['company', 'department', 'position', 'role', 'mentor', 'atasan']);
+        $notifications = $this->getNotifications();
+        $activeTab = strtolower((string) $request->query('tab', 'exposure'));
+
+        if (!in_array($activeTab, ['exposure', 'mentoring', 'learning'], true)) {
+            $activeTab = 'exposure';
+        }
+
+        $sessionId = $request->query('session_id');
+
+        $activities = \App\Models\IdpActivity::with(['type', 'verifier'])
+            ->where('user_id_talent', $user->id)
+            ->when($sessionId, function ($query) use ($sessionId) {
+                return $query->where('development_session_id', $sessionId);
+            })
+            ->when(!$sessionId && $this->hasIsActiveColumn('idp_activity'), function ($query) {
+                return $query->where('is_active', true);
+            })
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        $exposureData = [];
+        $mentoringData = [];
+        $learningData = [];
+
+        foreach ($activities as $act) {
+            $typeName = $act->type ? $act->type->type_name : '';
+
+            // Build array of all file paths and their names
+            $docPaths = [];
+            $docNames = [];
+            if ($act->document_path) {
+                if (str_starts_with($act->document_path, '["')) {
+                    $docPaths = json_decode($act->document_path, true) ?? [];
+                    $docNames = $act->file_name ? explode(', ', $act->file_name) : [];
+                } else {
+                    $docPaths = [$act->document_path];
+                    $docNames = [$act->file_name ?? ''];
+                }
+            }
+
+            if ($typeName === 'Exposure') {
+                $exposureData[] = [
+                    'id' => $act->id,
+                    'mentor' => $act->verifier ? $act->verifier->nama : '-',
+                    'tema' => $act->theme,
+                    'tanggal_update' => $act->updated_at,
+                    'tanggal' => $act->activity_date,
+                    'lokasi' => $act->location,
+                    'aktivitas' => $act->activity,
+                    'deskripsi' => $act->description,
+                    'file_paths' => $docPaths,
+                    'file_names' => $docNames,
+                    'status' => $act->status,
+                ];
+            } elseif ($typeName === 'Mentoring') {
+                $mentoringData[] = [
+                    'id' => $act->id,
+                    'mentor' => $act->verifier ? $act->verifier->nama : '-',
+                    'tema' => $act->theme,
+                    'tanggal_update' => $act->updated_at,
+                    'tanggal' => $act->activity_date,
+                    'lokasi' => $act->location,
+                    'deskripsi' => $act->description,
+                    'action_plan' => $act->action_plan,
+                    'file_paths' => $docPaths,
+                    'file_names' => $docNames,
+                    'status' => $act->status,
+                ];
+            } elseif ($typeName === 'Learning') {
+                $learningData[] = [
+                    'id' => $act->id,
+                    'sumber' => $act->activity,
+                    'tema' => $act->theme,
+                    'tanggal_update' => $act->updated_at,
+                    'tanggal' => $act->activity_date,
+                    'platform' => $act->platform,
+                    'file_paths' => $docPaths,
+                    'file_names' => $docNames,
+                    'status' => $act->status,
+                ];
+            }
+        }
+
+        return view('talent.logbook', compact(
+            'user',
+            'notifications',
+            'exposureData',
+            'mentoringData',
+            'learningData',
+            'activeTab'
+        ));
+    }
+
+
+
+    public function logbookItemDetail($id)
+    {
+        $user = Auth::user()->load(['company', 'department', 'position', 'role', 'mentor', 'atasan']);
+        $notifications = $this->getNotifications();
+
+        $activity = \App\Models\IdpActivity::with(['talent', 'verifier', 'type'])->findOrFail($id);
+
+        if ($activity->user_id_talent !== $user->id) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        return view('talent.logbook-detail', compact('user', 'activity', 'notifications'));
+    }
+
+    public function editIdpMonitoring($id)
+    {
+        try {
+            $user = Auth::user()->load(['company', 'department', 'position', 'role', 'mentor', 'atasan', 'promotion_plan']);
+            if ($user->role->role_name !== 'talent' && $user->role->role_name !== 'talent') {
+                abort(403, 'Hanya talent/talent yang bisa mengakses halaman ini.');
+            }
+
+            $activity = IdpActivity::with('type', 'verifier')->findOrFail($id);
+            if ($activity->user_id_talent !== Auth::id()) {
+                abort(403, 'Unauthorized action.');
+            }
+
+            $tab = strtolower($activity->type->type_name ?? 'exposure');
+
+            // Ambil mentor dari promotion plan (multiple mentors)
+            $mentors = $user->promotion_plan ? $user->promotion_plan->mentor_models : collect();
+            $atasans = $user->atasan ? collect([$user->atasan]) : collect();
+
+            $notifications = $this->getNotifications();
+            $editMode = true;
+
+            return view('talent.idp-monitoring', compact('user', 'tab', 'mentors', 'atasans', 'notifications', 'activity', 'editMode'));
+        } catch (\Exception $e) {
+            Log::error('talentDashboard editIdpMonitoring error: ' . $e->getMessage());
+            return back()->with('error', 'Gagal memuat form edit logbook.');
+        }
+    }
+
+    public function updateIdpMonitoring(Request $request, $id)
+    {
+        try {
+            $user = Auth::user();
+
+            if (optional($user->promotion_plan)->is_locked) {
+                return back()->with('error', 'Progress Anda telah dikunci oleh Admin PDC. Anda tidak dapat mengirim atau mengubah data.');
+            }
+
+            $activity = IdpActivity::with('type')->findOrFail($id);
+
+            if ($activity->user_id_talent !== $user->id) {
+                abort(403, 'Unauthorized action.');
+            }
+
+            $tab = strtolower($activity->type->type_name ?? 'exposure');
+
+            // ── Validasi input ──────────────────────────────────────────────
+            $rules = [
+                'theme' => 'required|string|max:255',
+                'activity_date' => 'required|date',
+                'documents' => 'nullable|array|max:5', // maks 5 file
+                'documents.*' => 'file|max:5120|mimes:png,jpg,jpeg,pdf,doc,docx,xls,xlsx',
+            ];
+
+            if ($tab === 'learning') {
+                $rules['activity'] = 'required|string|max:255';
+                $rules['platform'] = 'required|string|max:255';
+            } else {
+                $rules['mentor_name'] = 'required|string|max:255';
+                $rules['location'] = 'required|string|max:255';
+            }
+
+            if ($tab === 'mentoring') {
+                $rules['description'] = 'required|string';
+                $rules['action_plan'] = 'required|string';
+            } elseif ($tab === 'exposure') {
+                $rules['activity'] = 'required|string';
+                $rules['description'] = 'required|string';
+            }
+
+            // Merge activity and description based on tab
+            $tab_from_request = $request->input('tab_type', $tab);
+            if ($tab_from_request === 'learning') {
+                $request->merge(['activity' => $request->input('activity_learning')]);
+            } elseif ($tab_from_request === 'exposure') {
+                $request->merge([
+                    'activity' => $request->input('activity_exposure'),
+                    'description' => $request->input('description_exposure')
+                ]);
+            } elseif ($tab_from_request === 'mentoring') {
+                $request->merge(['description' => $request->input('description_mentoring')]);
+            }
+
+            $validated = $request->validate($rules, [
+                'documents.max' => 'Maksimal 5 file yang bisa diupload.',
+                'documents.*.max' => 'Ukuran setiap file tidak boleh melebihi 5 MB.',
+                'documents.*.mimes' => 'Format file harus: PNG, JPG, PDF, DOC, DOCX, XLS, XLSX.',
+            ]);
+
+            // ── Upload file(s) / Hapus file yang dihapus user ────────────────
+            $keptPaths = $request->input('existing_documents_paths', []);
+            $keptNames = $request->input('existing_documents_names', []);
+
+            if (empty($keptPaths) && !$request->hasFile('documents')) {
+                return back()->with('error', 'Dokumentasi wajib dilampirkan minimal 1 file.')->withInput();
+            }
+
+            // Evaluasi file lama mana yang dihapus user dari UI
+            if ($activity->document_path) {
+                $oldPaths = [];
+                if (str_starts_with($activity->document_path, '["')) {
+                    $oldPaths = json_decode($activity->document_path, true);
+                } else {
+                    $oldPaths = [$activity->document_path];
+                }
+
+                $deletedPaths = array_diff($oldPaths, $keptPaths);
+                foreach ($deletedPaths as $path) {
+                    \Illuminate\Support\Facades\Storage::disk('public')->delete($path);
+                }
+            }
+
+            // Re-index array setelah array_diff dll
+            $keptPaths = array_values($keptPaths);
+            $keptNames = array_values($keptNames);
+
+            // Tambahkan file-file yang baru diunggah
+            if ($request->hasFile('documents')) {
+                foreach ($request->file('documents') as $file) {
+                    $keptNames[] = $file->getClientOriginalName();
+                    $keptPaths[] = $file->store('idp_documents', 'public');
+                }
+            }
+
+            // Gabungkan menjadi format string/JSON akhir
+            $documentPath = count($keptPaths) === 1
+                ? $keptPaths[0]
+                : (count($keptPaths) > 1 ? json_encode($keptPaths) : '');
+
+            $fileName = count($keptNames) === 1
+                ? $keptNames[0]
+                : (count($keptNames) > 1 ? implode(', ', $keptNames) : null);
+
+            // ── Verify by (mentor) ──────────────────────────────────────────
+            $verifyById = $activity->verify_by;
+            if ($request->filled('mentor_name')) {
+                $verifyById = User::where('nama', $request->mentor_name)->value('id');
+            }
+
+            // ── Update ke DB ────────────────────────────────────────────────
+            $activity->update([
+                'verify_by' => $verifyById,
+                'theme' => $validated['theme'],
+                'activity_date' => $validated['activity_date'],
+                'location' => $request->location ?? $activity->location,
+                'activity' => $request->activity ?? $activity->activity,
+                'description' => $request->description ?? $activity->description,
+                'action_plan' => $request->action_plan ?? $activity->action_plan,
+                'document_path' => $documentPath,
+                'file_name' => $fileName,
+                'platform' => $request->platform ?? $activity->platform,
+                'status' => 'Pending', // Kembalikan ke Pending bila diedit
+            ]);
+
+            $this->notifyLogbookStakeholders(
+                $user,
+                $verifyById,
+                'IDP Activity Diperbarui',
+                $user->nama . ' telah memperbarui IDP Monitoring (<span class="font-semibold">' . ucfirst($tab) . '</span>) dengan tema <span class="font-semibold">' . e($validated['theme']) . '</span>.',
+                'Talent <span class="font-semibold">' . e($user->nama) . '</span> telah memperbarui aktivitas IDP Monitoring <span class="font-semibold">' . e(ucfirst($tab)) . '</span> dengan tema <span class="font-semibold">' . e($validated['theme']) . '</span>.',
+                'info'
+            );
+
+            return redirect(route('talent.dashboard') . '#IDP Monitoring')
+                ->with('success', 'IDP Activity berhasil diperbarui.');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return back()->withErrors($e->errors())->withInput();
+        } catch (\Exception $e) {
+            Log::error('talentDashboard updateIdpMonitoring error: ' . $e->getMessage());
+            return back()->with('error', 'Terjadi kesalahan saat menyimpan data.');
+        }
+    }
+
+    public function destroyIdpMonitoring($id)
+    {
+        try {
+            $user = Auth::user();
+            if (optional($user->promotion_plan)->is_locked) {
+                return back()->with('error', 'Progress Anda telah dikunci oleh Admin PDC. Anda tidak dapat mengirim atau mengubah data.');
+            }
+
+            $act = IdpActivity::with('type')->findOrFail($id);
+            if ($act->user_id_talent !== Auth::id()) {
+                abort(403, 'Unauthorized action.');
+            }
+
+            $activityType = strtolower($act->type->type_name ?? 'exposure');
+            $activityTheme = $act->theme ?? '-';
+            $verifyById = $act->verify_by;
+
+            // Optionally delete old file path from storage
+            if ($act->document_path) {
+                if (str_starts_with($act->document_path, '["')) {
+                    $paths = json_decode($act->document_path, true);
+                    foreach ($paths as $path) {
+                        \Illuminate\Support\Facades\Storage::disk('public')->delete($path);
+                    }
+                } else {
+                    \Illuminate\Support\Facades\Storage::disk('public')->delete($act->document_path);
+                }
+            }
+
+            $act->delete();
+
+            $this->notifyLogbookStakeholders(
+                $user,
+                $verifyById,
+                'IDP Activity Dihapus',
+                $user->nama . ' telah menghapus IDP Monitoring (<span class="font-semibold">' . ucfirst($activityType) . '</span>) dengan tema <span class="font-semibold">' . e($activityTheme) . '</span>.',
+                'Talent <span class="font-semibold">' . e($user->nama) . '</span> telah menghapus aktivitas IDP Monitoring <span class="font-semibold">' . e(ucfirst($activityType)) . '</span> dengan tema <span class="font-semibold">' . e($activityTheme) . '</span>.',
+                'warning'
+            );
+
+            return redirect()->back()->with('success', 'Data logbook berhasil dihapus.');
+        } catch (\Exception $e) {
+            Log::error('talentDashboard destroyIdpMonitoring error: ' . $e->getMessage());
+            return back()->with('error', 'Gagal menghapus data logbook.');
+        }
+    }
+
+    public function riwayat()
+    {
+        try {
+            $user = Auth::user()->load(['company', 'department', 'position', 'role', 'mentor', 'atasan', 'promotion_plan.targetPosition']);
+            if ($user->role->role_name !== 'talent') {
+                abort(403);
+            }
+
+            $notifications = $this->getNotifications();
+
+            // Status keputusan final yang ditetapkan oleh PDC
+            // Data riwayat hanya ditampilkan setelah PDC menentukan keputusan akhir
+            $finalStatuses = [
+                'Promoted',
+                'Not Promoted',
+                'Ready Now',
+                'Ready in 1-2 Years',
+                'Ready in > 2 Years',
+                'Not Ready',
+            ];
+
+            // Riwayat sekarang berbasis Development Session, sehingga satu talent bisa
+            // mempunyai banyak siklus promosi tanpa data antar siklus tercampur.
+            $sessions = DB::table('development_sessions as ds')
+                ->leftJoin('promotion_plan as pp', 'pp.development_session_id', '=', 'ds.id')
+                ->leftJoin('position as tp', 'tp.id', '=', 'pp.target_position_id')
+                ->leftJoin('position as sp', 'sp.id', '=', 'ds.source_position_id')
+                ->where('ds.user_id_talent', $user->id)
+                ->where(function ($q) use ($finalStatuses) {
+                    $q->where('ds.is_active', false)
+                        ->orWhereIn('ds.status', $finalStatuses);
+                })
+                ->orderBy('ds.created_at', 'desc')
+                ->select(
+                    'ds.*',
+                    'pp.start_date',
+                    'pp.target_date',
+                    'pp.target_position_id',
+                    'pp.status_promotion',
+                    'tp.position_name as target_position_name',
+                    'sp.position_name as source_position_name'
+                )
+                ->get()
+                ->map(function ($session) use ($user) {
+                    // Gunakan source_position_name dari DB (development_sessions.source_position_id)
+                    // jika tersedia, jika tidak gunakan heuristic sebagai fallback
+                    if (empty($session->source_position_name)) {
+                        // Fallback 1: user's current position jika berbeda dari target
+                        $currentPos = optional($user->position)->position_name;
+                        if ($currentPos && strtolower(trim($currentPos)) !== strtolower(trim($session->target_position_name ?? ''))) {
+                            $session->source_position_name = $currentPos;
+                        } else {
+                            // Fallback 2: heuristic (last resort)
+                            $session->source_position_name = $this->resolveSourcePositionNameForHistory(
+                                $session->target_position_id,
+                                $session->target_position_name
+                            );
+                        }
+                    }
+
+                    return $session;
+                });
+
+            // Riwayat dianggap tersedia jika ada sesi yang bisa ditampilkan
+            $isDecisionFinal = $sessions->isNotEmpty();
+
+            return view('talent.riwayat', compact('user', 'notifications', 'sessions', 'isDecisionFinal'));
+        } catch (\Exception $e) {
+            Log::error('talent riwayat error: ' . $e->getMessage());
+            throw $e;
+        }
+    }
+
+    protected function resolveSourcePositionNameForHistory(?int $targetPositionId, ?string $targetPositionName): ?string
+    {
+        $normalizedTarget = $this->normalizePositionNameForHistory($targetPositionName);
+
+        if (in_array($normalizedTarget, ['supervisor', 'officer'], true)) {
+            return 'Staff';
+        }
+
+        if ($normalizedTarget === 'manager') {
+            return 'Supervisor/Officer';
+        }
+
+        if ($normalizedTarget === 'general manager') {
+            return 'Manager';
+        }
+
+        if ($targetPositionId) {
+            $targetPosition = \App\Models\Position::find($targetPositionId);
+
+            if ($targetPosition?->grade_level !== null) {
+                return \App\Models\Position::where('grade_level', '<', $targetPosition->grade_level)
+                    ->orderByDesc('grade_level')
+                    ->value('position_name');
+            }
+        }
+
+        return null;
+    }
+
+    protected function normalizePositionNameForHistory(?string $name): string
+    {
+        return strtolower(trim((string) $name));
+    }
+    public function riwayatDetail($id)
+    {
+        try {
+            $user = Auth::user()->load(['company', 'department', 'position', 'role', 'mentor', 'atasan', 'promotion_plan.targetPosition']);
+            if ($user->role->role_name !== 'talent') {
+                abort(403);
+            }
+
+            $notifications = $this->getNotifications();
+
+            // Development Session yang dipilih
+            $developmentSession = DevelopmentSession::where('id', $id)
+                ->where('user_id_talent', $user->id)
+                ->first();
+
+            if (!$developmentSession) {
+                abort(404, 'Data riwayat tidak ditemukan.');
+            }
+
+            $session = DB::table('assessment_session')
+                ->where('development_session_id', $developmentSession->id)
+                ->where('user_id_talent', $user->id)
+                ->orderByDesc('created_at')
+                ->first();
+
+            // Ensure the profile card shows data from the viewed session's cycle
+            $sessionPlan = \App\Models\PromotionPlan::with(['targetPosition'])
+                ->where('user_id_talent', $user->id)
+                ->where('development_session_id', $developmentSession->id)
+                ->orderBy('updated_at', 'desc')
+                ->first();
+
+            if ($sessionPlan) {
+                $user->setRelation('promotion_plan', $sessionPlan);
+            }
+
+            // Ambil source position dari development_session.source_position_id (akurat)
+            // Heuristic hanya digunakan sebagai last resort jika source_position_id NULL
+            $devSessionSourcePositionName = null;
+            if ($developmentSession->source_position_id) {
+                $sourcePos = \App\Models\Position::find($developmentSession->source_position_id);
+                $devSessionSourcePositionName = $sourcePos?->position_name;
+            }
+
+            $user->history_source_position_name = $devSessionSourcePositionName
+                ?? $this->resolveSourcePositionNameForHistory(
+                    $sessionPlan?->target_position_id ?? $developmentSession->target_position_id,
+                    optional($sessionPlan?->targetPosition)->position_name
+                );
+
+            // Data Kompetensi dari sesi ini
+            $kompetensiData = [];
+            if ($session) {
+                $details = DB::table('detail_assessment')
+                    ->join('competencies', 'detail_assessment.competence_id', '=', 'competencies.id')
+                    ->where('assessment_id', $session->id)
+                    ->select('competencies.name', 'detail_assessment.score_talent', 'detail_assessment.score_atasan', 'detail_assessment.gap_score')
+                    ->get();
+
+                foreach ($details as $d) {
+                    $avg = min(5, ($d->score_talent + $d->score_atasan) / 2);
+                    $kompetensiData[$d->name] = [
+                        'score' => $avg,
+                        'gap' => $d->gap_score ?? 0
+                    ];
+                }
+            }
+
+            // IDP Monitoring (Aktivitas)
+            $idpActivities = IdpActivity::with('type')
+                ->where('user_id_talent', $user->id)
+                ->where('development_session_id', $developmentSession->id)
+                ->get();
+
+            $exposureCount = $idpActivities->filter(fn($act) => $act->type && $act->type->type_name === 'Exposure')->count();
+            $learningCount = $idpActivities->filter(fn($act) => $act->type && $act->type->type_name === 'Learning')->count();
+            $mentoringCount = $idpActivities->filter(fn($act) => $act->type && $act->type->type_name === 'Mentoring')->count();
+
+            // Project Improvement
+            $projects = ImprovementProject::where('user_id_talent', $user->id)
+                ->where('development_session_id', $developmentSession->id)
+                ->orderBy('created_at', 'desc')
+                ->get();
+
+            // ── Hasil Penilaian Panelis ──────────────────────────────────────
+            $panelisAssessments = \App\Models\PanelisAssessment::with('panelis')
+                ->where('user_id_talent', $user->id)
+                ->where('development_session_id', $developmentSession->id)
+                ->whereNotNull('panelis_scores_json')
+                ->get();
+
+            // Nama aspek penilaian (harus sama dengan urutan di form penilaian panelis)
+            $panelisAspects = [
+                'Pemahaman Bisnis & Strategi',
+                'Identifikasi Masalah',
+                'Analisis Akar Masalah',
+                'Solusi yang Ditawarkan',
+                'Rencana Implementasi',
+                'Target Dampak & KPI',
+                'Risiko & Mitigasi',
+                'Gaya Presentasi & Penguasaan Materi',
+                'Refleksi Peran sebagai Posisi yang Dituju',
+                'Nilai Tambah',
+            ];
+
+            // Hitung rata-rata per aspek dari semua panelis
+            $panelisAspectAverages = [];
+            $panelisCount = $panelisAssessments->count();
+
+            foreach ($panelisAspects as $idx => $aspectName) {
+                $sum = 0;
+                $validCount = 0;
+                foreach ($panelisAssessments as $pa) {
+                    $scores = $pa->panelis_scores_json ?? [];
+                    $score = isset($scores[$idx]) ? (int) $scores[$idx] : 0;
+                    if ($score > 0) {
+                        $sum += $score;
+                        $validCount++;
+                    }
+                }
+                $panelisAspectAverages[$aspectName] = $validCount > 0
+                    ? round($sum / $validCount, 2)
+                    : 0;
+            }
+
+            // Total skor rata-rata keseluruhan panelis
+            $panelisScoreTotal = $panelisCount > 0
+                ? round($panelisAssessments->avg('panelis_score'), 2)
+                : 0;
+
+            $panelisScoreTotalDikaliDua = round($panelisScoreTotal * 2, 2);
+
+            // Kumpulkan komentar dari semua panelis (non-empty)
+            $panelisKomentar = $panelisAssessments
+                ->filter(fn($pa) => !empty(trim($pa->panelis_komentar ?? '')))
+                ->map(fn($pa) => [
+                    'panelis' => optional($pa->panelis)->nama ?? 'Panelis',
+                    'komentar' => trim($pa->panelis_komentar),
+                ])
+                ->values()
+                ->toArray();
+
+            return view('talent.riwayat-detail', compact(
+                'user',
+                'notifications',
+                'session',
+                'kompetensiData',
+                'exposureCount',
+                'learningCount',
+                'mentoringCount',
+                'projects',
+                'panelisAspects',
+                'panelisAspectAverages',
+                'panelisScoreTotal',
+                'panelisScoreTotalDikaliDua',
+                'panelisKomentar',
+                'panelisCount'
+            ));
+        } catch (\Exception $e) {
+            Log::error('talent riwayatDetail error: ' . $e->getMessage());
+            throw $e;
+        }
+    }
+}
