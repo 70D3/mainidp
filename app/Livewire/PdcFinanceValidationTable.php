@@ -42,9 +42,9 @@ class PdcFinanceValidationTable extends Component
             if ($talentId) {
                 $notification = AppNotification::create([
                     'user_id' => $talentId,
-                    'title'   => 'Project Improvement Dihapus',
-                    'desc'    => 'Project Improvement Anda yang berjudul <span class="font-semibold">' . e($projectTitle) . '</span> telah dihapus oleh Admin PDC.',
-                    'type'    => 'danger',
+                    'title' => 'Project Improvement Dihapus',
+                    'desc' => 'Project Improvement Anda yang berjudul <span class="font-semibold">' . e($projectTitle) . '</span> telah dihapus oleh Admin PDC.',
+                    'type' => 'danger',
                     'is_read' => false,
                 ]);
 
@@ -115,7 +115,7 @@ class PdcFinanceValidationTable extends Component
         }
 
         // Apply sorting manually as original code
-        $projects = $query->orderByRaw("FIELD(status, 'Pending', 'Approved', 'Rejected')")
+        $projects = $query->orderByRaw("CASE status WHEN 'Pending' THEN 1 WHEN 'Approved' THEN 2 WHEN 'Rejected' THEN 3 ELSE 4 END")
             ->orderBy('created_at', 'desc')
             ->get();
 
@@ -128,7 +128,7 @@ class PdcFinanceValidationTable extends Component
         $total = $allProjects->count();
         $pending = $allProjects->filter(function ($project) {
             return empty($project->finance_feedback) ||
-                   (!str_starts_with($project->finance_feedback, '[Approved]') &&
+                (!str_starts_with($project->finance_feedback, '[Approved]') &&
                     !str_starts_with($project->finance_feedback, '[Rejected]'));
         })->count();
         $approved = $allProjects->filter(function ($project) {
@@ -147,13 +147,13 @@ class PdcFinanceValidationTable extends Component
         $companies = Company::orderBy('nama_company')->get();
 
         return view('livewire.pdc-finance-validation-table', [
-            'projects'     => $projects,
-            'total'        => $total,
-            'pending'      => $pending,
-            'approved'     => $approved,
-            'rejected'     => $rejected,
+            'projects' => $projects,
+            'total' => $total,
+            'pending' => $pending,
+            'approved' => $approved,
+            'rejected' => $rejected,
             'financeUsers' => $financeUsers,
-            'companies'    => $companies,
+            'companies' => $companies,
         ]);
     }
 }
