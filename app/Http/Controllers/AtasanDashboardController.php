@@ -249,12 +249,12 @@ class AtasanDashboardController extends Controller
         $filterDepartemen = $request->input('departemen');
 
         $talentsQuery = User::whereHas('all_promotion_plans', function ($q) use ($user, $finalStatuses) {
-                $q->where('is_active', false)
-                    ->whereIn('status_promotion', $finalStatuses)
-                    ->whereHas('developmentSession', function ($sessionQuery) use ($user) {
-                        $sessionQuery->where('atasan_id', $user->id);
-                    });
-            })
+            $q->where('is_active', false)
+                ->whereIn('status_promotion', $finalStatuses)
+                ->whereHas('developmentSession', function ($sessionQuery) use ($user) {
+                    $sessionQuery->where('atasan_id', $user->id);
+                });
+        })
             ->with([
                 'position',
                 'department',
@@ -274,7 +274,7 @@ class AtasanDashboardController extends Controller
             ]);
 
         if ($search) {
-            $talentsQuery->where('nama', 'like', '%' . $search . '%');
+            $talentsQuery->where('nama', 'ilike', '%' . $search . '%');
         }
 
         $talentModels = $talentsQuery->get();
@@ -410,21 +410,21 @@ class AtasanDashboardController extends Controller
         $user = Auth::user()->load(['company', 'department', 'position', 'role']);
         $finalStatuses = ['Approved Panelis', 'Promoted', 'Not Promoted', 'Ready in 1-2 Years', 'Ready in > 2 Years', 'Not Ready'];
         $talent = User::with([
-                'position',
-                'department',
-                'company',
-                'mentor',
-                'atasan',
-                'promotion_plan.targetPosition',
-                'assessmentSession.details.competence',
-                'idpActivities.type',
-                'improvementProjects',
-                'all_promotion_plans.targetPosition',
-                'all_promotion_plans.developmentSession.sourcePosition',
-                'all_assessmentSessions.details.competence',
-                'all_idpActivities.type',
-                'all_improvementProjects'
-            ])
+            'position',
+            'department',
+            'company',
+            'mentor',
+            'atasan',
+            'promotion_plan.targetPosition',
+            'assessmentSession.details.competence',
+            'idpActivities.type',
+            'improvementProjects',
+            'all_promotion_plans.targetPosition',
+            'all_promotion_plans.developmentSession.sourcePosition',
+            'all_assessmentSessions.details.competence',
+            'all_idpActivities.type',
+            'all_improvementProjects'
+        ])
             ->findOrFail($talentId);
 
         $requestedSessionId = $request->query('session_id');
@@ -477,16 +477,16 @@ class AtasanDashboardController extends Controller
     {
         $user = Auth::user()->load(['company', 'department', 'position', 'role']);
         $talent = User::with([
-                'position',
-                'department',
-                'company',
-                'idpActivities.type',
-                'idpActivities.verifier',
-                'all_idpActivities.type',
-                'all_idpActivities.verifier',
-                'all_promotion_plans.targetPosition',
-                'all_promotion_plans.developmentSession.sourcePosition',
-            ])
+            'position',
+            'department',
+            'company',
+            'idpActivities.type',
+            'idpActivities.verifier',
+            'all_idpActivities.type',
+            'all_idpActivities.verifier',
+            'all_promotion_plans.targetPosition',
+            'all_promotion_plans.developmentSession.sourcePosition',
+        ])
             ->findOrFail($talentId);
 
         $sessionId = $request->query('session_id');

@@ -57,7 +57,7 @@ class PdcPanelisReviewTable extends Component
             ]);
 
         if ($this->search) {
-            $query->where('nama', 'like', '%' . $this->search . '%');
+            $query->where('nama', 'ilike', '%' . $this->search . '%');
         }
         if ($this->companyFilter) {
             $query->where('company_id', $this->companyFilter);

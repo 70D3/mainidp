@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration 
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -18,20 +17,7 @@ return new class extends Migration
             $table->foreignId('development_session_id')->nullable()->constrained('development_sessions')->nullOnDelete();
             $table->foreignId('target_position_id')->constrained('position'); // Key target position_id [cite: 161]
             $table->json('mentor_ids')->nullable(); // Array of mentor user IDs
-            $table->enum('status_promotion', [
-                'Draft',
-                'In Progress',
-                'Pending Panelis',
-                'Approved Panelis',
-                'Rejected Panelis',
-                'Ready',
-                'Promoted',
-                'Not Promoted',
-                'Ready Now',
-                'Ready in 1-2 Years',
-                'Ready in > 2 Years',
-                'Not Ready',
-            ])->default('Draft'); // Key status_promotion [cite: 168]
+            $table->string('status_promotion')->default('Draft'); // Key status_promotion [cite: 168]
             $table->date('start_date'); // Key start date [cite: 175]
             $table->date('target_date'); // Key target_date [cite: 182]
             $table->boolean('is_locked')->default(false);
@@ -54,7 +40,7 @@ return new class extends Migration
             $table->text('action_plan'); // Key action_plan [cite: 221]
             $table->string('document_path'); // Key document_path [cite: 224]
             $table->string('file_name')->nullable();
-            $table->enum('status', ['Pending', 'Approved', 'Rejected']); // Key status [cite: 217]
+            $table->string('status')->default('Pending'); // Key status [cite: 217]
             $table->boolean('is_active')->default(true);
             $table->string('platform'); // Key platform [cite: 227]
             $table->timestamps();
@@ -67,7 +53,7 @@ return new class extends Migration
             $table->foreignId('development_session_id')->nullable()->constrained('development_sessions')->nullOnDelete();
             $table->string('title'); // Key title [cite: 166]
             $table->string('document_path'); // Key document_path [cite: 173]
-            $table->enum('status', ['On Progress', 'Pending', 'Verified', 'Rejected']); // Key status [cite: 180]
+            $table->string('status')->default('On Progress'); // Key status [cite: 180]
             $table->boolean('is_active')->default(true);
             $table->foreignId('verify_by')->nullable()->constrained('users'); // FK verify_by [cite: 235]
             $table->dateTime('verify_at')->nullable(); // Key verify_at [cite: 247]

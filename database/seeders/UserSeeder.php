@@ -46,18 +46,18 @@ class UserSeeder extends Seeder
      */
     private function seedCompany(): array
     {
+        // Catatan: Tidak menggunakan ID eksplisit agar sequence PostgreSQL tidak konflik
         $companys = [
-            1 => 'PT Tiga Serangkai Inti corpora',
-            2 => 'PT Tiga Serangkai Pustaka mandiri',
-            3 => 'PT Wangsa Jatra Lestari',
-            4 => 'PT Assalam Niaga Utama',
-            5 => 'PT K33 Distribusi'
+            'PT Tiga Serangkai Inti corpora',
+            'PT Tiga Serangkai Pustaka mandiri',
+            'PT Wangsa Jatra Lestari',
+            'PT Assalam Niaga Utama',
+            'PT K33 Distribusi',
         ];
         $compIds = [];
 
-        foreach ($companys as $id => $name) {
-            DB::table('company')->insert([
-                'id' => $id,
+        foreach ($companys as $name) {
+            $id = DB::table('company')->insertGetId([
                 'nama_company' => $name,
                 'created_at' => now(),
                 'updated_at' => now(),

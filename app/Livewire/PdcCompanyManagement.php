@@ -86,7 +86,7 @@ class PdcCompanyManagement extends Component
 
     public function render()
     {
-        $companies = Company::when($this->search, fn($q) => $q->where('nama_company', 'like', '%' . $this->search . '%'))
+        $companies = Company::when($this->search, fn($q) => $q->where('nama_company', 'ilike', '%' . $this->search . '%'))
             ->orderBy('id')
             ->get();
 

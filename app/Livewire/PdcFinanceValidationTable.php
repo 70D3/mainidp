@@ -88,14 +88,14 @@ class PdcFinanceValidationTable extends Component
         // otherwise 'Pending'
         if ($this->statusFilter) {
             if ($this->statusFilter === 'approved') {
-                $query->where('finance_feedback', 'like', '[Approved]%');
+                $query->where('finance_feedback', 'ilike', '[Approved]%');
             } elseif ($this->statusFilter === 'rejected') {
-                $query->where('finance_feedback', 'like', '[Rejected]%');
+                $query->where('finance_feedback', 'ilike', '[Rejected]%');
             } elseif ($this->statusFilter === 'pending') {
                 $query->whereNull('finance_feedback')
                     ->orWhere(function ($q) {
-                        $q->where('finance_feedback', 'not like', '[Approved]%')
-                            ->where('finance_feedback', 'not like', '[Rejected]%');
+                        $q->where('finance_feedback', 'not ilike', '[Approved]%')
+                            ->where('finance_feedback', 'not ilike', '[Rejected]%');
                     });
             }
         }
@@ -110,8 +110,8 @@ class PdcFinanceValidationTable extends Component
         // Filter: Search (Talent name or Project title)
         if (!empty($this->search)) {
             $searchTerm = '%' . $this->search . '%';
-            $query->where('title', 'like', $searchTerm)
-                ->orWhereHas('talent', fn($qt) => $qt->where('nama', 'like', $searchTerm));
+            $query->where('title', 'ilike', $searchTerm)
+                ->orWhereHas('talent', fn($qt) => $qt->where('nama', 'ilike', $searchTerm));
         }
 
         // Apply sorting manually as original code

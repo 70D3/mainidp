@@ -32,19 +32,20 @@ class FinanceValidasiTable extends Component
             ->whereNotNull('feedback')
             ->where('status', 'Pending')
             ->whereNull('finance_feedback')
-            ->when($this->search, fn($q) => $q->where(function ($q2) {
-            $q2->where('title', 'like', "%{$this->search}%")
-                ->orWhereHas('talent', fn($q3) => $q3->where('nama', 'like', "%{$this->search}%"));
-        }
-        ))
+            ->when($this->search, fn($q) => $q->where(
+                function ($q2) {
+                    $q2->where('title', 'ilike', "%{$this->search}%")
+                        ->orWhereHas('talent', fn($q3) => $q3->where('nama', 'ilike', "%{$this->search}%"));
+                }
+            ))
             ->when($this->statusFilter, function ($q) {
-            if ($this->statusFilter === 'Approved') {
-                $q->whereIn('status', ['Approved', 'Verified']);
-                return;
-            }
+                if ($this->statusFilter === 'Approved') {
+                    $q->whereIn('status', ['Approved', 'Verified']);
+                    return;
+                }
 
-            $q->where('status', $this->statusFilter);
-        })
+                $q->where('status', $this->statusFilter);
+            })
             ->latest()
             ->paginate($this->perPage);
 

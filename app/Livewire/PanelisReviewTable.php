@@ -23,11 +23,12 @@ class PanelisReviewTable extends Component
     {
         $projects = ImprovementProject::with(['talent', 'talent.position', 'talent.department', 'talent.assessmentSession.details'])
             ->where('status', 'Pending')
-            ->when($this->search, fn($q) => $q->where(function ($q2) {
-            $q2->where('title', 'like', "%{$this->search}%")
-                ->orWhereHas('talent', fn($q3) => $q3->where('nama', 'like', "%{$this->search}%"));
-        }
-        ))
+            ->when($this->search, fn($q) => $q->where(
+                function ($q2) {
+                    $q2->where('title', 'ilike', "%{$this->search}%")
+                        ->orWhereHas('talent', fn($q3) => $q3->where('nama', 'ilike', "%{$this->search}%"));
+                }
+            ))
             ->latest()
             ->paginate($this->perPage);
 

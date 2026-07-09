@@ -80,14 +80,14 @@ class FinanceDashboardController extends Controller
             ->whereNotNull('feedback')
             ->where('verify_by', $user->id)
             ->where(function ($q) {
-            $q->where('finance_feedback', 'like', '[Approved]%')
-                ->orWhere('finance_feedback', 'like', '[Rejected]%');
-        })
+                $q->where('finance_feedback', 'ilike', '[Approved]%')
+                    ->orWhere('finance_feedback', 'ilike', '[Rejected]%');
+            })
             ->orderBy('updated_at', 'desc');
 
         if ($search) {
             $projectsQuery->whereHas('talent', function ($query) use ($search) {
-                $query->where('nama', 'like', '%' . $search . '%');
+                $query->where('nama', 'ilike', '%' . $search . '%');
             });
         }
 

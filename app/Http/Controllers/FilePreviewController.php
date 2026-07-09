@@ -22,7 +22,7 @@ class FilePreviewController extends Controller
             return $this->missingFileResponse();
         }
 
-        if (! Storage::disk('public')->exists($path)) {
+        if (!Storage::disk('public')->exists($path)) {
             return $this->missingFileResponse();
         }
 
@@ -52,7 +52,7 @@ class FilePreviewController extends Controller
             ], $this->noCacheHeaders()));
         }
 
-        if ($request->boolean('download') || ! $this->canPreviewInBrowser($mimeType, $extension)) {
+        if ($request->boolean('download') || !$this->canPreviewInBrowser($mimeType, $extension)) {
             return response()->download($absolutePath, $downloadFilename, array_merge([
                 'Content-Type' => $mimeType,
             ], $this->noCacheHeaders()));
@@ -102,7 +102,7 @@ class FilePreviewController extends Controller
     {
         $activity = IdpActivity::with('talent')
             ->where('document_path', $path)
-            ->orWhere('document_path', 'like', '%' . $path . '%')
+            ->orWhere('document_path', 'ilike', '%' . $path . '%')
             ->get()
             ->first(function (IdpActivity $item) use ($path) {
                 return $this->pathBelongsToDocumentField($item->document_path, $path);
@@ -137,14 +137,14 @@ class FilePreviewController extends Controller
 
     protected function resolveActivityOriginalName(IdpActivity $activity, string $path): string
     {
-        if (! str_starts_with((string) $activity->document_path, '["')) {
+        if (!str_starts_with((string) $activity->document_path, '["')) {
             return $activity->file_name ?: basename($path);
         }
 
         $paths = json_decode($activity->document_path, true);
         $names = array_map('trim', explode(',', (string) $activity->file_name));
 
-        if (! is_array($paths)) {
+        if (!is_array($paths)) {
             return basename($path);
         }
 
@@ -159,7 +159,7 @@ class FilePreviewController extends Controller
 
     protected function pathBelongsToDocumentField(?string $documentPath, string $path): bool
     {
-        if (! $documentPath) {
+        if (!$documentPath) {
             return false;
         }
 
@@ -167,7 +167,7 @@ class FilePreviewController extends Controller
             return true;
         }
 
-        if (! str_starts_with($documentPath, '["')) {
+        if (!str_starts_with($documentPath, '["')) {
             return false;
         }
 
