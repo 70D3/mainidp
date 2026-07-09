@@ -46,8 +46,8 @@ class AtasanMonitoringTable extends Component
             ->whereHas('promotion_plan', fn($q) => $q->where('atasan_id', $user->id))
             ->when($this->search, function ($q) {
                 $q->where(function ($q2) {
-                    $q2->where('nama', 'like', "%{$this->search}%")
-                        ->orWhereHas('position', fn($q3) => $q3->where('position_name', 'like', "%{$this->search}%"));
+                    $q2->where('nama', 'ilike', "%{$this->search}%")
+                        ->orWhereHas('position', fn($q3) => $q3->where('position_name', 'ilike', "%{$this->search}%"));
                 });
             })
             ->with([

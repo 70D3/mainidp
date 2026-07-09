@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -14,7 +13,7 @@ return new class extends Migration
         Schema::create('status_log', function (Blueprint $table) {
             $table->id(); // PK id [cite: 122]
             $table->string('name_tabel'); // Key name_tabel [cite: 123]
-            $table->enum('status', ['Pending', 'Approved', 'Rejected',]); // Key status [cite: 126]
+            $table->string('status')->default('Pending'); // Key status [cite: 126]
             $table->string('remark')->nullable(); // Key remark [cite: 134]
             $table->timestamps(); // created_at [cite: 136]
         });

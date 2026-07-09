@@ -11,72 +11,103 @@ class AssessmentSeeder extends Seeder
     public function run(): void
     {
         // Kompetensi Master
-        DB::table('competencies')->insert([
-            ['id' => 1, 'name' => 'Integrity'],
-            ['id' => 2, 'name' => 'Communication'],
-            ['id' => 3, 'name' => 'Innovation & Creativity'],
-            ['id' => 4, 'name' => 'Customer Orientation'],
-            ['id' => 5, 'name' => 'Teamwork'],
-            ['id' => 6, 'name' => 'Leadership'],
-            ['id' => 7, 'name' => 'Business Acumen'],
-            ['id' => 8, 'name' => 'Problem Solving & Decission Making'],
-            ['id' => 9, 'name' => 'Acievement Orientation'],
-            ['id' => 10, 'name' => 'Strategic Thinking'],
-        ]);
+        // Catatan: Tidak menggunakan ID eksplisit agar sequence PostgreSQL tidak konflik
+        $competencyNames = [
+            'Integrity',
+            'Communication',
+            'Innovation & Creativity',
+            'Customer Orientation',
+            'Teamwork',
+            'Leadership',
+            'Business Acumen',
+            'Problem Solving & Decission Making',
+            'Acievement Orientation',
+            'Strategic Thinking',
+        ];
 
-        // Assessment Utama
-        DB::table('assessment_session')->insert([
-            'id' => 1,
-            'user_id_talent' => 2,
-            'user_id_atasan' => 1,
-            'period' => '2026',
-        ]);
+        $competencyIds = []; // key: 1-based index => actual DB id
+        foreach ($competencyNames as $index => $name) {
+            $competencyIds[$index + 1] = DB::table('competencies')->insertGetId([
+                'name' => $name,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        }
 
-        // Detail Assessment (Gap Analysis)
-        DB::table('detail_assessment')->insert([
-            [
-                'assessment_id' => 1,
-                'competence_id' => 1,
+        // Ambil user talent pertama dan atasan pertama secara dinamis
+        $firstTalent = DB::table('users')
+            ->join('role', 'users.role_id', '=', 'role.id')
+            ->where('role.role_name', 'talent')
+            ->orderBy('users.id')
+            ->first(['users.id']);
+
+        $firstAtasan = DB::table('users')
+            ->join('role', 'users.role_id', '=', 'role.id')
+            ->where('role.role_name', 'atasan')
+            ->orderBy('users.id')
+            ->first(['users.id']);
+
+        if ($firstTalent && $firstAtasan) {
+            // Assessment Utama
+            $assessmentId = DB::table('assessment_session')->insertGetId([
+                'user_id_talent' => $firstTalent->id,
+                'user_id_atasan' => $firstAtasan->id,
+                'period' => '2026',
+                'is_active' => true,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+
+            // Detail Assessment (Gap Analysis)
+            DB::table('detail_assessment')->insert([
+                'assessment_id' => $assessmentId,
+                'competence_id' => $competencyIds[1],
                 'score_atasan' => 4,
                 'score_talent' => 5,
                 'gap_score' => -1.0,
                 'notes' => 'Initial assessment notes',
-            ]
-        ]);
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        }
 
         // Standar Kompetensi per Posisi (Sesuai Matriks)
-        $targetScores = [
-            // STAFF (position_id = 1)
-            1 => [1 => 5, 2 => 2, 3 => 2, 4 => 2, 5 => 2, 6 => 2, 7 => 2, 8 => 2, 9 => 2, 10 => 2],
+        // Ambil position IDs secara dinamis berdasarkan nama posisi
+        $positionIds = DB::table('position')->pluck('id', 'position_name');
 
-            // SUPERVISOR (position_id = 2)
-            // Sesuai kolom OFFICER/SUPERVISOR
-            2 => [1 => 5, 2 => 3, 3 => 3, 4 => 3, 5 => 3, 6 => 3, 7 => 3, 8 => 3, 9 => 4, 10 => 4],
-
-            // OFFICER (position_id = 3)
-            // Sesuai kolom OFFICER/SUPERVISOR
-            3 => [1 => 5, 2 => 3, 3 => 3, 4 => 3, 5 => 3, 6 => 3, 7 => 3, 8 => 3, 9 => 4, 10 => 4],
-
-            // MANAGER (position_id = 4)
-            // Sesuai kolom MANAGER
-            4 => [1 => 5, 2 => 3, 3 => 3, 4 => 3, 5 => 4, 6 => 4, 7 => 4, 8 => 4, 9 => 4, 10 => 4],
-
-            // GENERAL MANAGER (position_id = 5)
-            // Sesuai kolom MD/GENERAL MANAGER
-            5 => [1 => 5, 2 => 4, 3 => 4, 4 => 4, 5 => 5, 6 => 5, 7 => 5, 8 => 5, 9 => 5, 10 => 5],
-
-            // PANELIS/BOD (position_id = 6)
-            // Sesuai kolom BOD
-            6 => [1 => 5, 2 => 5, 3 => 5, 4 => 5, 5 => 5, 6 => 5, 7 => 5, 8 => 5, 9 => 5, 10 => 5],
+        // Mapping: index kompetensi (1-based) => target level per posisi
+        $targetScoresByName = [
+            // STAFF
+            'Staff' => [1 => 5, 2 => 2, 3 => 2, 4 => 2, 5 => 2, 6 => 2, 7 => 2, 8 => 2, 9 => 2, 10 => 2],
+            // SUPERVISOR
+            'Supervisor' => [1 => 5, 2 => 3, 3 => 3, 4 => 3, 5 => 3, 6 => 3, 7 => 3, 8 => 3, 9 => 4, 10 => 4],
+            // OFFICER
+            'Officer' => [1 => 5, 2 => 3, 3 => 3, 4 => 3, 5 => 3, 6 => 3, 7 => 3, 8 => 3, 9 => 4, 10 => 4],
+            // MANAGER
+            'Manager' => [1 => 5, 2 => 3, 3 => 3, 4 => 3, 5 => 4, 6 => 4, 7 => 4, 8 => 4, 9 => 4, 10 => 4],
+            // GENERAL MANAGER
+            'General Manager' => [1 => 5, 2 => 4, 3 => 4, 4 => 4, 5 => 5, 6 => 5, 7 => 5, 8 => 5, 9 => 5, 10 => 5],
+            // PANELIS/BOD
+            'Panelis' => [1 => 5, 2 => 5, 3 => 5, 4 => 5, 5 => 5, 6 => 5, 7 => 5, 8 => 5, 9 => 5, 10 => 5],
         ];
 
         $inserts = [];
-        foreach ($targetScores as $posId => $scores) {
-            foreach ($scores as $compId => $level) {
+        foreach ($targetScoresByName as $positionName => $scores) {
+            $posId = $positionIds[$positionName] ?? null;
+            if (!$posId)
+                continue;
+
+            foreach ($scores as $compIndex => $level) {
+                $compId = $competencyIds[$compIndex] ?? null;
+                if (!$compId)
+                    continue;
+
                 $inserts[] = [
                     'position_id' => $posId,
                     'competence_id' => $compId,
                     'target_level' => $level,
+                    'created_at' => now(),
+                    'updated_at' => now(),
                 ];
             }
         }
@@ -84,6 +115,7 @@ class AssessmentSeeder extends Seeder
         DB::table('position_target_competence')->insert($inserts);
 
         // Pertanyaan Kompetensi (Questions)
+        // competencyIds digunakan untuk mapping index => actual DB id
         $questions = [
             // Integrity (competence_id = 1)
             [
@@ -357,9 +389,15 @@ class AssessmentSeeder extends Seeder
         ];
 
         foreach ($questions as $q) {
+            // Gunakan ID kompetensi yang sudah diinsert (bukan hardcoded)
+            $actualCompetenceId = $competencyIds[$q['competence_id']] ?? $q['competence_id'];
             DB::table('question')->updateOrInsert(
-            ['competence_id' => $q['competence_id'], 'level' => $q['level']],
-            ['question_text' => $q['question_text']]
+                ['competence_id' => $actualCompetenceId, 'level' => $q['level']],
+                [
+                    'question_text' => $q['question_text'],
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]
             );
         }
     }

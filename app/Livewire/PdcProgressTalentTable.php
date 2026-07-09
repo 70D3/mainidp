@@ -34,7 +34,7 @@ class PdcProgressTalentTable extends Component
             })
             ->with(['company', 'department', 'position', 'mentor', 'atasan', 'promotion_plan.targetPosition'])
             ->when($this->search, function ($q) {
-                $q->where('users.nama', 'like', '%' . $this->search . '%');
+                $q->where('users.nama', 'ilike', '%' . $this->search . '%');
             })
             ->get();
 

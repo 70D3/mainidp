@@ -340,11 +340,11 @@ class PDCAdminController extends Controller
         $user = auth()->user();
         $companies = Company::orderByRaw("
             CASE 
-                WHEN nama_company LIKE '%Inti corpora%' THEN 1
-                WHEN nama_company LIKE '%Pustaka mandiri%' THEN 2
-                WHEN nama_company LIKE '%Wangsa Jatra Lestari%' THEN 3
-                WHEN nama_company LIKE '%Assalam Niaga Utama%' THEN 4
-                WHEN nama_company LIKE '%K33 Distribusi%' THEN 5
+                WHEN nama_company ILIKE '%Inti corpora%' THEN 1
+                WHEN nama_company ILIKE '%Pustaka mandiri%' THEN 2
+                WHEN nama_company ILIKE '%Wangsa Jatra Lestari%' THEN 3
+                WHEN nama_company ILIKE '%Assalam Niaga Utama%' THEN 4
+                WHEN nama_company ILIKE '%K33 Distribusi%' THEN 5
                 ELSE 6 
             END ASC
         ")->orderBy('nama_company')->get();
@@ -377,11 +377,11 @@ class PDCAdminController extends Controller
         // $companies = Company::orderBy('nama_company')->get();
         $companies = Company::orderByRaw("
             CASE 
-                WHEN nama_company LIKE '%Inti corpora%' THEN 1
-                WHEN nama_company LIKE '%Pustaka mandiri%' THEN 2
-                WHEN nama_company LIKE '%Wangsa Jatra Lestari%' THEN 3
-                WHEN nama_company LIKE '%Assalam Niaga Utama%' THEN 4
-                WHEN nama_company LIKE '%K33 Distribusi%' THEN 5
+                WHEN nama_company ILIKE '%Inti corpora%' THEN 1
+                WHEN nama_company ILIKE '%Pustaka mandiri%' THEN 2
+                WHEN nama_company ILIKE '%Wangsa Jatra Lestari%' THEN 3
+                WHEN nama_company ILIKE '%Assalam Niaga Utama%' THEN 4
+                WHEN nama_company ILIKE '%K33 Distribusi%' THEN 5
                 ELSE 6 
             END ASC
         ")->orderBy('nama_company')->get();
@@ -1059,7 +1059,7 @@ class PDCAdminController extends Controller
             ->whereHas('talent.promotion_plan', function ($q) {
                 $q->whereNotIn('status_promotion', ['Promoted', 'Not Promoted']);
             })
-            ->orderByRaw("CASE WHEN status = 'Pending' THEN 1 WHEN status = 'Approved' THEN 2 WHEN status = 'Rejected' THEN 3 ELSE 4 END")
+            ->orderByRaw("CASE status WHEN 'Pending' THEN 1 WHEN 'Approved' THEN 2 WHEN 'Rejected' THEN 3 ELSE 4 END")
             ->orderBy('created_at', 'desc')
             ->get();
 
@@ -1195,7 +1195,7 @@ class PDCAdminController extends Controller
     public function user_management()
     {
         $user = auth()->user();
-        
+
         $talents = User::whereHas('roles', function ($q) {
             $q->whereRaw('LOWER(TRIM(role_name)) = ?', ['talent']);
         })->with(['position', 'department', 'company', 'roles'])->latest()->get();
@@ -1217,9 +1217,9 @@ class PDCAdminController extends Controller
         })->with(['position', 'department', 'company', 'roles'])->latest()->get();
 
         $counts = [
-            'Talent'  => $talents->count(),
-            'Mentor'  => $mentors->count(),
-            'Atasan'  => $atasans->count(),
+            'Talent' => $talents->count(),
+            'Mentor' => $mentors->count(),
+            'Atasan' => $atasans->count(),
             'Finance' => $finances->count(),
             'Panelis' => $panelisUsers->count(),
         ];
@@ -1237,11 +1237,11 @@ class PDCAdminController extends Controller
         $rolesData = Role::all(); // Provide all roles for the assign modal
         $companies = Company::orderByRaw("
             CASE 
-                WHEN nama_company LIKE '%Inti corpora%' THEN 1
-                WHEN nama_company LIKE '%Pustaka mandiri%' THEN 2
-                WHEN nama_company LIKE '%Wangsa Jatra Lestari%' THEN 3
-                WHEN nama_company LIKE '%Assalam Niaga Utama%' THEN 4
-                WHEN nama_company LIKE '%K33 Distribusi%' THEN 5
+                WHEN nama_company ILIKE '%Inti corpora%' THEN 1
+                WHEN nama_company ILIKE '%Pustaka mandiri%' THEN 2
+                WHEN nama_company ILIKE '%Wangsa Jatra Lestari%' THEN 3
+                WHEN nama_company ILIKE '%Assalam Niaga Utama%' THEN 4
+                WHEN nama_company ILIKE '%K33 Distribusi%' THEN 5
                 ELSE 6 
             END ASC
         ")->orderBy('nama_company')->get();
@@ -1447,7 +1447,7 @@ class PDCAdminController extends Controller
 
         // Filters
         if ($request->filled('search')) {
-            $query->where('nama', 'like', '%' . $request->search . '%');
+            $query->where('nama', 'ilike', '%' . $request->search . '%');
         }
         if ($request->filled('company_id')) {
             $query->where('company_id', $request->company_id);
@@ -1853,11 +1853,11 @@ class PDCAdminController extends Controller
 
         $companies = Company::orderByRaw("
             CASE 
-                WHEN nama_company LIKE '%Inti corpora%' THEN 1
-                WHEN nama_company LIKE '%Pustaka mandiri%' THEN 2
-                WHEN nama_company LIKE '%Wangsa Jatra Lestari%' THEN 3
-                WHEN nama_company LIKE '%Assalam Niaga Utama%' THEN 4
-                WHEN nama_company LIKE '%K33 Distribusi%' THEN 5
+                WHEN nama_company ILIKE '%Inti corpora%' THEN 1
+                WHEN nama_company ILIKE '%Pustaka mandiri%' THEN 2
+                WHEN nama_company ILIKE '%Wangsa Jatra Lestari%' THEN 3
+                WHEN nama_company ILIKE '%Assalam Niaga Utama%' THEN 4
+                WHEN nama_company ILIKE '%K33 Distribusi%' THEN 5
                 ELSE 6 
             END ASC
         ")->orderBy('nama_company')->get();

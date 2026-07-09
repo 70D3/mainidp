@@ -42,9 +42,9 @@ class PdcFinanceValidationTable extends Component
             if ($talentId) {
                 $notification = AppNotification::create([
                     'user_id' => $talentId,
-                    'title'   => 'Project Improvement Dihapus',
-                    'desc'    => 'Project Improvement Anda yang berjudul <span class="font-semibold">' . e($projectTitle) . '</span> telah dihapus oleh Admin PDC.',
-                    'type'    => 'danger',
+                    'title' => 'Project Improvement Dihapus',
+                    'desc' => 'Project Improvement Anda yang berjudul <span class="font-semibold">' . e($projectTitle) . '</span> telah dihapus oleh Admin PDC.',
+                    'type' => 'danger',
                     'is_read' => false,
                 ]);
 
@@ -88,14 +88,14 @@ class PdcFinanceValidationTable extends Component
         // otherwise 'Pending'
         if ($this->statusFilter) {
             if ($this->statusFilter === 'approved') {
-                $query->where('finance_feedback', 'like', '[Approved]%');
+                $query->where('finance_feedback', 'ilike', '[Approved]%');
             } elseif ($this->statusFilter === 'rejected') {
-                $query->where('finance_feedback', 'like', '[Rejected]%');
+                $query->where('finance_feedback', 'ilike', '[Rejected]%');
             } elseif ($this->statusFilter === 'pending') {
                 $query->whereNull('finance_feedback')
                     ->orWhere(function ($q) {
-                        $q->where('finance_feedback', 'not like', '[Approved]%')
-                            ->where('finance_feedback', 'not like', '[Rejected]%');
+                        $q->where('finance_feedback', 'not ilike', '[Approved]%')
+                            ->where('finance_feedback', 'not ilike', '[Rejected]%');
                     });
             }
         }
@@ -110,12 +110,12 @@ class PdcFinanceValidationTable extends Component
         // Filter: Search (Talent name or Project title)
         if (!empty($this->search)) {
             $searchTerm = '%' . $this->search . '%';
-            $query->where('title', 'like', $searchTerm)
-                ->orWhereHas('talent', fn($qt) => $qt->where('nama', 'like', $searchTerm));
+            $query->where('title', 'ilike', $searchTerm)
+                ->orWhereHas('talent', fn($qt) => $qt->where('nama', 'ilike', $searchTerm));
         }
 
         // Apply sorting manually as original code
-        $projects = $query->orderByRaw("CASE WHEN status = 'Pending' THEN 1 WHEN status = 'Approved' THEN 2 WHEN status = 'Rejected' THEN 3 ELSE 4 END")
+        $projects = $query->orderByRaw("CASE status WHEN 'Pending' THEN 1 WHEN 'Approved' THEN 2 WHEN 'Rejected' THEN 3 ELSE 4 END")
             ->orderBy('created_at', 'desc')
             ->get();
 
@@ -128,7 +128,7 @@ class PdcFinanceValidationTable extends Component
         $total = $allProjects->count();
         $pending = $allProjects->filter(function ($project) {
             return empty($project->finance_feedback) ||
-                   (!str_starts_with($project->finance_feedback, '[Approved]') &&
+                (!str_starts_with($project->finance_feedback, '[Approved]') &&
                     !str_starts_with($project->finance_feedback, '[Rejected]'));
         })->count();
         $approved = $allProjects->filter(function ($project) {
@@ -147,13 +147,13 @@ class PdcFinanceValidationTable extends Component
         $companies = Company::orderBy('nama_company')->get();
 
         return view('livewire.pdc-finance-validation-table', [
-            'projects'     => $projects,
-            'total'        => $total,
-            'pending'      => $pending,
-            'approved'     => $approved,
-            'rejected'     => $rejected,
+            'projects' => $projects,
+            'total' => $total,
+            'pending' => $pending,
+            'approved' => $approved,
+            'rejected' => $rejected,
             'financeUsers' => $financeUsers,
-            'companies'    => $companies,
+            'companies' => $companies,
         ]);
     }
 }
