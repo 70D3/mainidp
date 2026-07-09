@@ -115,7 +115,7 @@ class PdcFinanceValidationTable extends Component
         }
 
         // Apply sorting manually as original code
-        $projects = $query->orderByRaw("FIELD(status, 'Pending', 'Approved', 'Rejected')")
+        $projects = $query->orderByRaw("CASE WHEN status = 'Pending' THEN 1 WHEN status = 'Approved' THEN 2 WHEN status = 'Rejected' THEN 3 ELSE 4 END")
             ->orderBy('created_at', 'desc')
             ->get();
 

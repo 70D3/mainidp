@@ -1059,7 +1059,7 @@ class PDCAdminController extends Controller
             ->whereHas('talent.promotion_plan', function ($q) {
                 $q->whereNotIn('status_promotion', ['Promoted', 'Not Promoted']);
             })
-            ->orderByRaw("FIELD(status, 'Pending', 'Approved', 'Rejected')")
+            ->orderByRaw("CASE WHEN status = 'Pending' THEN 1 WHEN status = 'Approved' THEN 2 WHEN status = 'Rejected' THEN 3 ELSE 4 END")
             ->orderBy('created_at', 'desc')
             ->get();
 
