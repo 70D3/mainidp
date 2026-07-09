@@ -300,7 +300,8 @@
                             adalah <i>self-referencing FK</i> yang menunjuk ke tabel users itu sendiri — artinya mentor
                             dan atasan juga merupakan user dalam sistem. Saat login, sistem akan mengarahkan user ke
                             halaman yang sesuai role-nya. Kolom <b>role_id</b> adalah role utama user, sedangkan tabel
-                            <b>user_role</b> menyimpan kemungkinan peran tambahan.</div>
+                            <b>user_role</b> menyimpan kemungkinan peran tambahan.
+                        </div>
                         <ul class="cols">
                             <li><span class="badge pk">PK</span> <span class="col-name">id</span> <span
                                     class="col-type">bigint</span></li>
@@ -343,7 +344,8 @@
                             satu orang bisa memiliki lebih dari satu peran. Contoh: seseorang yang menjabat sebagai
                             Mentor sekaligus Atasan akan memiliki 2 baris di sini. Sistem menggunakan tabel ini untuk
                             menentukan menu dan halaman apa saja yang boleh diakses user saat login. Kolom
-                            <b>id_user</b> → users, <b>id_role</b> → role.</div>
+                            <b>id_user</b> → users, <b>id_role</b> → role.
+                        </div>
                         <ul class="cols">
                             <li><span class="badge pk">PK</span> <span class="col-name">id</span> <span
                                     class="col-type">bigint</span></li>
@@ -359,7 +361,8 @@
                         <div class="table-desc"><b>Master data perusahaan/cabang.</b> Satu perusahaan dapat memiliki
                             banyak departemen (<b>department</b>) dan banyak karyawan (<b>users</b>). Kolom
                             <b>nama_company</b> adalah nama resmi perusahaan. Mendukung multi-company sehingga sistem
-                            bisa dipakai oleh beberapa anak perusahaan sekaligus dalam satu platform.</div>
+                            bisa dipakai oleh beberapa anak perusahaan sekaligus dalam satu platform.
+                        </div>
                         <ul class="cols">
                             <li><span class="badge pk">PK</span> <span class="col-name">id</span> <span
                                     class="col-type">bigint</span></li>
@@ -374,7 +377,8 @@
                             Finance, IT, Operations, dll. Kolom <b>company_id</b> (FK) mengikat departemen ke perusahaan
                             induknya. Satu departemen hanya milik satu perusahaan, tetapi satu perusahaan bisa punya
                             banyak departemen. User (karyawan) akan ditempatkan ke salah satu departemen via kolom
-                            <b>department_id</b> di tabel users.</div>
+                            <b>department_id</b> di tabel users.
+                        </div>
                         <ul class="cols">
                             <li><span class="badge pk">PK</span> <span class="col-name">id</span> <span
                                     class="col-type">bigint</span></li>
@@ -411,7 +415,8 @@
                             selama pengembangan), <b>Atasan</b> (supervisor langsung yang menilai talent),
                             <b>Panelis</b> (penguji independen tahap akhir), <b>Finance</b> (memvalidasi aspek anggaran
                             improvement project), dan <b>PDC Admin</b> (admin yang mengelola seluruh data sistem).
-                            Setiap role memiliki dashboard, menu, dan hak akses berbeda.</div>
+                            Setiap role memiliki dashboard, menu, dan hak akses berbeda.
+                        </div>
                         <ul class="cols">
                             <li><span class="badge pk">PK</span> <span class="col-name">id</span> <span
                                     class="col-type">bigint</span></li>
@@ -437,7 +442,8 @@
                             aktivitas dalam satu periode dikelompokkan bersama. Satu talent bisa punya beberapa session
                             jika siklus pengembangan diulang. Kolom <b>source_position_id</b> = jabatan awal,
                             <b>target_position_id</b> = jabatan yang dituju. Kolom <b>is_active</b> menandai session
-                            yang sedang berjalan vs yang sudah selesai/diarsipkan.</div>
+                            yang sedang berjalan vs yang sudah selesai/diarsipkan.
+                        </div>
                         <ul class="cols">
                             <li><span class="badge pk">PK</span> <span class="col-name">id</span> <span
                                     class="col-type">bigint</span></li>
@@ -480,7 +486,8 @@
                                 Now</b>, <b>Ready in 1-2 Years</b>, <b>Ready in &gt;2 Years</b>, atau <b>Not Ready</b>.
                             Kolom <b>is_locked</b> mencegah talent mengedit data setelah dikunci oleh admin. Kolom
                             <b>mentor_ids</b> menyimpan array JSON ID mentor yang mendampingi (bisa lebih dari satu).
-                            Terhubung ke <b>development_sessions</b> sebagai konteks sesi pengembangan.</div>
+                            Terhubung ke <b>development_sessions</b> sebagai konteks sesi pengembangan.
+                        </div>
                         <ul class="cols">
                             <li><span class="badge pk">PK</span> <span class="col-name">id</span> <span
                                     class="col-type">bigint</span></li>
@@ -553,7 +560,8 @@
                             <b>detail_assessment</b>). Kolom <b>period</b> menyatakan periode penilaian (misal:
                             Q1-2026). Kolom <b>user_id_atasan</b> nullable karena pada beberapa kasus atasan belum
                             ditentukan saat session dibuat. Kolom <b>is_active</b> memisahkan assessment aktif dari
-                            arsip session lama.</div>
+                            arsip session lama.
+                        </div>
                         <ul class="cols">
                             <li><span class="badge pk">PK</span> <span class="col-name">id</span> <span
                                     class="col-type">bigint</span></li>
@@ -583,7 +591,8 @@
                             <b>gap_score</b>: selisih (score_atasan - score_talent), nilai positif = talent overestimate
                             diri sendiri, nilai negatif = atasan tidak puas. <b>notes</b>: catatan penjelasan. Hasil gap
                             score ini digunakan untuk menentukan area kompetensi mana yang perlu diprioritaskan dalam
-                            IDP.</div>
+                            IDP.
+                        </div>
                         <ul class="cols">
                             <li><span class="badge pk">PK</span> <span class="col-name">id</span> <span
                                     class="col-type">bigint</span></li>
@@ -672,7 +681,8 @@
                             satu panelis hanya menilai talent yang sama sekali dalam satu session. Kolom
                             <b>panelis_scores_json</b> menyimpan rincian skor per aspek dalam format JSON. Kolom
                             <b>panelis_rekomendasi</b> berisi keputusan akhir panelis apakah talent direkomendasikan
-                            promosi atau tidak.</div>
+                            promosi atau tidak.
+                        </div>
                         <ul class="cols">
                             <li><span class="badge pk">PK</span> <span class="col-name">id</span> <span
                                     class="col-type">bigint</span></li>
@@ -737,7 +747,8 @@
                             <b>location</b> (tempat), <b>activity</b> (nama kegiatan), <b>description</b> (penjelasan
                             detail), <b>action_plan</b> (rencana tindak lanjut), <b>document_path &amp; file_name</b>
                             (bukti berupa file). Setelah talent mengajukan, mentor/atasan memverifikasi: <b>status</b> =
-                            Pending → Approved/Rejected. Kolom <b>verify_by</b> mencatat siapa yang memverifikasi.</div>
+                            Pending → Approved/Rejected. Kolom <b>verify_by</b> mencatat siapa yang memverifikasi.
+                        </div>
                         <ul class="cols">
                             <li><span class="badge pk">PK</span> <span class="col-name">id</span> <span
                                     class="col-type">bigint</span></li>
@@ -798,7 +809,8 @@
                             <b>Verified</b> / <b>Rejected</b>. Kolom <b>feedback</b> = catatan dari mentor/atasan,
                             <b>finance_feedback</b> = catatan dari Finance. ⚠️ Model juga menyimpan field panelis
                             (score, komentar, rekomendasi, tanggal penilaian) sebagai data legacy yang mungkin akan
-                            dipindah ke tabel panelis_assessments.</div>
+                            dipindah ke tabel panelis_assessments.
+                        </div>
                         <ul class="cols">
                             <li><span class="badge pk">PK</span> <span class="col-name">id</span> <span
                                     class="col-type">bigint</span></li>
@@ -810,7 +822,8 @@
                                     (mentor/atasan yang verifikasi)</span></li>
                             <li><span class="badge fk">FK</span> <span class="col-name">development_session_id</span>
                                 <span class="col-type">bigint, nullable</span> <span class="col-note">→
-                                    development_sessions</span></li>
+                                    development_sessions</span>
+                            </li>
                             <li><span class="badge" style="visibility:hidden">--</span> <span
                                     class="col-name">title</span> <span class="col-type">string</span> <span
                                     class="col-note">judul proyek</span></li>
@@ -825,7 +838,8 @@
                                     class="col-note">session aktif/arsip</span></li>
                             <li><span class="badge" style="visibility:hidden">--</span> <span
                                     class="col-name">verify_at</span> <span class="col-type">datetime, nullable</span>
-                                <span class="col-note">waktu diverifikasi</span></li>
+                                <span class="col-note">waktu diverifikasi</span>
+                            </li>
                             <li><span class="badge" style="visibility:hidden">--</span> <span
                                     class="col-name">feedback</span> <span class="col-type">text, nullable</span> <span
                                     class="col-note">catatan mentor/atasan</span></li>
@@ -834,7 +848,8 @@
                                     nullable</span> <span class="col-note">catatan dari Finance</span></li>
                             <li><span class="badge" style="visibility:hidden">--</span> <span
                                     class="col-name">panelis_score</span> <span class="col-type">int, nullable</span>
-                                <span class="col-note">⚠️ field legacy panelis</span></li>
+                                <span class="col-note">⚠️ field legacy panelis</span>
+                            </li>
                             <li><span class="badge" style="visibility:hidden">--</span> <span
                                     class="col-name">panelis_scores_json</span> <span class="col-type">json,
                                     nullable</span> <span class="col-note">⚠️ rincian skor panelis</span></li>
@@ -876,7 +891,7 @@
                                     class="col-note">nama tabel yang berubah</span></li>
                             <li><span class="badge" style="visibility:hidden">--</span> <span
                                     class="col-name">status</span> <span class="col-type">enum</span> <span
-                                    class="col-note">Pending, Approved, Rejected</span></li>
+                                    class="col-note">, Approved, Rejected</span></li>
                             <li><span class="badge" style="visibility:hidden">--</span> <span
                                     class="col-name">remark</span> <span class="col-type">string, nullable</span> <span
                                     class="col-note">alasan perubahan</span></li>
@@ -893,7 +908,8 @@
                             (nama file, perubahan data, dll.). Kolom <b>ip_address</b> dan <b>user_agent</b> membantu
                             identifikasi apakah akses berasal dari perangkat/lokasi yang mencurigakan. Kolom
                             <b>user_id</b> nullable karena event seperti login gagal terjadi sebelum user
-                            terautentikasi.</div>
+                            terautentikasi.
+                        </div>
                         <ul class="cols">
                             <li><span class="badge pk">PK</span> <span class="col-name">id</span> <span
                                     class="col-type">bigint</span></li>
