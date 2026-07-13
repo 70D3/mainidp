@@ -1866,7 +1866,7 @@ class PDCAdminController extends Controller
         // Fetch talents whose promotion process is completed (all final decision statuses)
         $finalStatuses = ['Promoted', 'Not Promoted', 'Ready in 1-2 Years', 'Ready in > 2 Years', 'Not Ready'];
         $talents = User::whereHas('roles', function ($q) {
-            $q->where('role_name', 'Talent');
+            $q->where('role_name', 'talent');
         })
             ->whereHas('all_promotion_plans', function ($q) use ($finalStatuses) {
                 $q->where('is_active', false)->whereIn('status_promotion', $finalStatuses);
