@@ -1126,7 +1126,7 @@
                 <div class="tl-body">
                     <div class="tl-label"><span class="tl-dot-mini"></span>Tahap 1</div>
                     <div class="tl-title">Registrasi &amp; Seleksi</div>
-                    <div class="tl-desc">Kandidat mendaftar dan mengikuti proses seleksi untuk menjadi Talent program
+                    <div class="tl-desc">Talent mendaftar dan mengikuti proses seleksi untuk menjadi Talent program
                         IDP.</div>
                 </div>
             </div>

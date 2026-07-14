@@ -370,7 +370,7 @@
                 if (posEl) posEl.style.display = 'none';
             }
 
-            const warningEl = document.getElementById('non-kandidat-warning');
+            const warningEl = document.getElementById('non-talent-warning');
             if (warningEl) warningEl.style.display = isTalent ? 'none' : 'block';
         }
 

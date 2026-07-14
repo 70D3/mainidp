@@ -664,10 +664,10 @@
                                 Standar</th>
                             <th
                                 style="background-color:#d4e6e1; color:#000000; padding:10px 8px; text-align:center; border:none; width:13%;">
-                                Skor Talent</th>
+                                Level Talent</th>
                             <th
                                 style="background-color:#d4e6e1; color:#000000; padding:10px 8px; text-align:center; border:none; width:13%;">
-                                Skor Atasan</th>
+                                Level Atasan</th>
                             <th
                                 style="background-color:#d4e6e1; color:#000000; padding:10px 8px; text-align:center; border:none; width:13%;">
                                 Final Skor</th>

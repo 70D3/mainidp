@@ -101,7 +101,7 @@ Panelis adalah user reviewer akhir yang menilai talent pada tahap panelis. Panel
 4. Sistem membuat `assessment_session` aktif dan `detail_assessment`.
 5. Atasan menerima notifikasi untuk memberi penilaian.
 6. Atasan mengisi skor kompetensi untuk talent.
-7. Sistem menghitung final score dan gap score terhadap standar target posisi.
+7. Sistem menghitung Average dan gap score terhadap standar target posisi.
 8. PDC Admin dapat memilih top 3 gap prioritas.
 
 ### 5.4 IDP Monitoring dan Logbook
@@ -276,7 +276,7 @@ Panelis adalah user reviewer akhir yang menilai talent pada tahap panelis. Panel
 1. Atasan dapat membuka halaman assessment untuk talent bawahannya.
 2. Atasan hanya dapat menilai talent yang memiliki assessment session aktif.
 3. Atasan mengisi skor 0 sampai 5 untuk setiap kompetensi.
-4. Sistem menghitung gap score berdasarkan rata-rata skor talent dan atasan dibanding target kompetensi posisi.
+4. Sistem menghitung gap score berdasarkan rata-rata level talent dan atasan dibanding target kompetensi posisi.
 5. Talent dan PDC Admin menerima notifikasi setelah assessment atasan selesai.
 
 #### Monitoring
@@ -385,7 +385,7 @@ Panelis adalah user reviewer akhir yang menilai talent pada tahap panelis. Panel
 11. `development_sessions`: siklus development/promotion per talent.
 12. `promotion_plan`: target promosi, mentor, status, periode, dan relasi session.
 13. `assessment_session`: header assessment talent dan atasan.
-14. `detail_assessment`: skor talent, skor atasan, gap, dan notes/top gap.
+14. `detail_assessment`: level talent, level atasan, gap, dan notes/top gap.
 15. `idp_activity`: logbook aktivitas IDP.
 16. `improvement_project`: project improvement dan validasi finance.
 17. `panelis_assessments`: assignment dan hasil penilaian panelis.

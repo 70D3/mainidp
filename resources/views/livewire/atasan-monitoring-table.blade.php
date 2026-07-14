@@ -187,9 +187,9 @@
                                 </tr>
                                 <tr>
                                     @foreach ($talents as $talent)
-                                        <th class="th-sub" style="min-width:100px">Skor Talent</th>
-                                        <th class="th-sub" style="min-width:100px">Skor Atasan</th>
-                                        <th class="th-sub" style="min-width:100px">Final Score</th>
+                                        <th class="th-sub" style="min-width:100px">Level Talent</th>
+                                        <th class="th-sub" style="min-width:100px">Level Atasan</th>
+                                        <th class="th-sub" style="min-width:100px">Average</th>
                                         <th class="th-sub" style="min-width:80px">GAP</th>
                                     @endforeach
                                 </tr>
@@ -230,35 +230,7 @@
                                         @endforeach
                                     </tr>
                                 @endforeach
-                                <tr class="font-bold bg-[#f1f5f9] border-t-2 border-slate-200">
-                                    <td class="td-left text-teal-800">Nilai Rata-Rata</td>
-                                    <td>{{ number_format($standards->avg() ?: 0, 1) }}</td>
-                                    @foreach ($talents as $talent)
-                                        @php
-                                            $avgSelf =
-                                                optional(optional($talent->assessmentSession)->details)->avg(
-                                                    'score_talent',
-                                                ) ?:
-                                                0;
-                                            $avgAtasan =
-                                                optional(optional($talent->assessmentSession)->details)->avg(
-                                                    'score_atasan',
-                                                ) ?:
-                                                0;
-                                            $avgGap =
-                                                optional(optional($talent->assessmentSession)->details)->avg(
-                                                    'gap_score',
-                                                ) ?:
-                                                0;
-                                        @endphp
-                                        <td>{{ number_format($avgSelf, 1) }}</td>
-                                        <td>{{ number_format($avgAtasan, 1) }}</td>
-                                        <td>{{ number_format(($avgSelf + $avgAtasan) / 2, 1) }}</td>
-                                        <td class="p-1 text-center font-bold text-[#1e293b]">
-                                            {{ number_format($avgGap, 1) }}
-                                        </td>
-                                    @endforeach
-                                </tr>
+
                             </tbody>
                         </table>
                     </div>

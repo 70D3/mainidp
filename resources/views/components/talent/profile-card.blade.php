@@ -212,13 +212,8 @@
     }
 
     .mobile-profile-detail-panel {
-        max-height: 0;
-        overflow: hidden;
-        transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    .mobile-profile-detail-panel.open {
-        max-height: 500px !important;
+        display: flex;
+        flex: 2;
     }
 
     @media (max-width: 1024px) {
@@ -261,6 +256,17 @@
 
         .talent-hero-section {
             padding: 0;
+        }
+
+        .mobile-profile-detail-panel {
+            display: block;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .mobile-profile-detail-panel.open {
+            max-height: 500px !important;
         }
     }
 </style>

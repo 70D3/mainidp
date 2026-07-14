@@ -8,6 +8,6 @@ class EnsureTalentRole
 {
     public function handle(Request $request, Closure $next): Response
     {
-        return (new EnsureRole)->handle($request, $next, 'talent', 'kandidat');
+        return (new EnsureRole)->handle($request, $next, 'talent');
     }
 }

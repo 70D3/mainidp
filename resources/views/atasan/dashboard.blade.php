@@ -275,7 +275,7 @@
                             <tr>
                                 <th>Item Kompetensi</th>
                                 <th style="width: 80px;">Target</th>
-                                <th style="width: 100px;">Skor Talent</th>
+                                <th style="width: 100px;">Level Talent</th>
                             </tr>
                         </thead>
                         <tbody>

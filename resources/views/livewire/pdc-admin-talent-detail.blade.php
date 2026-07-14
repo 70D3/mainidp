@@ -20,7 +20,7 @@
 
             <label class="textarea-label">Alasan Mengesampingkan</label>
             <textarea class="modal-textarea"
-                placeholder="cth: Leadership diprioritaskan karena kandidat akan acting sebagai PIC proyek..."></textarea>
+                placeholder="cth: Leadership diprioritaskan karena talent akan acting sebagai PIC proyek..."></textarea>
 
             <div class="modal-footer">
                 <button class="btn-modal btn-reset-auto flex items-center gap-2" onclick="resetGapToAuto()">
@@ -211,9 +211,9 @@
                             </tr>
                             <tr>
                                 @foreach ($talents as $talent)
-                                    <th class="th-sub">Skor Talent</th>
-                                    <th class="th-sub">Skor Atasan</th>
-                                    <th class="th-sub">Final Score</th>
+                                    <th class="th-sub">Level Talent</th>
+                                    <th class="th-sub">Level Atasan</th>
+                                    <th class="th-sub">Average</th>
                                     <th class="th-sub">GAP</th>
                                 @endforeach
                             </tr>
@@ -254,45 +254,7 @@
                                     @endforeach
                                 </tr>
                             @endforeach
-                            {{-- Nilai Rata-rata --}}
-                            <tr class="font-bold bg-gray-50">
-                                <td class="td-left">Nilai Rata-Rata</td>
-                                <td>{{ number_format($standards->avg() ?: 0, 1) }}</td>
-                                @foreach ($talents as $talent)
-                                    @php
-                                        $avgSelf =
-                                            optional(optional($talent->assessmentSession)->details)->avg(
-                                                'score_talent',
-                                            ) ?:
-                                            0;
-                                        $avgAtasan =
-                                            optional(optional($talent->assessmentSession)->details)->avg(
-                                                'score_atasan',
-                                            ) ?:
-                                            0;
-                                        $avgGap =
-                                            optional(optional($talent->assessmentSession)->details)->avg('gap_score') ?:
-                                            0;
-                                    @endphp
-                                    <td>{{ number_format($avgSelf, 1) }}</td>
-                                    <td>{{ number_format($avgAtasan, 1) }}</td>
-                                    <td>{{ number_format(($avgSelf + $avgAtasan) / 2, 1) }}</td>
-                                    <td class="p-1">
-                                        @php
-                                            $cls = 'gap-ok';
-                                            if ($avgGap == 0) {
-                                                $cls = 'gap-none';
-                                            } elseif ($avgGap < -1.5) {
-                                                $cls = 'gap-large';
-                                            } elseif ($avgGap < 0) {
-                                                $cls = 'gap-small';
-                                            }
-                                        @endphp
-                                        <span
-                                            class="gap-badge {{ $cls }}">{{ number_format($avgGap, 1) }}</span>
-                                    </td>
-                                @endforeach
-                            </tr>
+
                         </tbody>
                     </table>
                 </div>

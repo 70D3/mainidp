@@ -27,7 +27,7 @@ class ProfileController extends Controller
         $activeRole = session('active_role');
         $roleName = strtolower(trim($activeRole ?: ($user->role->role_name ?? '')));
 
-        if (in_array($roleName, ['talent', 'kandidat'])) {
+        if (in_array($roleName, ['talent'])) {
             $layoutName = 'talent.layout';
         } elseif ($roleName === 'mentor') {
             $layoutName = 'mentor.layout';
@@ -43,7 +43,7 @@ class ProfileController extends Controller
             $layoutName = 'app-layout'; // fallback
         }
 
-        if (in_array($roleName, ['talent', 'kandidat', 'mentor', 'atasan'])) {
+        if (in_array($roleName, ['talent', 'mentor', 'atasan'])) {
             $hasDevPlan = \App\Models\PromotionPlan::where('is_active', true)
                 ->whereNotIn('status_promotion', ['Promoted', 'Not Promoted'])
                 ->where(function ($query) use ($user) {
