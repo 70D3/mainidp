@@ -393,7 +393,7 @@
                 <div class="prof-hero-badge">{{ $roleName }}</div>
                 
                 @php $roleNameLower = strtolower(trim($activeRoleName ?? $user->role->role_name ?? '')); @endphp
-                @if(in_array($roleNameLower, ['talent', 'kandidat']))
+                @if(in_array($roleNameLower, ['talent']))
                 <div class="flex md:hidden flex-col mt-3">
                     @php
                         $periode = '—';
@@ -408,7 +408,7 @@
             </div>
 
             @php $roleNameLower = strtolower(trim($activeRoleName ?? $user->role->role_name ?? '')); @endphp
-            @if(in_array($roleNameLower, ['talent', 'kandidat']))
+            @if(in_array($roleNameLower, ['talent']))
             <div class="prof-hero-meta hidden md:flex">
                 @php
                     $periode = '—';
@@ -464,7 +464,7 @@
                         ['label'=>'Role',                 'key'=>'role_id',       'type'=>'readonly', 'val'=>ucwords(str_replace('_',' ',$activeRoleName ?? $user->role->role_name ?? '—'))],
                         ['label'=>'Posisi Sekarang',      'key'=>'position_id',   'type'=>'readonly', 'val'=>$user->position->position_name ?? '—'],
                     ];
-                    if (isset($roleNameLower) && in_array($roleNameLower, ['talent', 'kandidat'])) {
+                    if (isset($roleNameLower) && in_array($roleNameLower, ['talent'])) {
                         $profilFields[] = ['label'=>'Mentor',               'key'=>'mentor',        'type'=>'readonly', 'val'=>collect(optional($user->promotion_plan)->mentor_models)->pluck('nama')->join(', ') ?: (optional($user->mentor)->nama ?? '—')];
                         $profilFields[] = ['label'=>'Atasan',               'key'=>'atasan',        'type'=>'readonly', 'val'=>optional($user->atasan)->nama ?? '—'];
                         $profilFields[] = ['label'=>'Posisi Yang Dituju',   'key'=>'target_position','type'=>'readonly', 'val'=>optional(optional($user->promotion_plan)->targetPosition)->position_name ?? '—'];

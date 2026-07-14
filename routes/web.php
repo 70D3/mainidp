@@ -36,9 +36,7 @@ Route::get('/dashboard', function () {
     }
 
     // Redirect based on role instead of trying to show a non-existent dashboard view
-    if ($roleName === 'kandidat') {
-        return redirect()->route('kandidat.dashboard');
-    } elseif ($roleName === 'talent') {
+    if ($roleName === 'talent') {
         return redirect()->route('talent.dashboard');
     } elseif ($roleName === 'atasan') {
         return redirect()->route('atasan.dashboard');

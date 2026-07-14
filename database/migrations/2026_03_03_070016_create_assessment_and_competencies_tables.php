@@ -48,7 +48,7 @@ return new class extends Migration
 
         Schema::create('assessment_session', function (Blueprint $table) {
             $table->id(); // PK id [cite: 196]
-            $table->foreignId('user_id_talent')->constrained('users'); // FK user_id(kandidat) [cite: 202]
+            $table->foreignId('user_id_talent')->constrained('users'); // FK user_id(talent) [cite: 202]
             $table->foreignId('development_session_id')->nullable()->constrained('development_sessions')->nullOnDelete();
             $table->foreignId('user_id_atasan')->nullable()->constrained('users'); // FK user_id(atasan) [cite: 209]
             $table->boolean('is_active')->default(true);

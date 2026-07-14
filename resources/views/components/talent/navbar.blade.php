@@ -76,15 +76,15 @@
                 {{-- Dropdown Header --}}
                 <div class="px-5 py-5 bg-gradient-to-br from-[#0f172a] to-[#38475a]">
                     <div class="flex items-center gap-3.5">
-                            @if($avatarUrl)
-                                <img src="{{ $avatarUrl }}" alt="{{ $nama }}"
-                                    class="w-12 h-12 rounded-xl object-cover border border-white/15 flex-shrink-0 shadow-[0_4px_12px_rgba(20,184,166,0.4)]">
-                            @else
-                                <div class="w-12 h-12 rounded-xl flex items-center justify-center font-extrabold text-white flex-shrink-0 text-base"
-                                    style="background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%); box-shadow: 0 4px 12px rgba(20,184,166,0.4);">
-                                    {{ $initials }}
-                                </div>
-                            @endif
+                        @if($avatarUrl)
+                            <img src="{{ $avatarUrl }}" alt="{{ $nama }}"
+                                class="w-12 h-12 rounded-xl object-cover border border-white/15 flex-shrink-0 shadow-[0_4px_12px_rgba(20,184,166,0.4)]">
+                        @else
+                            <div class="w-12 h-12 rounded-xl flex items-center justify-center font-extrabold text-white flex-shrink-0 text-base"
+                                style="background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%); box-shadow: 0 4px 12px rgba(20,184,166,0.4);">
+                                {{ $initials }}
+                            </div>
+                        @endif
                         <div class="overflow-hidden">
                             <p class="text-[14px] font-bold text-white truncate">
                                 {{ $user->nama ?? ($user->name ?? '-') }}
@@ -199,6 +199,21 @@
 
                     {{-- Section: Account --}}
                     <div class="px-3">
+                        @if (Auth::user()->roles->count() > 1)
+                            <a href="{{ route('role.select') }}"
+                                class="flex items-center gap-3 px-4 py-3 rounded-xl text-[14px] text-[#005ba1] hover:bg-[#f8fafc] transition-colors group">
+                                <div
+                                    class="w-8 h-8 rounded-lg bg-[#e6f0f9] group-hover:bg-[#005ba1] flex items-center justify-center transition-colors flex-shrink-0">
+                                    <svg xmlns="http://www.w3.org/2000/svg"
+                                        class="h-3.5 w-3.5 text-[#005ba1] group-hover:text-white transition-colors"
+                                        fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                                            d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                                    </svg>
+                                </div>
+                                <span class="font-medium">Ganti Role</span>
+                            </a>
+                        @endif
                         <form method="POST" action="{{ route('logout') }}" class="m-0">
                             @csrf
                             <button type="submit"
@@ -411,6 +426,24 @@
                         </a>
                     </li>
                     <li class="mx-3 border-t border-gray-100 my-1"></li>
+                    @if (Auth::user()->roles->count() > 1)
+                        <li>
+                            <a href="{{ route('role.select') }}"
+                                class="flex items-center gap-3 px-4 py-2.5 text-sm text-[#005ba1] hover:bg-[#f8fafc] transition-colors group">
+                                <div
+                                    class="w-7 h-7 rounded-lg bg-[#e6f0f9] group-hover:bg-[#005ba1] flex items-center justify-center transition-colors flex-shrink-0">
+                                    <svg xmlns="http://www.w3.org/2000/svg"
+                                        class="h-3.5 w-3.5 text-[#005ba1] group-hover:text-white transition-colors"
+                                        fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                                            d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                                    </svg>
+                                </div>
+                                <span>Ganti Role</span>
+                            </a>
+                        </li>
+                        <li class="mx-3 border-t border-gray-100 my-1"></li>
+                    @endif
                     <li>
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf

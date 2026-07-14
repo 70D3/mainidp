@@ -589,9 +589,9 @@
                         <tr>
                             <th class="th-main w-[380px]">Kompetensi</th>
                             <th class="th-main w-[80px]">Standar</th>
-                            <th class="th-main">Skor Talent</th>
-                            <th class="th-main">Skor Atasan</th>
-                            <th class="th-main">Final Score</th>
+                            <th class="th-main">Level Talent</th>
+                            <th class="th-main">Level Atasan</th>
+                            <th class="th-main">Average</th>
                             <th class="th-main">GAP</th>
                         </tr>
                     </thead>
@@ -627,31 +627,7 @@
                                 </td>
                             </tr>
                         @endforeach
-                        {{-- Average row --}}
-                        @php
-                            $sess = $talent->assessmentSession;
-                            $avgT = $sess ? $sess->details->avg('score_talent') ?? 0 : 0;
-                            $avgA = $sess ? $sess->details->avg('score_atasan') ?? 0 : 0;
-                            $avgGap = $sess ? $sess->details->avg('gap_score') ?? 0 : 0;
 
-                            $avgCls = 'gap-none';
-                            if ($avgGap > 0) {
-                                $avgCls = 'gap-positive';
-                            } elseif ($avgGap < -1.5) {
-                                $avgCls = 'gap-large';
-                            } elseif ($avgGap < 0) {
-                                $avgCls = 'gap-small';
-                            }
-                        @endphp
-                        <tr class="font-bold bg-gray-50">
-                            <td class="td-left">Nilai Rata-Rata</td>
-                            <td>{{ number_format($standards->avg() ?: 0, 1) }}</td>
-                            <td>{{ number_format($avgT, 1) }}</td>
-                            <td>{{ number_format($avgA, 1) }}</td>
-                            <td>{{ number_format(($avgT + $avgA) / 2, 1) }}</td>
-                            <td class="p-1"><span
-                                    class="font-bold text-[#334155]">{{ number_format($avgGap, 1) }}</span></td>
-                        </tr>
                     </tbody>
                 </table>
             </div>

@@ -77,6 +77,7 @@ class PdcFinanceValidationTable extends Component
                 'talent.department',
                 'talent.company',
                 'talent.promotion_plan.targetPosition',
+                'verifier',
             ])->whereHas('talent.promotion_plan', function ($q) {
                 $q->whereNotIn('status_promotion', ['Promoted', 'Not Promoted']);
             });

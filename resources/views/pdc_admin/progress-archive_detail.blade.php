@@ -972,9 +972,9 @@
                         <tr>
                             <th class="th-main" style="width:300px;">Kompetensi</th>
                             <th class="th-main" style="width:70px;">Standar</th>
-                            <th class="th-sub border-b-2 border-slate-200 bg-white">Skor Talent</th>
-                            <th class="th-sub border-b-2 border-slate-200 bg-white">Skor Atasan</th>
-                            <th class="th-sub border-b-2 border-slate-200 bg-white">Final Score</th>
+                            <th class="th-sub border-b-2 border-slate-200 bg-white">Level Talent</th>
+                            <th class="th-sub border-b-2 border-slate-200 bg-white">Level Atasan</th>
+                            <th class="th-sub border-b-2 border-slate-200 bg-white">Average</th>
                             <th class="th-sub bg-[#ef4444] border-[#ef4444] text-white" style="width: 120px;">Gap</th>
                         </tr>
                     </thead>
@@ -1003,24 +1003,7 @@
                                     </td>
                                 </tr>
                             @endforeach
-                            {{-- Average row --}}
-                            @php
-                                $sess = $talent->assessmentSession;
-                                $avgT = $sess ? $sess->details->avg('score_talent') ?? 0 : 0;
-                                $avgA = $sess ? $sess->details->avg('score_atasan') ?? 0 : 0;
-                                $avgGap = $sess ? $sess->details->avg('gap_score') ?? 0 : 0;
-                                $avgCls = $avgGap >= 0 ? 'gap-none' : ($avgGap <= -1.5 ? 'gap-large' : 'gap-small');
-                            @endphp
-                            <tr class="font-bold bg-gray-50 border-t-2 border-slate-200">
-                                <td class="td-left">Nilai Rata-Rata</td>
-                                <td>{{ number_format(collect($standards)->avg() ?: 0, 1) }}</td>
-                                <td>{{ number_format($avgT, 1) }}</td>
-                                <td>{{ number_format($avgA, 1) }}</td>
-                                <td>{{ number_format(($avgT + $avgA) / 2, 1) }}</td>
-                                <td class="text-center p-2"><span
-                                        class="gap-badge {{ $avgCls }}">{{ number_format($avgGap, 1) }}</span>
-                                </td>
-                            </tr>
+
                         @else
                             <!-- MOCKUP matching image -->
                             <tr>
@@ -1103,14 +1086,7 @@
                                 <td><span class="font-bold">3</span></td>
                                 <td class="text-center p-2"><span class="gap-badge gap-small">-1</span></td>
                             </tr>
-                            <tr class="font-bold bg-gray-50 border-t-2 border-slate-200">
-                                <td class="td-left">Nilai Rata-Rata</td>
-                                <td>3.9</td>
-                                <td>2.8</td>
-                                <td>3.1</td>
-                                <td>3.0</td>
-                                <td class="text-center p-2"><span class="gap-badge gap-small">-0.95</span></td>
-                            </tr>
+
                         @endif
                     </tbody>
                 </table>

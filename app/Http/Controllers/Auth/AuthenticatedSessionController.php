@@ -122,9 +122,9 @@ class AuthenticatedSessionController extends Controller
     {
 
 
-        // Verifikasi intent kandidat (dari session storeKompetensi)
-        if (session()->has('register_kandidat')) {
-            $intent = session('register_kandidat');
+        // Verifikasi intent talent (dari session storeKompetensi)
+        if (session()->has('register_talent')) {
+            $intent = session('register_talent');
             // Pastikan user yang login adalah user_id yang baru registrasi
             if (Auth::user()->id !== $intent['user_id']) {
                 Auth::logout();
@@ -132,21 +132,21 @@ class AuthenticatedSessionController extends Controller
             }
             // Trigger event Registered (yang seharusnya dipanggil di storeKompetensi)
             event(new Registered(Auth::user()));
-            session()->forget('register_kandidat');
+            session()->forget('register_talent');
         }
 
 
 
         // setelah Auth::attempt / setelah user di-retrieve dan login dilakukan
-        // Verifikasi intent non-kandidat (dari flow registrasi non-kandidat)
-        if (session()->has('register_non_kandidat')) {
-            $intent = session('register_non_kandidat');
+        // Verifikasi intent non-talent (dari flow registrasi non-talent)
+        if (session()->has('register_non_talent')) {
+            $intent = session('register_non_talent');
             if (Auth::user()->role !== $intent['role']) {
                 Auth::logout();
                 return back()->withErrors(['username' => 'Role akun tidak sesuai dengan yang dipilih saat registrasi.']);
             }
             // Role cocok → hapus session intent
-            session()->forget('register_non_kandidat');
+            session()->forget('register_non_talent');
         }
 
         $roles = Auth::user()->roles;

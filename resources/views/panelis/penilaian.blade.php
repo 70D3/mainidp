@@ -817,7 +817,9 @@
             <div class="talent-hero-meta-row mt-2">
                 <span class="talent-hero-meta-label">Tanggal Penilaian</span>
                 <input type="date" id="tanggal-penilaian" class="date-input-custom"
-                    value="{{ $existingAssessment && $existingAssessment->panelis_tanggal_penilaian ? \Carbon\Carbon::parse($existingAssessment->panelis_tanggal_penilaian)->format('Y-m-d') : now()->format('Y-m-d') }}">
+                    value="{{ $existingAssessment && $existingAssessment->panelis_tanggal_penilaian ? \Carbon\Carbon::parse($existingAssessment->panelis_tanggal_penilaian)->format('Y-m-d') : now()->format('Y-m-d') }}"
+                    {{ $existingAssessment && $existingAssessment->panelis_tanggal_penilaian ? 'readonly' : '' }}
+                    @if($existingAssessment && $existingAssessment->panelis_tanggal_penilaian) style="pointer-events: none; background-color: #f8fafc; color: #64748b;" @endif>
             </div>
         </div>
     </div>

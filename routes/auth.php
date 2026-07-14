@@ -17,7 +17,7 @@ Route::middleware('guest')->group(function () {
 
     Route::post('register', [RegisteredUserController::class, 'store']);
 
-    // Step 2 registrasi kandidat: halaman kompetensi
+    // Step 2 registrasi talent: halaman kompetensi
     Route::get('register/kompetensi', [RegisteredUserController::class, 'stepKompetensi'])
         ->name('register.kompetensi');
 

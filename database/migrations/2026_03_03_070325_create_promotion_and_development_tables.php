@@ -13,7 +13,7 @@ return new class extends Migration {
 
         Schema::create('promotion_plan', function (Blueprint $table) {
             $table->id(); // PK id [cite: 149]
-            $table->foreignId('user_id_talent')->constrained('users'); // FK user_id(kandidat) [cite: 153]
+            $table->foreignId('user_id_talent')->constrained('users'); // FK user_id(talent) [cite: 153]
             $table->foreignId('development_session_id')->nullable()->constrained('development_sessions')->nullOnDelete();
             $table->foreignId('target_position_id')->constrained('position'); // Key target position_id [cite: 161]
             $table->json('mentor_ids')->nullable(); // Array of mentor user IDs
@@ -28,7 +28,7 @@ return new class extends Migration {
 
         Schema::create('idp_activity', function (Blueprint $table) {
             $table->id(); // PK id [cite: 186]
-            $table->foreignId('user_id_talent')->constrained('users'); // FK user_id(kandidat) [cite: 193]
+            $table->foreignId('user_id_talent')->constrained('users'); // FK user_id(talent) [cite: 193]
             $table->foreignId('development_session_id')->nullable()->constrained('development_sessions')->nullOnDelete();
             $table->foreignId('type_idp')->constrained('idp_type'); // FK type_id [cite: 198]
             $table->foreignId('verify_by')->nullable()->constrained('users'); // FK verify_by [cite: 235]
@@ -49,7 +49,7 @@ return new class extends Migration {
 
         Schema::create('improvement_project', function (Blueprint $table) {
             $table->id(); // PK id [cite: 151]
-            $table->foreignId('user_id_talent')->constrained('users'); // FK user_id(kandidat) [cite: 160]
+            $table->foreignId('user_id_talent')->constrained('users'); // FK user_id(talent) [cite: 160]
             $table->foreignId('development_session_id')->nullable()->constrained('development_sessions')->nullOnDelete();
             $table->string('title'); // Key title [cite: 166]
             $table->string('document_path'); // Key document_path [cite: 173]

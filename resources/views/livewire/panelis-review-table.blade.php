@@ -115,7 +115,7 @@
                 {{-- Score Input --}}
                 <div class="score-section">
                     <span class="score-label">Skor</span>
-                    <input type="number" class="score-input" placeholder="Masukkan skor talent dari skala 1 - 100" min="1" max="100">
+                    <input type="number" class="score-input" placeholder="Masukkan level talent dari skala 1 - 100" min="1" max="100">
                 </div>
 
                 {{-- Action Buttons --}}

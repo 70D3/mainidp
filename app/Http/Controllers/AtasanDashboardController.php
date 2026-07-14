@@ -137,7 +137,18 @@ class AtasanDashboardController extends Controller
     {
         $user = Auth::user();
         $talent = User::where('atasan_id', $user->id)
-            ->with(['promotion_plan.targetPosition', 'position'])
+            ->with([
+                'promotion_plan.targetPosition',
+                'position',
+                'company',
+                'department',
+                'mentor',
+                'atasan',
+                'role',
+                'activeDevelopmentSession.sourcePosition',
+                'activeDevelopmentSession.targetPosition',
+                'activeDevelopmentSession.atasan',
+            ])
             ->findOrFail($talentId);
 
         // Find the ACTIVE assessment session for this talent
@@ -430,11 +441,11 @@ class AtasanDashboardController extends Controller
         $requestedSessionId = $request->query('session_id');
         $archivedPlan = $requestedSessionId
             ? $talent->all_promotion_plans->firstWhere('development_session_id', (int) $requestedSessionId)
-            : $talent->all_promotion_plans->first(function ($plan) use ($finalStatuses, $user) {
+            : $talent->all_promotion_plans->filter(function ($plan) use ($finalStatuses, $user) {
                 return !$plan->is_active
                     && in_array($plan->status_promotion, $finalStatuses, true)
                     && (int) optional($plan->developmentSession)->atasan_id === (int) $user->id;
-            });
+            })->first();
         $sessionId = $archivedPlan?->development_session_id;
 
         if (!$archivedPlan || (int) optional($archivedPlan->developmentSession)->atasan_id !== (int) $user->id) {
