@@ -23,6 +23,7 @@
             .no-scrollbar::-webkit-scrollbar {
                 display: none;
             }
+
             .no-scrollbar {
                 -ms-overflow-style: none;
                 scrollbar-width: none;
@@ -117,7 +118,8 @@
         {{-- ── Page Header ── --}}
         <div class="flex items-center gap-4 mb-8">
             <div class="w-14 h-14 bg-slate-900 rounded-2xl flex items-center justify-center shadow-lg shrink-0">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-7 h-7 text-white">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
+                    class="w-7 h-7 text-white">
                     <path
                         d="M11.25 4.533A9.707 9.707 0 006 3a9.735 9.735 0 00-3.25.555.75.75 0 00-.5.707v14.25a.75.75 0 001 .707A8.237 8.237 0 016 18.75c1.995 0 3.823.707 5.25 1.886V4.533zM12.75 20.636A8.214 8.214 0 0118 18.75c1.68 0 3.282.466 4.75 1.286a.75.75 0 001-.707V4.262a.75.75 0 00-.5-.707A9.735 9.735 0 0018 3a9.707 9.707 0 00-5.25 1.533v16.103z" />
                 </svg>
@@ -125,7 +127,8 @@
             <div>
                 <h1 class="text-2xl font-extrabold text-[#1f2937]">LogBook</h1>
                 <p class="text-[13px] font-medium text-gray-500 mt-1">Rekam jejak aktivitas pengembangan talent
-                    {{ strtolower($talent->nama) }}</p>
+                    {{ strtolower($talent->nama) }}
+                </p>
             </div>
         </div>
 
@@ -162,7 +165,8 @@
                                 <td class="py-4 px-6 font-bold text-sm text-slate-800 text-center">{{ $item['mentor'] }}
                                 </td>
                                 <td class="py-4 px-6 text-sm font-semibold text-slate-800 w-48 text-center">
-                                    {{ \Illuminate\Support\Str::limit($item['tema'], 35) }}</td>
+                                    {{ \Illuminate\Support\Str::limit($item['tema'], 35) }}
+                                </td>
                                 <td class="py-4 px-6 text-center text-sm text-slate-600 whitespace-nowrap">
                                     {{ $item['tanggal_update'] ? \Carbon\Carbon::parse($item['tanggal_update'])->locale('id')->translatedFormat('d F Y') : '-' }}
                                 </td>
@@ -241,9 +245,11 @@
                         @forelse($mentoringData as $item)
                             <tr class="border-b border-gray-100 hover:bg-teal-50/50 transition duration-150">
                                 <td class="py-4 px-6 font-bold text-sm text-slate-800 text-center">
-                                    {{ $item['mentor'] }}</td>
+                                    {{ $item['mentor'] }}
+                                </td>
                                 <td class="py-4 px-6 text-sm font-semibold text-slate-800 w-48 text-center">
-                                    {{ \Illuminate\Support\Str::limit($item['tema'], 35) }}</td>
+                                    {{ \Illuminate\Support\Str::limit($item['tema'], 35) }}
+                                </td>
                                 <td class="py-4 px-6 text-center text-sm text-slate-600 whitespace-nowrap">
                                     {{ $item['tanggal_update'] ? \Carbon\Carbon::parse($item['tanggal_update'])->locale('id')->translatedFormat('d F Y') : '-' }}
                                 </td>
@@ -322,9 +328,11 @@
                         @forelse($learningData as $item)
                             <tr class="border-b border-gray-100 hover:bg-teal-50/50 transition duration-150">
                                 <td class="py-4 px-6 font-bold text-sm text-slate-800 text-center">
-                                    {{ $item['sumber'] }}</td>
+                                    {{ $item['sumber'] }}
+                                </td>
                                 <td class="py-4 px-6 text-sm font-semibold text-slate-800 w-48 text-center">
-                                    {{ \Illuminate\Support\Str::limit($item['tema'], 35) }}</td>
+                                    {{ \Illuminate\Support\Str::limit($item['tema'], 35) }}
+                                </td>
                                 <td class="py-4 px-6 text-center text-sm text-slate-600 whitespace-nowrap">
                                     {{ $item['tanggal_update'] ? \Carbon\Carbon::parse($item['tanggal_update'])->locale('id')->translatedFormat('d F Y') : '-' }}
                                 </td>

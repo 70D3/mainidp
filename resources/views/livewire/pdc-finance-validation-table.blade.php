@@ -140,7 +140,7 @@
                             <tbody class="divide-y divide-gray-100">
                                 @foreach ($companyProjects as $project)
                                     @php
-                                        $finDec = 'Pending';
+                                        $finDec = 'On Review';
                                         if ($project->finance_feedback) {
                                             if (str_starts_with($project->finance_feedback, '[Approved]')) {
                                                 $finDec = 'Approved';

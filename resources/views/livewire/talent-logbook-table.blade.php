@@ -86,7 +86,7 @@
                                         <span
                                             class="inline-flex items-center gap-1 text-orange-500 text-[11px] font-bold bg-orange-50 px-3 py-1 rounded-full border border-orange-100">
                                             <span class="w-1.5 h-1.5 rounded-full bg-orange-400"></span>
-                                            {{ $item['status'] ?: 'Pending' }}
+                                            {{ ($item['status'] === 'Pending' ? 'On Review' : $item['status']) ?: 'On Review' }}
                                         </span>
                                     @endif
                                 </td>
@@ -190,7 +190,7 @@
                                     @else
                                         <span
                                             class="inline-flex items-center gap-1 text-orange-500 text-[9px] font-bold bg-orange-50 px-2 py-0.5 rounded-full border border-orange-100">
-                                            {{ $item['status'] ?: 'Pending' }}
+                                            {{ ($item['status'] === 'Pending' ? 'On Review' : $item['status']) ?: 'On Review' }}
                                         </span>
                                     @endif
                                 </td>

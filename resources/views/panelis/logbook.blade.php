@@ -203,7 +203,7 @@
                                 </td>
                                 <td class="py-4 px-6 text-center w-32">
                                     @php
-                                        $st = $act->status ?? 'Pending';
+                                        $st = $act->status ?? 'On Review';
                                         $isApprove = in_array($st, ['Approve', 'Approved', 'Verified']);
                                     @endphp
                                     @if ($isApprove)
@@ -267,7 +267,7 @@
                     <tbody>
                         @forelse($exposureActivities as $act)
                             @php
-                                $st = $act->status ?? 'Pending';
+                                $st = $act->status ?? 'On Review';
                                 $isApprove = in_array($st, ['Approve', 'Approved', 'Verified']);
                             @endphp
                             <tr>
@@ -350,7 +350,7 @@
                                 </td>
                                 <td class="py-4 px-6 text-center w-32">
                                     @php
-                                        $st = $act->status ?? 'Pending';
+                                        $st = $act->status ?? 'On Review';
                                         $isApprove = in_array($st, ['Approve', 'Approved', 'Verified']);
                                     @endphp
                                     @if ($isApprove)
@@ -414,7 +414,7 @@
                     <tbody>
                         @forelse($mentoringActivities as $act)
                             @php
-                                $st = $act->status ?? 'Pending';
+                                $st = $act->status ?? 'On Review';
                                 $isApprove = in_array($st, ['Approve', 'Approved', 'Verified']);
                             @endphp
                             <tr>
@@ -497,7 +497,7 @@
                                 </td>
                                 <td class="py-4 px-6 text-center w-32">
                                     @php
-                                        $st = $act->status ?? 'Pending';
+                                        $st = $act->status ?? 'On Review';
                                         $isApprove = in_array($st, ['Approve', 'Approved', 'Verified']);
                                     @endphp
                                     @if ($isApprove)
@@ -561,7 +561,7 @@
                     <tbody>
                         @forelse($learningActivities as $act)
                             @php
-                                $st = $act->status ?? 'Pending';
+                                $st = $act->status ?? 'On Review';
                                 $isApprove = in_array($st, ['Approve', 'Approved', 'Verified']);
                             @endphp
                             <tr>

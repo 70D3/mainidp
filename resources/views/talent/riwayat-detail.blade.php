@@ -500,7 +500,7 @@
                                     <td class="py-4 px-6 text-center w-48">
                                         @php
                                             // Ambil status dari Finance Validation (via feedback)
-                                            $finDec = 'Pending';
+                                            $finDec = 'On Review';
                                             if ($project->finance_feedback) {
                                                 if (str_starts_with($project->finance_feedback, '[Approved]')) {
                                                     $finDec = 'Approved';
@@ -527,7 +527,7 @@
                                         @else
                                             <span
                                                 class="inline-flex items-center gap-1.5 text-orange-500 text-[11px] font-bold bg-orange-50 px-3 py-1 rounded-full border border-orange-100">
-                                                <span class="w-1.5 h-1.5 rounded-full bg-orange-400"></span> Pending
+                                                <span class="w-1.5 h-1.5 rounded-full bg-orange-400"></span> On Review
                                             </span>
                                         @endif
                                     </td>

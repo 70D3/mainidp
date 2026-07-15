@@ -1203,7 +1203,7 @@
             @php
                 $verifier = $project->verifier;
                 // Determine status based on finance_feedback (same as PdcFinanceValidationTable)
-                $financeStatus = 'Pending';
+                $financeStatus = 'On Review';
                 if (!empty($project->finance_feedback)) {
                     if (str_starts_with($project->finance_feedback, '[Approved]')) {
                         $financeStatus = 'Approved';
@@ -1277,7 +1277,7 @@
                         <div
                             class="px-8 py-2 border rounded-full font-bold text-[0.8rem] flex items-center gap-2 shadow-sm {{ $statusBadgeColor }}">
                             <span class="w-2 h-2 rounded-full {{ $dotBadgeColor }}"></span>
-                            {{ ucfirst($financeStatus ?? 'Pending') }}
+                            {{ ucfirst($financeStatus ?? 'On Review') }}
                         </div>
                     </div>
                 </div>
@@ -1336,7 +1336,7 @@
                         <div
                             class="shrink-0 px-4 sm:px-8 py-2 border rounded-full font-bold text-[0.75rem] sm:text-[0.8rem] flex justify-center items-center gap-1.5 sm:gap-2 shadow-sm {{ $statusBadgeColor }}">
                             <span class="w-2 h-2 rounded-full shrink-0 {{ $dotBadgeColor }}"></span>
-                            <span class="whitespace-nowrap">{{ ucfirst($financeStatus ?? 'Pending') }}</span>
+                            <span class="whitespace-nowrap">{{ ucfirst($financeStatus ?? 'On Review') }}</span>
                         </div>
                     </div>
                 </div>
