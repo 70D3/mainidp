@@ -544,12 +544,14 @@
             @media (max-width: 767px) {
                 .pill-nav-tabs {
                     gap: 0;
+                    width: 100%;
                 }
 
                 .pill-tab {
-                    flex: 0 0 auto;
-                    padding: 8px 14px;
-                    font-size: 0.78rem;
+                    flex: 1;
+                    padding: 8px 4px;
+                    font-size: 0.75rem;
+                    text-align: center;
                 }
 
                 .nav-tabs {

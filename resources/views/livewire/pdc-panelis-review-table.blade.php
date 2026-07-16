@@ -146,7 +146,7 @@
                                             $progressPlan = optional($progressTalent)->promotion_plan;
                                             $sessionId = optional($progressPlan)->development_session_id;
                                             $alreadySent = in_array(optional($progressPlan)->status_promotion, [
-                                                'On Review Panelis',
+                                                'Pending Panelis',
                                                 'Approved Panelis',
                                                 'Rejected Panelis',
                                             ]);
@@ -225,7 +225,7 @@
                                                 @elseif($financeStatus === 'Rejected')
                                                     <span class="badge badge-red">Rejected</span>
                                                 @else
-                                                    <span class="badge badge-amber">Pending</span>
+                                                    <span class="badge badge-amber">On Review</span>
                                                 @endif
                                             </td>
 

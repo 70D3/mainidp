@@ -198,7 +198,7 @@
                 </svg>
             </div>
             <div class="prem-stat-value animate-counter" data-target="{{ $assessmentPending }}">0</div>
-            <div class="prem-stat-label">Assessment Pending</div>
+            <div class="prem-stat-label">Assessment On review</div>
         </div>
         <div class="prem-stat prem-stat-green">
             <div class="prem-stat-icon si-green">
