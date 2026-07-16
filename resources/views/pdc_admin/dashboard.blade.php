@@ -443,7 +443,7 @@
                             clip-rule="evenodd" />
                     </svg></div>
                 <div class="prem-stat-value animate-counter" data-target="{{ (int) ($pendingFinance ?? 0) }}">0</div>
-                <div class="prem-stat-label">Pending Finance</div>
+                <div class="prem-stat-label">On Review Finance</div>
             </a>
             <a href="{{ route('pdc_admin.panelis_review') }}" class="prem-stat clickable prem-stat-amber">
                 <div class="prem-stat-icon si-amber"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
@@ -453,7 +453,7 @@
                             clip-rule="evenodd" />
                     </svg></div>
                 <div class="prem-stat-value animate-counter" data-target="{{ (int) ($pendingPanelis ?? 0) }}">0</div>
-                <div class="prem-stat-label">Pending Panelis</div>
+                <div class="prem-stat-label">On Review Panelis</div>
             </a>
             <a href="{{ route('pdc_admin.progress_archive') }}" class="prem-stat clickable prem-stat-green">
                 <div class="prem-stat-icon si-green">

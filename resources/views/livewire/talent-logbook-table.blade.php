@@ -74,19 +74,19 @@
                                 <td class="py-4 px-6 text-center w-32">
                                     @if (in_array($item['status'], ['Approve', 'Approved']))
                                         <span
-                                            class="inline-flex items-center gap-1 text-green-600 text-[11px] font-bold bg-green-50 px-3 py-1 rounded-full border border-green-100">
+                                            class="inline-flex items-center gap-1 text-green-600 text-[11px] font-bold bg-green-50 px-3 py-1 rounded-full border border-green-100 whitespace-nowrap">
                                             <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span> Approved
                                         </span>
                                     @elseif (in_array($item['status'], ['Reject', 'Rejected']))
                                         <span
-                                            class="inline-flex items-center gap-1 text-red-600 text-[11px] font-bold bg-red-50 px-3 py-1 rounded-full border border-red-100">
+                                            class="inline-flex items-center gap-1 text-red-600 text-[11px] font-bold bg-red-50 px-3 py-1 rounded-full border border-red-100 whitespace-nowrap">
                                             <span class="w-1.5 h-1.5 rounded-full bg-red-500"></span> Rejected
                                         </span>
                                     @else
                                         <span
-                                            class="inline-flex items-center gap-1 text-orange-500 text-[11px] font-bold bg-orange-50 px-3 py-1 rounded-full border border-orange-100">
+                                            class="inline-flex items-center gap-1 text-orange-500 text-[11px] font-bold bg-orange-50 px-3 py-1 rounded-full border border-orange-100 whitespace-nowrap">
                                             <span class="w-1.5 h-1.5 rounded-full bg-orange-400"></span>
-                                            {{ $item['status'] ?: 'Pending' }}
+                                            {{ ($item['status'] === 'Pending' ? 'On Review' : $item['status']) ?: 'On Review' }}
                                         </span>
                                     @endif
                                 </td>
@@ -179,18 +179,18 @@
                                 <td class="text-center p-2 whitespace-nowrap">
                                     @if (in_array($item['status'], ['Approve', 'Approved']))
                                         <span
-                                            class="inline-flex items-center gap-1 text-green-600 text-[9px] font-bold bg-green-50 px-2 py-0.5 rounded-full border border-green-100">
+                                            class="inline-flex items-center gap-1 text-green-600 text-[9px] font-bold bg-green-50 px-2 py-0.5 rounded-full border border-green-100 whitespace-nowrap">
                                             Approved
                                         </span>
                                     @elseif (in_array($item['status'], ['Reject', 'Rejected']))
                                         <span
-                                            class="inline-flex items-center gap-1 text-red-600 text-[9px] font-bold bg-red-50 px-2 py-0.5 rounded-full border border-red-100">
+                                            class="inline-flex items-center gap-1 text-red-600 text-[9px] font-bold bg-red-50 px-2 py-0.5 rounded-full border border-red-100 whitespace-nowrap">
                                             Rejected
                                         </span>
                                     @else
                                         <span
-                                            class="inline-flex items-center gap-1 text-orange-500 text-[9px] font-bold bg-orange-50 px-2 py-0.5 rounded-full border border-orange-100">
-                                            {{ $item['status'] ?: 'Pending' }}
+                                            class="inline-flex items-center gap-1 text-orange-500 text-[9px] font-bold bg-orange-50 px-2 py-0.5 rounded-full border border-orange-100 whitespace-nowrap">
+                                            {{ ($item['status'] === 'Pending' ? 'On Review' : $item['status']) ?: 'On Review' }}
                                         </span>
                                     @endif
                                 </td>

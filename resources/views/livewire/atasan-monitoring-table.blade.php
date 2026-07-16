@@ -432,10 +432,10 @@
                                                         </span>
                                                     @else
                                                         <span
-                                                            class="inline-flex items-center gap-1.5 text-orange-500 text-[11px] font-bold bg-orange-50 px-3 py-1 rounded-full border border-orange-100">
+                                                            class="inline-flex items-center gap-1.5 text-orange-500 text-[11px] font-bold bg-orange-50 px-3 py-1 rounded-full border border-orange-100 whitespace-nowrap">
                                                             <span
                                                                 class="w-1.5 h-1.5 rounded-full bg-orange-400"></span>
-                                                            Pending
+                                                            On Review
                                                         </span>
                                                     @endif
                                                 </td>
@@ -530,14 +530,14 @@
                                                 <td class="py-4 px-6 text-center">
                                                     @if (in_array($act->status, ['Approve', 'Approved', 'Verified']))
                                                         <span
-                                                            class="inline-flex items-center gap-1.5 text-emerald-700 text-xs font-bold bg-emerald-50 px-3 py-1.5 rounded-full border border-emerald-200"><span
+                                                            class="inline-flex items-center gap-1.5 text-emerald-700 text-xs font-bold bg-emerald-50 px-3 py-1.5 rounded-full border border-emerald-200 whitespace-nowrap"><span
                                                                 class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                                                            {{ in_array($act->status, ['Approve', 'Approved']) ? 'Approved' : 'Verified' }}</span>
+                                                            Approved</span>
                                                     @else
                                                         <span
-                                                            class="inline-flex items-center gap-1.5 text-amber-700 text-xs font-bold bg-amber-50 px-3 py-1.5 rounded-full border border-amber-200"><span
+                                                            class="inline-flex items-center gap-1.5 text-amber-700 text-xs font-bold bg-amber-50 px-3 py-1.5 rounded-full border border-amber-200 whitespace-nowrap"><span
                                                                 class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
-                                                            Pending</span>
+                                                            On Review</span>
                                                     @endif
                                                 </td>
                                                 <td class="py-4 px-6 text-center">

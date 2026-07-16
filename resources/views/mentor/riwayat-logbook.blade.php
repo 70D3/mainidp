@@ -153,7 +153,7 @@
                                         <span
                                             class="inline-flex items-center gap-1 text-orange-500 text-[11px] font-bold bg-orange-50 px-3 py-1 rounded-full border border-orange-100">
                                             <span class="w-1.5 h-1.5 rounded-full bg-orange-400"></span>
-                                            {{ $data['status'] ?: 'Pending' }}
+                                            {{ $data['status'] ?: 'On Review' }}
                                         </span>
                                     @endif
                                 </td>
@@ -227,7 +227,7 @@
                                         <span
                                             class="inline-flex items-center gap-1 text-orange-500 text-[11px] font-bold bg-orange-50 px-3 py-1 rounded-full border border-orange-100">
                                             <span class="w-1.5 h-1.5 rounded-full bg-orange-400"></span>
-                                            {{ $data['status'] ?: 'Pending' }}
+                                            {{ $data['status'] ?: 'On Review' }}
                                         </span>
                                     @endif
                                 </td>
@@ -302,7 +302,7 @@
                                         <span
                                             class="inline-flex items-center gap-1 text-orange-500 text-[11px] font-bold bg-orange-50 px-3 py-1 rounded-full border border-orange-100">
                                             <span class="w-1.5 h-1.5 rounded-full bg-orange-400"></span>
-                                            {{ $data['status'] ?: 'Pending' }}
+                                            {{ $data['status'] ?: 'On Review' }}
                                         </span>
                                     @endif
                                 </td>

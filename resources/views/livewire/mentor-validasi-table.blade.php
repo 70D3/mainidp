@@ -264,9 +264,9 @@
                                             <td class="py-4 px-6 text-center w-32">
                                                 @if ($data['status'] === 'Pending' || $data['status'] === null || $data['status'] === '')
                                                     <span
-                                                        class="inline-flex items-center gap-1 text-orange-500 text-[11px] font-bold bg-orange-50 px-3 py-1 rounded-full border border-orange-100">
+                                                        class="inline-flex items-center gap-1 text-orange-500 text-[11px] font-bold bg-orange-50 px-3 py-1 rounded-full border border-orange-100 whitespace-nowrap">
                                                         <span class="w-1.5 h-1.5 rounded-full bg-orange-400"></span>
-                                                        Pending
+                                                        On Review
                                                     </span>
                                                 @elseif(in_array($data['status'], ['Approve', 'Approved']))
                                                     <span
@@ -379,8 +379,8 @@
 
                                     @if ($data['status'] === 'Pending' || $data['status'] === null || $data['status'] === '')
                                         <span
-                                            class="inline-flex items-center gap-1 text-orange-500 text-[11px] font-bold bg-orange-50 px-3 py-1 rounded-full border border-orange-100">
-                                            <span class="w-1.5 h-1.5 rounded-full bg-orange-400"></span> Pending
+                                            class="inline-flex items-center gap-1 text-orange-500 text-[11px] font-bold bg-orange-50 px-3 py-1 rounded-full border border-orange-100 whitespace-nowrap">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-orange-400"></span> On Review
                                         </span>
                                     @elseif(in_array($data['status'], ['Approve', 'Approved']))
                                         <span

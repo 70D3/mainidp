@@ -225,7 +225,7 @@
                                                 @elseif($financeStatus === 'Rejected')
                                                     <span class="badge badge-red">Rejected</span>
                                                 @else
-                                                    <span class="badge badge-amber">Pending</span>
+                                                    <span class="badge badge-amber">On Review</span>
                                                 @endif
                                             </td>
 

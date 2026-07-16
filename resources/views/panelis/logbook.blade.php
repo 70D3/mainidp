@@ -203,7 +203,7 @@
                                 </td>
                                 <td class="py-4 px-6 text-center w-32">
                                     @php
-                                        $st = $act->status ?? 'Pending';
+                                        $st = $act->status === 'Pending' ? 'On Review' : ($act->status ?? 'On Review');
                                         $isApprove = in_array($st, ['Approve', 'Approved', 'Verified']);
                                     @endphp
                                     @if ($isApprove)
@@ -267,7 +267,7 @@
                     <tbody>
                         @forelse($exposureActivities as $act)
                             @php
-                                $st = $act->status ?? 'Pending';
+                                $st = $act->status === 'Pending' ? 'On Review' : ($act->status ?? 'On Review');
                                 $isApprove = in_array($st, ['Approve', 'Approved', 'Verified']);
                             @endphp
                             <tr>
@@ -350,7 +350,7 @@
                                 </td>
                                 <td class="py-4 px-6 text-center w-32">
                                     @php
-                                        $st = $act->status ?? 'Pending';
+                                        $st = $act->status ?? 'On Review';
                                         $isApprove = in_array($st, ['Approve', 'Approved', 'Verified']);
                                     @endphp
                                     @if ($isApprove)
@@ -414,7 +414,7 @@
                     <tbody>
                         @forelse($mentoringActivities as $act)
                             @php
-                                $st = $act->status ?? 'Pending';
+                                $st = $act->status === 'Pending' ? 'On Review' : ($act->status ?? 'On Review');
                                 $isApprove = in_array($st, ['Approve', 'Approved', 'Verified']);
                             @endphp
                             <tr>
@@ -497,13 +497,13 @@
                                 </td>
                                 <td class="py-4 px-6 text-center w-32">
                                     @php
-                                        $st = $act->status ?? 'Pending';
+                                        $st = $act->status === 'Pending' ? 'On Review' : ($act->status ?? 'On Review');
                                         $isApprove = in_array($st, ['Approve', 'Approved', 'Verified']);
                                     @endphp
                                     @if ($isApprove)
                                         <span
                                             class="inline-flex items-center gap-1 text-green-600 text-[11px] font-bold bg-green-50 px-3 py-1 rounded-full border border-green-100">
-                                            <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span> Verified
+                                            <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span> Approved
                                         </span>
                                     @elseif (in_array($st, ['Reject', 'Rejected']))
                                         <span
@@ -561,7 +561,7 @@
                     <tbody>
                         @forelse($learningActivities as $act)
                             @php
-                                $st = $act->status ?? 'Pending';
+                                $st = $act->status === 'Pending' ? 'On Review' : ($act->status ?? 'On Review');
                                 $isApprove = in_array($st, ['Approve', 'Approved', 'Verified']);
                             @endphp
                             <tr>
@@ -579,7 +579,7 @@
                                 </td>
                                 <td class="text-center p-2 whitespace-nowrap">
                                     @if ($isApprove)
-                                        <span class="inline-flex items-center gap-1 text-green-600 text-[9px] font-bold bg-green-50 px-2 py-0.5 rounded-full border border-green-100">Verified</span>
+                                        <span class="inline-flex items-center gap-1 text-green-600 text-[9px] font-bold bg-green-50 px-2 py-0.5 rounded-full border border-green-100">Approved</span>
                                     @elseif (in_array($st, ['Reject', 'Rejected']))
                                         <span class="inline-flex items-center gap-1 text-red-600 text-[9px] font-bold bg-red-50 px-2 py-0.5 rounded-full border border-red-100">Rejected</span>
                                     @else

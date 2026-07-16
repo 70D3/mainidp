@@ -484,9 +484,9 @@
                                                 </span>
                                             @else
                                                 <span
-                                                    class="inline-flex items-center gap-1.5 text-orange-500 text-[11px] font-bold bg-orange-50 px-3 py-1 rounded-full border border-orange-100">
+                                                    class="inline-flex items-center gap-1.5 text-orange-500 text-[11px] font-bold bg-orange-50 px-3 py-1 rounded-full border border-orange-100 whitespace-nowrap">
                                                     <span class="w-1.5 h-1.5 rounded-full bg-orange-400"></span>
-                                                    Pending
+                                                    On Review
                                                 </span>
                                             @endif
                                         </td>
@@ -601,10 +601,10 @@
                                                             </span>
                                                         @else
                                                             <span
-                                                                class="inline-flex items-center gap-1 text-orange-500 text-[11px] font-bold bg-orange-50 px-3 py-1 rounded-full border border-orange-100">
+                                                                class="inline-flex items-center gap-1 text-orange-500 text-[11px] font-bold bg-orange-50 px-3 py-1 rounded-full border border-orange-100 whitespace-nowrap">
                                                                 <span
                                                                     class="w-1.5 h-1.5 rounded-full bg-orange-400"></span>
-                                                                {{ $act->status ?: 'Pending' }}
+                                                                {{ ($act->status === 'Pending' ? 'On Review' : $act->status) ?: 'On Review' }}
                                                             </span>
                                                         @endif
                                                     </td>
@@ -699,10 +699,10 @@
                                                             </span>
                                                         @else
                                                             <span
-                                                                class="inline-flex items-center gap-1 text-orange-500 text-[11px] font-bold bg-orange-50 px-3 py-1 rounded-full border border-orange-100">
+                                                                class="inline-flex items-center gap-1 text-orange-500 text-[11px] font-bold bg-orange-50 px-3 py-1 rounded-full border border-orange-100 whitespace-nowrap">
                                                                 <span
                                                                     class="w-1.5 h-1.5 rounded-full bg-orange-400"></span>
-                                                                {{ $act->status ?: 'Pending' }}
+                                                                {{ ($act->status === 'Pending' ? 'On Review' : $act->status) ?: 'On Review' }}
                                                             </span>
                                                         @endif
                                                     </td>
@@ -797,10 +797,10 @@
                                                             </span>
                                                         @else
                                                             <span
-                                                                class="inline-flex items-center gap-1 text-orange-500 text-[11px] font-bold bg-orange-50 px-3 py-1 rounded-full border border-orange-100">
+                                                                class="inline-flex items-center gap-1 text-orange-500 text-[11px] font-bold bg-orange-50 px-3 py-1 rounded-full border border-orange-100 whitespace-nowrap">
                                                                 <span
                                                                     class="w-1.5 h-1.5 rounded-full bg-orange-400"></span>
-                                                                {{ $act->status ?: 'Pending' }}
+                                                                {{ ($act->status === 'Pending' ? 'On Review' : $act->status) ?: 'On Review' }}
                                                             </span>
                                                         @endif
                                                     </td>
