@@ -146,7 +146,7 @@
                                             $progressPlan = optional($progressTalent)->promotion_plan;
                                             $sessionId = optional($progressPlan)->development_session_id;
                                             $alreadySent = in_array(optional($progressPlan)->status_promotion, [
-                                                'Pending Panelis',
+                                                'On Review Panelis',
                                                 'Approved Panelis',
                                                 'Rejected Panelis',
                                             ]);

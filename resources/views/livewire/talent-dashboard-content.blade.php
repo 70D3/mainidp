@@ -558,7 +558,7 @@
                                 </td>
                                 <td class="py-4 px-6 text-center w-48">
                                     @php
-                                        $projectStatus = 'Pending';
+                                        $projectStatus = 'On Review';
 
                                         if (str_starts_with($project->finance_feedback ?? '', '[Approved]')) {
                                             $projectStatus = 'Approved';
@@ -575,11 +575,11 @@
                                     @elseif($projectStatus === 'Rejected')
                                         <span class="badge badge-red">Rejected</span>
                                     @else
-                                        <span class="badge badge-amber">Pending</span>
+                                        <span class="badge badge-amber">On Review</span>
                                     @endif
                                 </td>
                                 <td class="py-4 px-6 text-center w-28">
-                                    @if ($projectStatus === 'Pending' || $projectStatus === 'Rejected')
+                                    @if ($projectStatus === 'On Review' || $projectStatus === 'Rejected')
                                         <button type="button" wire:click="editProject({{ $project->id }})"
                                             class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 border border-transparent rounded-lg text-[12px] font-semibold text-white shadow-sm transition-all {{ optional($user->promotion_plan)->is_locked ? 'opacity-50 cursor-not-allowed pointer-events-none' : 'hover:bg-blue-700' }}"
                                             title="{{ optional($user->promotion_plan)->is_locked ? 'Progress telah dikunci' : 'Edit Judul/File Project' }}"

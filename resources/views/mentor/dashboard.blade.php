@@ -225,7 +225,7 @@
                 </svg>
             </div>
             <div class="prem-stat-value animate-counter" data-target="{{ $totalPending }}">{{ $totalPending }}</div>
-            <div class="prem-stat-label">Pending Review</div>
+            <div class="prem-stat-label">On Review</div>
         </div>
         <div class="prem-stat prem-stat-green">
             <div class="prem-stat-icon si-green">
@@ -320,7 +320,7 @@
                     <thead class="bg-slate-50 border-b border-gray-200">
                         <tr>
                             <th class="py-4 px-6 text-sm font-bold text-slate-700 text-center">Talent</th>
-                            <th class="py-4 px-6 text-sm font-bold text-slate-700 text-center">Pending</th>
+                            <th class="py-4 px-6 text-sm font-bold text-slate-700 text-center">On Review</th>
                             <th class="py-4 px-6 text-sm font-bold text-slate-700 text-center">Approved</th>
                             <th class="py-4 px-6 text-sm font-bold text-slate-700 text-center">Rejected</th>
                             <th class="py-4 px-6 text-sm font-bold text-slate-700 text-center">Progress Logbook</th>
