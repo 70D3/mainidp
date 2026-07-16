@@ -1351,6 +1351,25 @@
                     if (deptEl) deptEl.style.display = 'none';
                     if (posEl) posEl.style.display = 'none';
                 }
+
+                // Sembunyikan opsi "Panelis" dari dropdown posisi untuk semua role selain panelis
+                const posSelect = document.getElementById('add_position_id');
+                if (posSelect) {
+                    Array.from(posSelect.options).forEach(opt => {
+                        if (opt.textContent.trim().toLowerCase() === 'panelis') {
+                            opt.style.display = 'none';
+                            opt.disabled = true;
+                            // Jika opsi ini sedang terpilih, reset ke default
+                            if (opt.selected) {
+                                posSelect.value = '';
+                            }
+                        } else {
+                            opt.style.display = '';
+                            opt.disabled = false;
+                        }
+                    });
+                }
+
                 // Reset departments when role changes
                 const deptSelect = document.getElementById('add_department_id');
                 deptSelect.innerHTML = '<option value="" disabled selected>Pilih departemen</option>';
