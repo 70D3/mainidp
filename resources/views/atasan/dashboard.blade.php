@@ -198,7 +198,7 @@
                 </svg>
             </div>
             <div class="prem-stat-value animate-counter" data-target="{{ $assessmentPending }}">0</div>
-            <div class="prem-stat-label">Assessment On review</div>
+            <div class="prem-stat-label">Assessment On Review</div>
         </div>
         <div class="prem-stat prem-stat-green">
             <div class="prem-stat-icon si-green">
@@ -242,13 +242,11 @@
                         <div class="talent-name-block">
                             <span class="name">{{ $talent->nama }}</span>
                             <span class="role">
-                                <span
-                                    class="text-gray-500">{{ optional($talent->position)->position_name ?? '-' }}</span>
+                                <span class="text-gray-500">{{ optional($talent->position)->position_name ?? '-' }}</span>
                                 @if (optional($talent->promotion_plan)->targetPosition)
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 text-gray-300 mx-1"
-                                        fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
-                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                            d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 text-gray-300 mx-1" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
                                     </svg>
                                     <span
                                         class="text-gray-500">{{ $talent->promotion_plan->targetPosition->position_name }}</span>
@@ -320,8 +318,8 @@
                         @endif
                     @else
                         <div class="btn-assessment btn-assessment-done gap-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-amber-500 flex-shrink-0"
-                                fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-amber-500 flex-shrink-0" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                 <path stroke-linecap="round" stroke-linejoin="round"
                                     d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
@@ -336,8 +334,8 @@
                     class="col-span-1 lg:col-span-2 text-center py-20 bg-[#f9fafb] rounded-[20px] border border-[#e2e8f0] shadow-[0_2px_12px_rgba(0,0,0,0.04)] flex flex-col items-center justify-center">
                     <div class="w-20 h-20 rounded-full flex items-center justify-center mb-5"
                         style="background:linear-gradient(135deg,#ccfbf1,#99f6e4)">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-teal-600" fill="none"
-                            viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-teal-600" fill="none" viewBox="0 0 24 24"
+                            stroke-width="1.5" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round"
                                 d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
                         </svg>
@@ -358,7 +356,8 @@
                         </svg>
                     </div>
                     <h3 class="text-lg font-bold text-slate-800 mb-1">Semua Assessment Selesai!</h3>
-                    <p class="text-slate-500 text-sm max-w-sm">Anda telah menyelesaikan tugas assessment untuk seluruh talent di tim Anda</p>
+                    <p class="text-slate-500 text-sm max-w-sm">Anda telah menyelesaikan tugas assessment untuk seluruh talent di
+                        tim Anda</p>
                 </div>
             @endif
         @endforelse
