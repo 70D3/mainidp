@@ -202,7 +202,7 @@
                         }));
 
                         // 2. Tampilkan toast realtime
-                        pdcShowToast(notificationData.title, notificationData.desc);
+                        // pdcShowToast(notificationData.title, notificationData.desc);
                     };
 
                     function initPdcRealtimeNotifications() {
@@ -406,7 +406,7 @@
                         pdcUpdateBadge();
                         pdcInsertRealtimeNotification(data.title || 'Notifikasi Baru', data.desc || '');
                         pdcShowBellPopup();
-                        pdcShowToast(data.title || 'Notifikasi Baru', data.desc || '');
+                        // pdcShowToast(data.title || 'Notifikasi Baru', data.desc || '');
                     });
 
                     function pdcInsertRealtimeNotification(title, desc) {

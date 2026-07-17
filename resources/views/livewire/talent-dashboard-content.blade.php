@@ -487,7 +487,12 @@
                         </div>
                     </div>
                     @error('project_file')
-                        <div class="text-red-500 text-xs mb-4">{{ $message }}</div>
+                        <div x-data="{ show: true }" x-show="show"
+                            x-init="setTimeout(() => show = false, 3000)"
+                            x-transition:leave="transition ease-out duration-500"
+                            x-transition:leave-start="opacity-100"
+                            x-transition:leave-end="opacity-0"
+                            class="text-red-500 text-xs mb-4">{{ $message }}</div>
                     @enderror
 
                     {{-- Submit Project --}}
