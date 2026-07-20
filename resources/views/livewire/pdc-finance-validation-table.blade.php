@@ -211,13 +211,22 @@
                                                 <div class="flex items-center justify-center gap-2 flex-nowrap">
                                                     @if ($isSentToFinance || $alreadyActed)
                                                         <button type="button" disabled
-                                                            class="inline-flex items-center justify-center h-9 px-4 text-[11px] font-bold text-gray-400 bg-gray-50 border border-gray-200 rounded-lg cursor-not-allowed flex-shrink-0">
+                                                            class="inline-flex items-center gap-1.5 px-4 py-2 text-[11px] font-bold text-gray-400 bg-gray-100 rounded-xl cursor-not-allowed flex-shrink-0">
                                                             ✓ Sudah Dipilih
+                                                        </button>
+                                                        {{-- Edit Button (only visible after action is taken/sent) --}}
+                                                        <button type="button"
+                                                            onclick="openFinanceModal('{{ addslashes($project->talent->nama ?? '-') }}', '{{ addslashes($project->talent->department->nama_department ?? '-') }}', '{{ addslashes($project->talent->promotion_plan->targetPosition->position_name ?? '-') }}', '{{ addslashes($project->talent->company->nama_company ?? '-') }}', {{ $project->id }}, '{{ addslashes($project->title) }}', '{{ $project->document_path ? route('files.preview', ['path' => $project->document_path]) : '#' }}', '{{ $project->talent->company_id ?? '' }}', 'edit', '{{ route('pdc_admin.finance_validation.edit', $project->id) }}', {{ $project->verify_by ?? 'null' }}, '{{ addslashes($project->feedback ?? '') }}')"
+                                                            class="inline-flex items-center gap-1.5 px-4 py-2 text-[11px] font-bold text-white bg-blue-500 hover:bg-blue-600 rounded-xl transition-all shadow-sm flex-shrink-0">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                                            </svg>
+                                                            Edit
                                                         </button>
                                                     @else
                                                         <button type="button"
                                                             onclick="openActionModal({{ $project->id }}, '{{ addslashes($project->talent->nama ?? '-') }}', '{{ route('pdc_admin.finance_validation.update', $project->id) }}', '{{ addslashes($project->talent->department->nama_department ?? '-') }}', '{{ addslashes($project->talent->promotion_plan->targetPosition->position_name ?? '-') }}', '{{ addslashes($project->talent->company->nama_company ?? '-') }}', '{{ addslashes($project->title) }}', '{{ $project->document_path ? route('files.preview', ['path' => $project->document_path]) : '#' }}', '{{ $project->talent->company_id ?? '' }}')"
-                                                            class="inline-flex items-center justify-center h-9 px-5 text-[11px] font-bold text-white bg-amber-500 hover:bg-amber-600 rounded-lg transition-all shadow-sm hover:shadow-md flex-shrink-0">
+                                                            class="inline-flex items-center gap-1.5 px-4 py-2 text-[11px] font-bold text-white bg-amber-500 hover:bg-amber-600 rounded-xl transition-all shadow-sm flex-shrink-0">
                                                             Pilih Aksi
                                                         </button>
                                                     @endif
@@ -323,7 +332,7 @@
                                 d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
                         </svg>
                     </div>
-                    <h3 class="text-xl font-extrabold text-[#1e293b]">Kirim Permintaan Validasi Finance</h3>
+                    <h3 id="finance-modal-title" class="text-xl font-extrabold text-[#1e293b]">Kirim Permintaan Validasi Finance</h3>
                 </div>
                 <button onclick="closeFinanceModal()" type="button"
                     class="text-gray-400 hover:text-gray-600 p-2 border border-gray-100 rounded-xl transition-colors">
@@ -335,8 +344,9 @@
                 </button>
             </div>
 
-            <form action="{{ route('pdc_admin.finance.request') }}" method="POST">
+            <form id="financeModalForm" action="{{ route('pdc_admin.finance.request') }}" method="POST">
                 @csrf
+                <input type="hidden" name="_method" id="finance-form-method" value="POST">
                 <input type="hidden" name="project_id" id="finance-proj-id" value="{{ old('project_id') }}">
 
                 <div class="p-6">
@@ -531,7 +541,10 @@
             </div>
         </div>
     @endif
+
 </div>
+
+
 
 
 
@@ -547,8 +560,18 @@
             }
         }
     </style>
+    <style>
+        @keyframes modalSlideIn {
+            from { opacity: 0; transform: scale(0.92) translateY(12px); }
+            to   { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        .animate-modal-in {
+            animation: modalSlideIn 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+        }
+    </style>
     <script>
         let currentProjectData = {};
+        let currentEditData = {};
 
         function openActionModal(projectId, talentName, actionUrl, deptName, posName, companyName, projTitle, projFileUrl,
             companyId) {
@@ -604,7 +627,9 @@
         document.addEventListener('DOMContentLoaded', initFinanceOptions);
         document.addEventListener('livewire:navigated', initFinanceOptions);
 
-        function openFinanceModal(talentName, deptName, posName, companyName, projId, projTitle, projFileUrl, companyId) {
+        function openFinanceModal(talentName, deptName, posName, companyName, projId, projTitle, projFileUrl, companyId, mode, editUrl, currentVerifierId, currentNotes) {
+            mode = mode || 'create';
+
             document.getElementById('fin-talent-name').textContent = talentName || '-';
             document.getElementById('fin-dept-name').textContent = deptName || '-';
             document.getElementById('fin-pos-name').textContent = posName || '-';
@@ -613,6 +638,28 @@
             document.getElementById('finance-proj-id').value = projId;
             document.getElementById('finance-proj-title').value = projTitle;
             document.getElementById('finance-proj-file').href = projFileUrl;
+
+            const form = document.getElementById('financeModalForm');
+            const methodInput = document.getElementById('finance-form-method');
+            const titleEl = document.getElementById('finance-modal-title');
+            const notesEl = form.querySelector('textarea[name="notes"]');
+            const submitBtn = form.querySelector('button[type="submit"]');
+
+            if (mode === 'edit') {
+                form.action = editUrl;
+                methodInput.value = 'PUT';
+                titleEl.textContent = 'Edit Pengiriman Validasi Finance';
+                if (notesEl) notesEl.value = currentNotes || '';
+                submitBtn.textContent = 'Simpan Perubahan';
+                submitBtn.className = 'px-6 py-2.5 text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-lg shadow-blue-500/30 rounded-xl transition-all hover:-translate-y-px';
+            } else {
+                form.action = '{{ route('pdc_admin.finance.request') }}';
+                methodInput.value = 'POST';
+                titleEl.textContent = 'Kirim Permintaan Validasi Finance';
+                if (notesEl) notesEl.value = '';
+                submitBtn.textContent = 'Kirim';
+                submitBtn.className = 'px-6 py-2.5 text-sm font-bold text-white bg-[#14b8a6] hover:bg-[#0d9488] shadow-lg shadow-teal-500/30 rounded-xl transition-all hover:-translate-y-px';
+            }
 
             const selectEl = document.getElementById('finance-assigned-select');
             if (selectEl && companyId) {
@@ -633,6 +680,8 @@
                     const noOption = new Option("Belum ada akun finance untuk perusahaan ini", "", true, true);
                     noOption.disabled = true;
                     selectEl.add(noOption);
+                } else if (mode === 'edit' && currentVerifierId) {
+                    selectEl.value = String(currentVerifierId);
                 } else {
                     selectEl.value = '';
                 }
@@ -714,5 +763,6 @@
                 document.getElementById('rejectForm').submit();
             }
         }
+
     </script>
 @endpush

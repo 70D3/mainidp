@@ -134,7 +134,7 @@
                                         Aksi</th>
                                 </tr>
                             </thead>
-                            <tbody class="divide-y divide-gray-100">
+                            <tbody>
                                 @foreach ($companyData['positions'] as $positionId => $posData)
                                     @php
                                         $firstTalent = $posData['talents']->first();
@@ -172,7 +172,7 @@
                                         }
                                     @endphp
                                     @foreach ($posData['talents'] as $index => $talent)
-                                        <tr class="talent-row hover:bg-teal-50/50 transition duration-150"
+                                        <tr class="talent-row hover:bg-teal-50/50 transition duration-150 {{ $index === 0 && !$loop->parent->first ? 'border-t border-gray-200' : '' }}"
                                             data-name="{{ strtolower($talent->nama) }}"
                                             data-company="{{ $talent->company_id }}"
                                             data-position="{{ $positionId }}"
@@ -625,30 +625,31 @@
             }
         }
 
-        // Re-init hover setelah Livewire update DOM
-        document.addEventListener('livewire:navigated', initGroupHover);
-        document.addEventListener('livewire:updated', initGroupHover);
-
+        // Highlight semua baris dalam satu grup posisi saat kursor diarahkan ke salah satu baris
         function initGroupHover() {
             document.querySelectorAll('.talent-row').forEach(row => {
                 row.addEventListener('mouseenter', () => {
                     const group = row.dataset.posGroup;
                     if (!group) return;
-                    document.querySelectorAll(`.talent-row[data-pos-group="${group}"]`).forEach(r => r
-                        .classList.add('group-hovered'));
+                    document.querySelectorAll(`.talent-row[data-pos-group="${group}"]`).forEach(r => r.classList.add('group-hovered'));
                 });
                 row.addEventListener('mouseleave', () => {
                     const group = row.dataset.posGroup;
                     if (!group) return;
-                    document.querySelectorAll(`.talent-row[data-pos-group="${group}"]`).forEach(r => r
-                        .classList.remove('group-hovered'));
+                    document.querySelectorAll(`.talent-row[data-pos-group="${group}"]`).forEach(r => r.classList.remove('group-hovered'));
                 });
             });
         }
 
         document.addEventListener('DOMContentLoaded', initGroupHover);
+        document.addEventListener('livewire:navigated', initGroupHover);
+        document.addEventListener('livewire:updated', initGroupHover);
     </script>
     <style>
+        .talent-row.group-hovered {
+            background-color: rgb(240 253 250 / 0.7) !important;
+        }
+
         .modal-step {
             display: none;
         }
