@@ -1123,6 +1123,44 @@ class PDCAdminController extends Controller
         return back()->with('success', 'Status berhasil diperbarui.');
     }
 
+    public function editFinanceProject(Request $request, $id)
+    {
+        $request->validate([
+            'assigned_finance_id' => 'required|exists:users,id',
+            'notes'               => 'nullable|string|max:1000',
+        ]);
+
+        $project = ImprovementProject::with('talent')->findOrFail($id);
+
+        // Validasi finance harus dari perusahaan yang sama dengan talent
+        $assignedFinance = User::whereHas('roles', fn($q) => $q->where('role_name', 'finance'))
+            ->find($request->assigned_finance_id);
+
+        if (
+            !$assignedFinance ||
+            !$project->talent ||
+            (string) $assignedFinance->company_id !== (string) $project->talent->company_id
+        ) {
+            return back()->withErrors([
+                'assigned_finance_id' => 'Finance yang dipilih harus sesuai dengan perusahaan talent.',
+            ])->withInput();
+        }
+
+        $updateData = [
+            'verify_by' => $request->assigned_finance_id,
+        ];
+
+        // Update catatan (feedback)
+        if ($request->has('notes')) {
+            $updateData['feedback'] = $request->notes;
+        }
+
+        $project->update($updateData);
+
+        return back()->with('success', 'Data pengiriman validasi finance berhasil diperbarui.');
+    }
+
+
     public function kompetensi()
     {
         $user = auth()->user();

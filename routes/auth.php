@@ -151,6 +151,8 @@ Route::middleware(['auth', 'verified', 'pdc_admin.only'])->group(function () {
         ->name('pdc_admin.finance_validation');
     Route::patch('/pdc-admin/finance-validation/{id}', [\App\Http\Controllers\PDCAdminController::class, 'updateFinanceValidation'])
         ->name('pdc_admin.finance_validation.update');
+    Route::put('/pdc-admin/finance-validation/{id}/edit', [\App\Http\Controllers\PDCAdminController::class, 'editFinanceProject'])
+        ->name('pdc_admin.finance_validation.edit');
     Route::get('/pdc-admin/kompetensi', [\App\Http\Controllers\PDCAdminController::class, 'kompetensi'])
         ->name('pdc_admin.kompetensi');
     Route::post('/pdc-admin/kompetensi/questions', [\App\Http\Controllers\PDCAdminController::class, 'updateQuestions'])
