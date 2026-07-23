@@ -77,6 +77,19 @@ class RegisteredUserController extends Controller
     }
 
     /**
+     * Check if username already exists in users table.
+     */
+    public function checkUsername(Request $request)
+    {
+        $username = $request->query('username');
+        if (!$username) {
+            return response()->json(['exists' => false]);
+        }
+        $exists = User::where('username', $username)->exists();
+        return response()->json(['exists' => $exists]);
+    }
+
+    /**
      * Handle an incoming registration request.
      *
      * @throws \Illuminate\Validation\ValidationException
@@ -84,7 +97,7 @@ class RegisteredUserController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $request->validate([
-            'username' => ['required', 'string', 'max:255', 'unique:users'],
+            'username' => ['required', 'string', 'max:255', 'not_regex:/\s/', 'unique:users'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:users'],
             'password' => [
                 'required',
@@ -101,8 +114,9 @@ class RegisteredUserController extends Controller
             'mentor_id' => ['nullable', 'exists:users,id'],
             'atasan_id' => ['nullable', 'exists:users,id'],
         ], [
-            'username.required' => 'Username wajib diisi.',
-            'username.unique' => 'Username tersebut telah digunakan.',
+            'username.required'   => 'Username wajib diisi.',
+            'username.not_regex'  => 'Username tidak boleh mengandung spasi.',
+            'username.unique'     => 'Username tersebut telah digunakan.',
             'email.required' => 'Email wajib diisi.',
             'email.email' => 'Format email tidak valid.',
             'email.unique' => 'Email tersebut telah digunakan.',

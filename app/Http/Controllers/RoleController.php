@@ -22,6 +22,14 @@ class RoleController extends Controller
             return redirect()->route('dashboard');
         }
 
+        // Exclude the currently active role from the list
+        $activeRole = session('active_role');
+        if ($activeRole) {
+            $roles = $roles->filter(function ($role) use ($activeRole) {
+                return strtolower(trim($role->role_name)) !== strtolower(trim($activeRole));
+            });
+        }
+
         return view('auth.select-role', compact('roles'));
     }
 
