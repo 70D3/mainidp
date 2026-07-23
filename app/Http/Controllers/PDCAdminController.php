@@ -1148,14 +1148,25 @@ class PDCAdminController extends Controller
 
         $updateData = [
             'verify_by' => $request->assigned_finance_id,
+            'finance_feedback' => null,
+            'status' => 'Pending',
         ];
 
         // Update catatan (feedback)
-        if ($request->has('notes')) {
+        if ($request->filled('notes')) {
             $updateData['feedback'] = $request->notes;
+        } elseif (empty($project->feedback)) {
+            $updateData['feedback'] = '-';
         }
 
         $project->update($updateData);
+
+        $this->addNotificationToUser(
+            $request->assigned_finance_id,
+            'Permintaan Validasi Finance',
+            'PDC Admin telah meminta validasi untuk Project Improvement <span class="font-semibold">' . $project->title . '</span>.',
+            'info'
+        );
 
         return back()->with('success', 'Data pengiriman validasi finance berhasil diperbarui.');
     }
