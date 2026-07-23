@@ -51,6 +51,22 @@
                     {{ $message }}
                 </p>
             @enderror
+            <p id="username-space-warning" class="error-message" style="display: none;">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
+                    stroke="currentColor" style="width:13px;height:13px;flex-shrink:0">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+                </svg>
+                Username tidak boleh mengandung spasi.
+            </p>
+            <p id="username-taken-warning" class="error-message" style="display: none;">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
+                    stroke="currentColor" style="width:13px;height:13px;flex-shrink:0">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+                </svg>
+                Username tersebut telah digunakan dan tidak boleh digunakan user lain.
+            </p>
         </div>
 
         {{-- ── EMAIL ───────────────────────────── --}}
@@ -417,6 +433,66 @@
             const companySelect = document.getElementById('company_id');
             if (companySelect && companySelect.value) {
                 loadDepartmentsByCompany(companySelect.value);
+            }
+
+            // Client-side username space & uniqueness validation
+            const usernameInput = document.getElementById('username');
+            const spaceWarning = document.getElementById('username-space-warning');
+            const takenWarning = document.getElementById('username-taken-warning');
+            const registerForm = document.getElementById('register-form');
+            let isUsernameTaken = false;
+            let checkTimeout = null;
+
+            if (usernameInput) {
+                usernameInput.addEventListener('input', function () {
+                    // Check spaces first
+                    if (this.value.includes(' ')) {
+                        spaceWarning.style.display = 'flex';
+                    } else {
+                        spaceWarning.style.display = 'none';
+                    }
+
+                    // Clear previous check timeout
+                    clearTimeout(checkTimeout);
+                    takenWarning.style.display = 'none';
+                    isUsernameTaken = false;
+
+                    const usernameVal = this.value.trim();
+                    if (usernameVal.length > 0 && !this.value.includes(' ')) {
+                        checkTimeout = setTimeout(() => {
+                            fetch(`{{ route('register.check_username') }}?username=${encodeURIComponent(usernameVal)}`)
+                                .then(res => res.json())
+                                .then(data => {
+                                    if (data.exists) {
+                                        takenWarning.style.display = 'flex';
+                                        isUsernameTaken = true;
+                                    } else {
+                                        takenWarning.style.display = 'none';
+                                        isUsernameTaken = false;
+                                    }
+                                })
+                                .catch(() => {});
+                        }, 500); // 500ms debounce
+                    }
+                });
+            }
+
+            if (registerForm && usernameInput) {
+                registerForm.addEventListener('submit', function (e) {
+                    if (usernameInput.value.includes(' ')) {
+                        e.preventDefault();
+                        if (spaceWarning) spaceWarning.style.display = 'flex';
+                        usernameInput.focus();
+                        return;
+                    }
+
+                    if (isUsernameTaken) {
+                        e.preventDefault();
+                        if (takenWarning) takenWarning.style.display = 'flex';
+                        usernameInput.focus();
+                        return;
+                    }
+                });
             }
         });
     </script>

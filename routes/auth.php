@@ -55,6 +55,10 @@ Route::get('register/departments', [\App\Http\Controllers\Auth\RegisteredUserCon
     ->name('register.departments_by_company')
     ->middleware('throttle:30,1'); // Minimal rate limit
 
+Route::get('register/check-username', [\App\Http\Controllers\Auth\RegisteredUserController::class, 'checkUsername'])
+    ->name('register.check_username')
+    ->middleware('throttle:60,1');
+
 Route::middleware('auth')->group(function () {
 
     Route::get('verify-email', EmailVerificationPromptController::class)
