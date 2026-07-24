@@ -629,9 +629,10 @@
                         @endforeach
 
                     </tbody>
-                </table>
             </div>
 
+            {{-- RADAR CHART KOMPETENSI --}}
+            @include('partials.radar-chart-kompetensi')
         </div>
 
         {{-- ================================= SECTION: IDP & LOGBOOK ================================= --}}
